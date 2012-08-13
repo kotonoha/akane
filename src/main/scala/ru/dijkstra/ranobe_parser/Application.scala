@@ -4,6 +4,9 @@ import java.io._
 import scalax.file.Path
 import java.nio.{BufferUnderflowException, ByteBuffer}
 import annotation.tailrec
+import javax.swing.JFileChooser
+import javax.swing.filechooser.FileNameExtensionFilter
+import java.util.Scanner
 
 
 abstract class Token
@@ -27,7 +30,7 @@ object Tokenizer {
     if (in.toChar.isLetter) return 1
     4
   }
-  // ML-STYLE
+
   @tailrec
   private def tokenize_(in: String, tokenAccum: String, listAccum: List[Token]) : List[Token] = {
     if (in.isEmpty) buildToken(tokenAccum) ::: listAccum
@@ -116,12 +119,13 @@ object Parser {
       case ServiceNodeEnd =>
         if (in.tail.head == BautenMark) parse_2ndStage(in.tail, accum, bauten_list, true)
         else if (in.tail.head == PageBreakMark) parse_2ndStage(in.tail, PageBreak :: accum, bauten_list, buildingList)
-        else throw new Exception("Error: unknown service node")
+        else // throw new Exception("Error: unknown service node")
+        parse_2ndStage(in.tail, new TextNode("", false) :: accum, bauten_list, buildingList)
       case ServiceNodeStart => parse_2ndStage(in.tail, accum, bauten_list, false)
       case tn@TextNode(a, _) => if (buildingList)
-        parse_2ndStage(in.tail, accum, TextNode(a, false)::bauten_list, false)
+        parse_2ndStage(in.tail, accum, TextNode(a, false)::bauten_list, true)
         else if (bauten_list contains tn)
-          parse_2ndStage(in.tail, TextNode(a, true) :: accum, bauten_list filterNot({b => b != TextNode(a, false)}), false)
+          parse_2ndStage(in.tail, TextNode(a, true) :: accum, bauten_list filterNot({b => b == TextNode(a, false)}), false)
         else parse_2ndStage(in.tail, TextNode(a, false) :: accum, bauten_list, false)
       case BautenMark => parse_2ndStage(in.tail, accum, bauten_list, buildingList)
       case PageBreakMark => parse_2ndStage(in.tail, accum, bauten_list, buildingList)
@@ -129,15 +133,85 @@ object Parser {
     }
   }
 
+  // Stage3 parsing: merging text extents
+
   def parse(in: List[Token]) : List[Node] = parse_2ndStage(parse_1stStage(in, Nil, false, false),Nil, Nil, false)
 }
 
 
+object html5render {
+  private def renderText(text: String, baku: Boolean) : String =
+    if (baku)
+      """<span class="bau">""" ++ text ++ """</span>""" else
+      //"""<span class="normal">""" ++ text ++ """</span>"""
+      text
+
+  private def render_(in: List[Node], accum: StringBuilder) : StringBuilder = {
+    if (in.isEmpty) return accum
+    in head match {
+      case PageBreak => return render_(in tail, accum.append("""<hr />""" ))
+      case LineBreak => return render_(in tail, accum.append("""<br />"""))
+      case QuotationStart => return render_(in tail, accum.append("""「"""))
+      case QuotationEnd => return render_(in tail, accum.append("""」"""))
+      case TextNode(text, baku) => {
+        if (!in.tail.isEmpty)
+        in.tail.head match {
+          case RubyNode(ruby) =>
+            return render_(in drop 2, accum.append("""<ruby>""").append(renderText(text, baku))
+              .append( """<rt>""").append(ruby).append("""</rt></ruby>"""))
+          case _ => return render_(in tail, accum.append(renderText(text, baku)))
+        } else return render_(in tail, accum.append(renderText(text, baku)))
+      }
+      case _ => render_(in tail, accum)
+    }
+  }
+  def render(in: List[Node]): String = {
+    return """<!doctype html>
+             <html>
+               <head>
+                 <style type="text/css">
+                   body {width:1024px; font-size:24px} .bau { color: red }
+                 </style>
+                 <meta charset=utf-8>
+                 <title>Ranobe renderer</title>
+               </head>
+               <body>""" ++ render_(in, new StringBuilder(1000000)) ++
+         """   </body>
+             </html>"""
+  }
+}
+
+
 object Application {
-  private val test = "青春を、おかしく［＃「おかしく」に傍点］するのはつきものだ！\n 戦場《せんじょう》ヶ｜原《はら》ひたぎは\n［「おかしく」に傍点］［＃改ページ］改ページ"
-  private val test2 = "阿良々木《あららぎ》暦《こよみ》を目がけて空から降ってきた女の子・戦場《せんじょう》ヶ｜原《はら》ひたぎには、およそ体重と呼べるようなものが、全くと言っていいほど、なかった――!?"
   def main(args: Array[String]): Unit = {
-    println("----")
-    println(Parser.parse(Tokenizer.tokenize(test2)))
+    var fileopen = new JFileChooser();
+    fileopen.setFileFilter(new FileNameExtensionFilter("*.txt", "txt"));
+    val ret = fileopen.showDialog(null, "Open File");
+    if (ret == JFileChooser.APPROVE_OPTION) {
+      if (!fileopen.getSelectedFile.exists()) throw new Exception("Error: No such file")
+      val sb = new StringBuilder()
+      val reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileopen.getSelectedFile), "UTF8"))
+      var line : String = null
+      var end = false
+      do {
+        line = reader.readLine()
+        if (line == null) end = true else {
+        sb.append(line)
+        sb.append('\n')                    }
+      }                                     while(!end)
+      var str = sb.toString()
+      System.gc()
+      //print(str)
+      val tokens = Tokenizer.tokenize(str)
+      //print(tokens)
+      val nodes = Parser.parse(tokens)
+      //print(nodes)
+      val html = html5render.render(nodes)
+      //print(html)
+      val fw = new FileOutputStream(fileopen.getSelectedFile.getAbsolutePath ++ ".html")
+      fw.write(html.getBytes("UTF8"))
+      fw.close()
+      reader.close()
+    }
   }
 }
