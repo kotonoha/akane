@@ -20,7 +20,7 @@ object UnicodeUtil {
     }
   }
 
-  def isKanji(c: Int) = inRange(c, kanjiRanges)
+  def isKanji(c: Int) = inRange(c, kanjiRanges) || c == '々'
 
   def isHiragana(p: Int) = inRange(p, hiraganaRange)
 
