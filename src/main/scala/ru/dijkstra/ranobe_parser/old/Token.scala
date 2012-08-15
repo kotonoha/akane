@@ -29,7 +29,7 @@ object Tokenizer {
     import org.eiennohito.stolen_utils.UnicodeUtil.{isKana, isKanji}
     if (isKana(in)) return 2
     if (isKanji(in)) return 3
-    if (in.toChar.isLetter) return 1
+    //if (in.toChar.isLetter) return 1
     4
   }
 

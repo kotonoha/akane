@@ -2,7 +2,7 @@ package ru.dijkstra.ranobe_parser
 
 import akka.actor._
 import java.io.{FileInputStream, InputStreamReader, BufferedReader}
-
+      /*
 class FileReaderActor(filename: String, pipeOutput: Actor) extends Actor {
   val reader = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "UTF8"))
   protected def receive = {
@@ -18,4 +18,4 @@ class FileReaderActor(filename: String, pipeOutput: Actor) extends Actor {
       reader.close()
     }
   }
-}
+}                   */
