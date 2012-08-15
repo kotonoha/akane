@@ -20,7 +20,10 @@ object UnicodeUtil {
     }
   }
 
-  def isKanji(c: Int) = inRange(c, kanjiRanges) || c == '々'
+  def isJapLetter(c: Int) = c == '１' || c == '２' || c == '４' || c == '５' || c == '６' || c == '７' || c == '８' || c == '９'  || c == '０'
+
+  // Digits used ro replace kanji with numerals, so it is kanji in terms of parsing
+  def isKanji(c: Int) = inRange(c, kanjiRanges) || c == '々' || isJapLetter(c)
 
   def isHiragana(p: Int) = inRange(p, hiraganaRange)
 

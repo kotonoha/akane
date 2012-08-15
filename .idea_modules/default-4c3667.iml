@@ -29,6 +29,8 @@
     <orderEntry type="library" name="com.github.jsuereth.scala-arm_scala-arm_2.9.1_1.0" level="project" />
     <orderEntry type="library" name="com.github.scala-incubator.io_scala-io-core_2.9.1_0.2.0" level="project" />
     <orderEntry type="library" name="com.github.scala-incubator.io_scala-io-file_2.9.1_0.2.0" level="project" />
+    <orderEntry type="library" name="org.jboss.netty_netty_3.2.7.Final" level="project" />
+    <orderEntry type="library" name="com.typesafe.akka_akka-actor_2.0.2" level="project" />
     <orderEntry type="library" scope="TEST" name="org.scalatest_scalatest_2.9.1_1.7.2" level="project" />
   </component>
 </module>
