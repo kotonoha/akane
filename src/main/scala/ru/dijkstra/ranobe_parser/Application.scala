@@ -14,8 +14,9 @@ import sys.process._
 
 sealed trait JumanMessage
 case class JumanQuery(input: String) extends JumanMessage
+case class DelayedJumanQuery(input: String, returnAdress: ActorRef) extends JumanMessage
 case class JumanEntry(writing: String, reading: String, dictForm: String, spPart: String, comment: String) extends JumanMessage
-
+case class ParsedQuery(inner : List[JumanEntry]) extends JumanMessage
 
 
 class JumanConnection(port: Int = 32000) extends Actor {
@@ -25,13 +26,7 @@ class JumanConnection(port: Int = 32000) extends Actor {
   var channel: Channel = null
   var bootstrap : ClientBootstrap = null
   var process : Process = JUMAN_LOAD_STRING.run()
-  var sender_ : ActorRef = null
 
-  var busy = false
-  var queue : List[String] = Nil
-
-  var currentString : String = null
-  var result : List[JumanEntry] = Nil
 
   private def encodeString(input: String) = new String(input.getBytes(), "Shift_JIS")
 
@@ -54,15 +49,36 @@ class JumanConnection(port: Int = 32000) extends Actor {
     }
     channel.write("RUN\n").awaitUninterruptibly()
   }
+
+  var busy = false
+  var returnAdress : ActorRef = null
+  var queue : List[(String, ActorRef)] = Nil
   def receive = {
     case JumanQuery(in) => {
       if (!busy) {
         busy = true
-        currentString = in
+        returnAdress = sender
         channel.write(encodeString(in))
-        sender_ = sender
       } else {
-        queue = in :: queue
+        queue = (in, sender) :: queue
+      }
+    }
+    case DelayedJumanQuery(in, ret) => {
+      if (!busy) {
+        busy = true
+        returnAdress = ret
+        channel.write(encodeString(in))
+      } else {
+        queue = (in, ret) :: queue
+      }
+    }
+    case result@ParsedQuery(_) => {
+      if (!busy) throw new Exception("Error: unexpected response")
+      busy = false
+      returnAdress ! result
+      if (!queue.isEmpty) {
+        self ! DelayedJumanQuery(queue.head._1, queue.head._2)
+        queue = queue tail
       }
     }
   }
@@ -73,34 +89,18 @@ class JumanConnection(port: Int = 32000) extends Actor {
   }
 
   class JumanOutputHandler extends SimpleChannelHandler {
+    var result : List[JumanEntry] = Nil
     override def messageReceived(ctx: ChannelHandlerContext, e:MessageEvent) {
-        import org.eiennohito.stolen_utils.UnicodeUtil.isKanji
-        val a =e.getMessage.toString
-
+      val a =e.getMessage.toString
       if (a.equals("EOS")) {
-        sender_ ! result.reverse
+        self ! ParsedQuery(result.reverse)
         result = Nil
-        busy = false
-        if (queue != Nil) {
-          self ! JumanQuery(queue head)
-          queue = queue tail
-        }
-
         return
       }
-
-        if (a.startsWith("200")) return
-        if (a.startsWith("@")) return
-        //if (a.split(' ').head.forall(!isKanji(_))) return
-
-        //result = a.split(' ').take(2).reduce(_ + "|" + _) :: result
-        result = buildEntry(a) :: result
+      if (a.startsWith("200")) return
+      if (a.startsWith("@")) return
+      result = buildEntry(a) :: result
     }
-    /*
-    override def channelConnected(ctx: ChannelHandlerContext, e:MessageEvent) {
-      e.getChannel.write("RUN").awaitUninterruptibly()
-    }
-    */
     override def exceptionCaught(context: ChannelHandlerContext, e: ExceptionEvent) {
       e.getChannel.close()
     }
