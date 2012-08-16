@@ -2,9 +2,11 @@ package ru.dijkstra.ranobe_parser
 
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.{FlatSpec, FreeSpec}
+import tokenizer.Tokenizer
 
 
 class TokenizerTest extends FlatSpec with ShouldMatchers {
+  import ru.dijkstra.ranobe_parser.tokenizer._
   "BuildToken" should " recognize kanji extends" in {
     Tokenizer.buildToken(new StringBuilder("馬鹿")) should equal (KanjiExtent("馬鹿")::Nil)
     Tokenizer.buildToken(new StringBuilder("阿良々木")) should equal (KanjiExtent("阿良々木")::Nil)
