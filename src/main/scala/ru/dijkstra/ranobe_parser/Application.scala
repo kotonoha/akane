@@ -74,12 +74,11 @@ class JumanConnectionActor(outputPipe : ActorRef, port: Int = 32000) extends Act
     }
     case result@ParsedQuery(_) => {
       if (!busy) throw new Exception("Error: unexpected response")
-      busy = false
       outputPipe ! result
       if (!queue.isEmpty) {
-        self ! JumanQuery(queue.head)
+        channel.write(encodeString(queue.head) + '\n')
         queue = queue tail
-      }
+      } else busy = false
     }
   }
 
