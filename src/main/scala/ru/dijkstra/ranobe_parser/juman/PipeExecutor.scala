@@ -1,0 +1,52 @@
+package ru.dijkstra.ranobe_parser.juman
+
+import java.io.{BufferedReader, InputStreamReader, Closeable}
+import collection.mutable.ListBuffer
+import ru.dijkstra.ranobe_parser.JumanEntry
+
+/**
+ * @author eiennohito
+ * @since 16.08.12
+ */
+
+class PipeExecutor(path: String) extends Closeable {
+
+  private val encod = {
+    System.getProperty("sun.desktop") match {
+      case "windows" => "shift_jis"
+      case _ => "utf-8"
+    }
+  }
+
+  private val process = {
+    val procBldr = new ProcessBuilder(path)
+    procBldr.start()
+  }
+
+  private val endl: Array[Byte] = Array(10.toByte)
+
+  def parse(in: String) = {
+    val os = process.getOutputStream
+    os.write(in.getBytes(encod))
+    if (!in.endsWith("\n")) {
+      os.write(endl)
+    }
+    os.flush()
+    val rdr = new InputStreamReader(process.getInputStream, encod)
+    val buf = new BufferedReader(rdr)
+    var ok = true
+    val bldr = new ListBuffer[JumanEntry]
+    do {
+      val line = buf.readLine()
+      if (line equals "EOS") { ok = false }
+      else {
+        bldr += JumanEntry.parse(line)
+      }
+    } while (ok)
+    bldr.toList
+  }
+
+  def close() {
+    process.destroy()
+  }
+}
