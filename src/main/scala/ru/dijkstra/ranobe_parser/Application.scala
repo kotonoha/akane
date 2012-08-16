@@ -18,8 +18,16 @@ case class DelayedJumanQuery(input: String, returnAdress: ActorRef) extends Juma
 case class JumanEntry(writing: String, reading: String, dictForm: String, spPart: String, comment: String) extends JumanMessage
 case class ParsedQuery(inner : List[JumanEntry]) extends JumanMessage
 
+class StupidPrintingPipeOutputActor(system: ActorSystem) extends Actor {
+  def receive = {
+    case a => {
+      println(a)
+      system.shutdown()
+    }
+  }
+}
 
-class JumanConnection(port: Int = 32000) extends Actor {
+class JumanConnectionActor(outputPipe : ActorRef, port: Int = 32000) extends Actor {
   val JUMAN_LOAD_STRING = """"C:\Program Files\juman\juman.exe" -b -S -C localhost:""" + port
   val host = "localhost"
 
@@ -27,9 +35,7 @@ class JumanConnection(port: Int = 32000) extends Actor {
   var bootstrap : ClientBootstrap = null
   var process : Process = JUMAN_LOAD_STRING.run()
 
-
   private def encodeString(input: String) = new String(input.getBytes(), "Shift_JIS")
-
   private def buildEntry(input: String) = {
     val tokens = input.split(' ')
     val comment = if (input.count(_ == '"') != 2) "NIL" else input.dropWhile(_ != '"').drop(1).dropRight(2)
@@ -49,43 +55,32 @@ class JumanConnection(port: Int = 32000) extends Actor {
     }
     channel.write("RUN\n").awaitUninterruptibly()
   }
+  override def postStop() {
+    channel.close().awaitUninterruptibly
+    process.destroy()
+    bootstrap.releaseExternalResources()
+  }
 
   var busy = false
-  var returnAdress : ActorRef = null
-  var queue : List[(String, ActorRef)] = Nil
+  var queue : List[String] = Nil
   def receive = {
     case JumanQuery(in) => {
       if (!busy) {
         busy = true
-        returnAdress = sender
-        channel.write(encodeString(in))
+        channel.write(encodeString(in) + '\n')
       } else {
-        queue = (in, sender) :: queue
-      }
-    }
-    case DelayedJumanQuery(in, ret) => {
-      if (!busy) {
-        busy = true
-        returnAdress = ret
-        channel.write(encodeString(in))
-      } else {
-        queue = (in, ret) :: queue
+        queue = in :: queue
       }
     }
     case result@ParsedQuery(_) => {
       if (!busy) throw new Exception("Error: unexpected response")
       busy = false
-      returnAdress ! result
+      outputPipe ! result
       if (!queue.isEmpty) {
-        self ! DelayedJumanQuery(queue.head._1, queue.head._2)
+        self ! JumanQuery(queue.head)
         queue = queue tail
       }
     }
-  }
-  override def postStop() {
-    channel.close().awaitUninterruptibly
-    process.destroy()
-    bootstrap.releaseExternalResources()
   }
 
   class JumanOutputHandler extends SimpleChannelHandler {
@@ -116,25 +111,20 @@ class JumanConnection(port: Int = 32000) extends Actor {
       pipeline
     }
 }
-
 }
 
 object Application {
   def main(args: Array[String]): Unit = {
     var a: ActorRef = null
-    val system = ActorSystem("atata")
-    try {
-
-    a = system.actorOf(Props(new JumanConnection()), "ja")
+    val system: ActorSystem = ActorSystem("atata")
+    val b = system.actorOf(Props(new StupidPrintingPipeOutputActor(system)), "printer")
+    a = system.actorOf(Props(new JumanConnectionActor(b)), "juman_interoper")
     val test = "高校生活を三年間で測れば、一学年二百人として、\"一年生から三年生までで\"、先輩後輩同級生、教師までを全部含め、およそ千人の人間と、生活空間を共にするわけだが、一体その中の何人が、自分にとって意味のある人間なのだろうか、なんて考え始めたら、とても絶望的な答が出てしまうことは、誰だって違いないのだから。"
-    val response = a.ask(JumanQuery(test + "\n"))(10000)
     println(test)
     println("---")
-    println(Await.result(response, Duration(10, "seconds")))
-    } catch {
-      case _ => gracefulStop(a,Duration(10, "seconds"))(system)
-    }
-    system.shutdown()
+    a ! JumanQuery(test)
+
+
   }
 }
 
