@@ -17,5 +17,12 @@ class PipeExecutorTest extends FreeSpec with ShouldMatchers{
      res should have length (4)
      res(1).reading should equal ("ねこ")
    }
+
+   "parses 2 times" in {
+     val ex = new PipeExecutor("juman.exe")
+     ex.parse("今")
+     ex.parse("貰う")
+     ex.close()
+   }
  }
 }
