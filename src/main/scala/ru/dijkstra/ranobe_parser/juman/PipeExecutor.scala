@@ -38,9 +38,10 @@ class PipeExecutor(path: String) extends Closeable {
     val bldr = new ListBuffer[JumanEntry]
     do {
       val line = buf.readLine()
-      if (line equals "EOS") { ok = false }
-      else {
-        bldr += JumanEntry.parse(line)
+      line match {
+        case "EOS" => ok = false
+        case x if x.startsWith("@") => //ignore
+        case x => bldr += JumanEntry.parse(line)
       }
     } while (ok)
     bldr.toList
