@@ -41,4 +41,11 @@ class AozoraParserTest extends org.scalatest.FunSuite with org.scalatest.matcher
     val nodes = parser.toList
     nodes should have length (2)
   }
+
+  test("weird furigana") {
+    val inp = new StringInput("その人垣を睨《にら》みつける。")
+    val parser = new AozoraParser(inp)
+    val nodes = parser.toList
+    nodes foreach (println(_))
+  }
 }

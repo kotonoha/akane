@@ -86,7 +86,6 @@ class AozoraParser(inp: AozoraInput) extends BufferedIterator[HighLvlNode] {
     while (inp.peek != '》') {
       buf.append(inp.next.toChar)
     }
-    inp.next
     var i = prev.length - 1
     while (i >= 0 && UnicodeUtil.isKanji(prev(i))) {
       i -= 1
