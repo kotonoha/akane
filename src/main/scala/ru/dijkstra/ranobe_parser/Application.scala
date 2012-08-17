@@ -26,6 +26,10 @@ object JumanEntry {
   }
 }
 
+object JumanRW {
+  def unapply(in: JumanEntry) = Some((in.writing, in.reading))
+}
+
 class StupidPrintingPipeOutputActor(system: ActorSystem) extends Actor {
   def receive = {
     case a => {
