@@ -24,5 +24,11 @@ class PipeExecutorTest extends FreeSpec with ShouldMatchers{
      ex.parse("貰う")
      ex.close()
    }
+
+   "test long stuff" in {
+     val ex = new PipeExecutor("juman.exe")
+     ex.parse("たったひとつのあの地獄がいつから始まり") foreach (println(_))
+     ex.close()
+   }
  }
 }

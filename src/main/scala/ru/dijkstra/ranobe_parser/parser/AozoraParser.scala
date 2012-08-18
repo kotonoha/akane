@@ -35,6 +35,8 @@ trait AozoraInput {
   }
 }
 
+
+
 object AozoraParser {
   val SENTENCE_SEPARATORS = HashSet('。', '？', '！', '?', '!', '」')
 }
@@ -106,13 +108,14 @@ class AozoraParser(inp: AozoraInput) extends BufferedIterator[HighLvlNode] {
         i += 1
         inp.next
       }
-      if (!inp.skipMatch("」に傍点］")) {
+      if (inp.skipMatch("」に傍点］")) {
+        val text = prev.substring(0, prev.length - i)
+        val hled = prev.substring(text.length)
+        buffer += StringNode(text)
+        buffer += HighlightNode(StringNode(hled))
+      } else {
         inp.skipUntil('］') //some mistype
       }
-      val text = prev.substring(0, prev.length - i)
-      val hled = prev.substring(text.length)
-      buffer += StringNode(text)
-      buffer += HighlightNode(StringNode(hled))
     } else {
       inp.skipUntil('］')
       buf.append(prev) //restore buffer
