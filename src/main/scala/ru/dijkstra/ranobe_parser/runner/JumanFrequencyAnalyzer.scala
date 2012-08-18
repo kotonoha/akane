@@ -29,7 +29,7 @@ object JumanFrequencyAnalyzer {
       val jp = new AozoraParser(inp)
       val fa = new FrequencyAnalyzer(pex, ignore)
       val info = fa.analyze(jp)
-      val pw = new PrintWriter("e:/temp/bake_nfo.txt")
+      val pw = new PrintWriter(path.path + ".freq")
       pw.println("total: %d results".format(info.cnt))
       info.items.foreach{ i => pw.println("%s -> %d".format(i.item, i.cnt)) }
       pw.close()
