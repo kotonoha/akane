@@ -1,12 +1,12 @@
 import sbt._
 
-organization := "ru.dijkstra"
+organization := "ws.kotonoha"
 
-name := "Ranobe Parser"
+name := "Akane"
 
 version := "0.1-SNAPSHOT"
 
-moduleName := "ranobe-parser"
+moduleName := "akane"
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "1.7.2" % "test"
 
