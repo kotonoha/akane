@@ -12,7 +12,9 @@ object AfterLexical {
 
   def matchFront(wr: String, rd: String) = {
     var i = 0
-    while (wr(i) == rd(i)) {
+    val wlen = wr.length
+    val rlen = rd.length
+    while (i < wlen && i < rlen && wr(i) == rd(i)) {
       i += 1
     }
     i

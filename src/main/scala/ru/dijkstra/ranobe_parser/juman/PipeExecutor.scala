@@ -18,7 +18,10 @@ class PipeExecutor(path: String) extends Closeable {
     }
   }
 
-  private val process = {
+  private var process = launch
+
+
+  private def launch: Process = {
     val procBldr = new ProcessBuilder(path)
     procBldr.start()
   }
@@ -26,6 +29,20 @@ class PipeExecutor(path: String) extends Closeable {
   private val endl: Array[Byte] = Array(10.toByte)
 
   def parse(in: String) = {
+    try {
+      parseInner(in)
+    } catch {
+      case e => {
+        //retry one time with new process
+        process.destroy()
+        process = launch
+        parseInner(in)
+      }
+    }
+  }
+
+
+  private def parseInner(in: String): List[JumanEntry] = {
     val os = process.getOutputStream
     os.write(in.getBytes(encod))
     if (!in.endsWith("\n")) {
