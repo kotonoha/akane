@@ -1,3 +1,0 @@
-package ws.kotonoha.akane
-
-

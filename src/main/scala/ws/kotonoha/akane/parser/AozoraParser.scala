@@ -6,8 +6,8 @@ import collection.mutable.ListBuffer
 import scala.Some
 import ws.kotonoha.akane.ast.Image
 import annotation.tailrec
-import org.eiennohito.stolen_utils.UnicodeUtil
 import collection.immutable.HashSet
+import ws.kotonoha.akane.unicode.UnicodeUtil
 
 /**
  * @author eiennohito

@@ -2,10 +2,11 @@ package ws.kotonoha.akane.tokenizer
 
 import annotation.tailrec
 
+import ws.kotonoha.akane.unicode.UnicodeUtil._
+
 object Tokenizer {
 
   private[akane] def buildToken(in: StringBuilder): List[Token] = {
-    import org.eiennohito.stolen_utils.UnicodeUtil.{isKana, isKanji}
     if (in.isEmpty) return Nil
     if (in.forall({
       isKanji(_)
@@ -34,7 +35,6 @@ object Tokenizer {
   }
 
   private def chType(in: Int): Int = {
-    import org.eiennohito.stolen_utils.UnicodeUtil.{isKana, isKanji}
     if (isKana(in)) return 2
     if (isKanji(in)) return 3
     //todo: recognize romaji

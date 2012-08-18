@@ -4,7 +4,6 @@ import ws.kotonoha.akane.ast._
 import ws.kotonoha.akane.ast.RubyNode
 import ws.kotonoha.akane.ast.StringNode
 import ws.kotonoha.akane.ast.ListNode
-import ws.kotonoha.akane.render.MetaInfo
 
 /**
  * @author eiennohito
