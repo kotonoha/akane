@@ -21,7 +21,15 @@ case class ParsedQuery(inner : List[JumanEntry]) extends JumanMessage
 object JumanEntry {
   def parse(in: String) = {
     val tokens = in.split(' ')
-    val comment = if (in.count(_ == '"') != 2) "NIL" else in.dropWhile(_ != '"').drop(1).dropRight(2)
+    //val comment = if (in.count(_ == '"') != 2) "NIL" else in.dropWhile(_ != '"').drop(1).dropRight(2)
+    val left = in.indexOf('\"')
+    val comment = {
+      if (left == -1) {
+        "NIL"
+      } else {
+        in.substring(left + 1, in.indexOf('\"', left + 1))
+      }
+    }
     JumanEntry(tokens(0), tokens(1), tokens(2), tokens(3), comment)
   }
 }
