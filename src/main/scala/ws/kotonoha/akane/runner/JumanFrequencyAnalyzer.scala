@@ -31,7 +31,7 @@ object JumanFrequencyAnalyzer {
       val info = fa.analyze(jp)
       val pw = new PrintWriter(path.path + ".freq", "utf-8")
       pw.println("total: %d results".format(info.cnt))
-      info.items.foreach{ i => pw.println("%s -> %d".format(i.item, i.cnt)) }
+      info.items.foreach{ i => pw.println("%s# -> %d".format(i.item, i.cnt)) }
       pw.close()
     }
   }

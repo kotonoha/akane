@@ -25,7 +25,9 @@ case class JumanDaihyou(writing: String, reading: String)
 object JumanUtil {
   private val regex = """代表表記:(.+?)/(.+?)\b""".r
 
-  private val ignore = """^[- 　0-9０-９a-zA-Zａ-ｚＡ-Ｚ。、（）〈〉()\[\]……~～〜\\＝/"・?？!！——「」『』]+$""".r
+  private val ignore =
+    """^[- 　0-9０-９a-zA-Zａ-ｚＡ-Ｚ一二三四五六七八九十百千万億ゲケヶ
+      | 。、（）〈〉()\[\]……~～〜\\＝/"・?？!！——「」『』]+$""".stripMargin.r
 
   def stripDa(str: String, pos: String): String = {
     if (pos.contains("形容") || pos.equals("助動詞")) {
