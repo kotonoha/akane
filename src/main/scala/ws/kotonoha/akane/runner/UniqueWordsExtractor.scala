@@ -63,6 +63,7 @@ object UniqueWordsExtractor {
       val a = fut map (x => {
         x.foreach {
           case JumanDaihyou(s, "") => pw.println(s)
+          case JumanDaihyou(s, r) if s.equals(r) => println(s)
           case JumanDaihyou(s, r) => pw.printf("%s|%s\n", s, r)
         }
         Nil
