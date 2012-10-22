@@ -48,7 +48,9 @@ object UnicodeUtil {
 
   def isHiragana(p: Int) = inRange(p, hiraganaRange)
 
-  def isKatakana(p: Int) = inRange(p, katakanaRange)
+  def isKatakana(p: Int): Boolean = inRange(p, katakanaRange)
+
+  def isKatakana(s: String): Boolean = stream(s).forall(isKatakana(_))
 
   def isKana(p: Int) = isHiragana(p) || isKatakana(p)
 
