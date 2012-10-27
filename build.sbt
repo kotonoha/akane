@@ -12,12 +12,13 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "1.8" % "test"
 
 libraryDependencies ++=
 					Seq("org.scalaz" %% "scalaz-core" % "6.0.3",
-						"com.github.jsuereth.scala-arm" %% "scala-arm" % "1.0"
+						"com.jsuereth" %% "scala-arm" % "1.2",
+						"javax.transaction" % "jta" % "1.0.1B" % "provided"
 					)
 
-libraryDependencies += "com.github.scala-incubator.io" %% "scala-io-core" % "0.2.0"
+libraryDependencies += "com.github.scala-incubator.io" %% "scala-io-core" % "0.4.1"
 
-libraryDependencies +=  "com.github.scala-incubator.io" %% "scala-io-file" % "0.2.0"
+libraryDependencies +=  "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.1"
 
 libraryDependencies ++= Seq("org.jboss.netty" % "netty" % "3.2.7.Final")
  

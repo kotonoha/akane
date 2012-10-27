@@ -17,7 +17,7 @@ import xml.Utility
 object HtmlJumanRenderer {
   def main(args: Array[String]) = {
     val fn = args(0)
-    val res = Path(fn) inputStream()
+    val res = Path(fn) inputStream
     val pe = new PipeExecutor("juman.exe")
     val jt = new JumanTransformer(pe)
     for (is <- res) {

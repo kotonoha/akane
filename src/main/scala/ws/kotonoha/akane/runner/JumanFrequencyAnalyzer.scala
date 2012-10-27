@@ -23,7 +23,7 @@ object JumanFrequencyAnalyzer {
       p.lines()(Codec.UTF8).filter(!_.startsWith("#")).foreach { hs += _ }
       hs
     }}.toSet[String]
-    for (is <- path.inputStream()) {
+    for (is <- path.inputStream) {
       val isr = new InputStreamReader(is, enc)
       val inp = new StreamReaderInput(isr)
       val jp = new AozoraParser(inp)

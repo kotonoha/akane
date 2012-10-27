@@ -53,7 +53,7 @@ object UniqueWordsExtractor {
         foreach { hs ++= _ }
       hs
     }}.toSet[String]
-    for (is <- fn.inputStream()) {
+    for (is <- fn.inputStream) {
       val pw = new PrintWriter(args(0) + ".out", "utf-8")
       val sr = new InputStreamReader(is, enc)
       val inp = new StreamReaderInput(sr)
