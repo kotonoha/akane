@@ -16,7 +16,7 @@
 
 package ws.kotonoha.akane.runner
 
-import scalax.file.Path
+import scalax.file.{PathMatcher, FileSystem, PathFinder, Path}
 import collection.mutable
 import scalax.io.Codec
 import ws.kotonoha.akane.parser.{AozoraParser, StreamReaderInput}
@@ -26,6 +26,8 @@ import ws.kotonoha.akane.{ParsedQuery, JumanQuery}
 import ws.kotonoha.akane.juman.{JumanDaihyou, PipeExecutor}
 import ws.kotonoha.akane.statistics.{UniqueWordsExtractor => WE}
 import akka.dispatch.Await
+import com.sun.org.apache.xml.internal.security.utils.ElementCheckerImpl.FullChecker
+import scalax.file.PathMatcher.{Exists, GlobNameMatcher}
 
 /**
  * @author eiennohito
@@ -41,13 +43,19 @@ class SmallJumanActor extends Actor {
 
 object UniqueWordsExtractor {
   import akka.util.duration._
+  import ws.kotonoha.akane.unicode.KanaUtil.{kataToHira => hira}
   def main(args: Array[String]) {
     val as = ActorSystem("uwe")
     val j = as.actorOf(Props[SmallJumanActor])
     val fn = Path.fromString(args(0))
     val enc = args(1)
-    val ignore = args.slice(2, args.length).foldLeft (new mutable.HashSet[String]()) {case (hs, path) => {
-      val p = Path(path)
+    //PathMatcher.GlobPathMatcher()
+    val paths = args.toList.drop(2).map(Path.fromString(_))
+    val files = paths.map{p => (p.parent, p.name)}.map{
+      case (Some(dir), nm) => dir ** GlobNameMatcher(nm)
+      case (None, nm) => Path.fromString(nm)
+    }.reduce(_ +++ _).iterator.filter(Exists)
+    val ignore = files.foldLeft(new mutable.HashSet[String]()) {case (hs, p) => {
       p.lines()(Codec.UTF8).filter(!_.startsWith("#")).
         map (w => w.split("\\|").map(_.trim).filter(_.length > 0)).
         foreach { hs ++= _ }
@@ -63,7 +71,7 @@ object UniqueWordsExtractor {
       val a = fut map (x => {
         x.foreach {
           case JumanDaihyou(s, "") => pw.println(s)
-          case JumanDaihyou(s, r) if s.equals(r) => println(s)
+          case JumanDaihyou(s, r) if hira(s).equals(r) => pw.println(s)
           case JumanDaihyou(s, r) => pw.printf("%s|%s\n", s, r)
         }
         Nil
