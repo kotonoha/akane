@@ -2,6 +2,8 @@ import sbt._
 
 organization := "ws.kotonoha"
 
+scalaVersion := "2.9.2"
+
 name := "Akane"
 
 version := "0.1-SNAPSHOT"
@@ -11,7 +13,7 @@ moduleName := "akane"
 libraryDependencies += "org.scalatest" %% "scalatest" % "1.8" % "test"
 
 libraryDependencies ++=
-					Seq("org.scalaz" %% "scalaz-core" % "6.0.3",
+					Seq("org.scalaz" %% "scalaz-core" % "6.0.4",
 						"com.jsuereth" %% "scala-arm" % "1.2",
 						"javax.transaction" % "jta" % "1.0.1B" % "provided"
 					)

@@ -17,7 +17,7 @@ import xml.Utility
 object HtmlJumanRenderer {
   def main(args: Array[String]) = {
     val fn = args(0)
-    val res = Path(fn) inputStream
+    val res = Path.fromString(fn) inputStream
     val pe = new PipeExecutor("juman.exe")
     val jt = new JumanTransformer(pe)
     for (is <- res) {
@@ -33,7 +33,7 @@ object HtmlJumanRenderer {
       } map {
         hr.render(_)
       }
-      val out = Path(args(0) + ".html")
+      val out = Path.fromString(args(0) + ".html")
 
       val pw = new PrintWriter(out.path, "utf-8")
       nodes foreach {n => {
