@@ -56,12 +56,14 @@ class MecabParser {
   private val tagger = new Tagger()
 
   def parse(s: String): List[MecabResult] = {
-    val lat = new Lattice()
-    lat.set_sentence(s)
-    tagger.parse(lat)
-    val lst = new NodeIterator(lat.bos_node()).toList
-    lat.delete()
-    lst
+    resource.makeManagedResource(new Lattice())(_.delete())(Nil) map (lat => {
+      lat.set_sentence(s)
+      tagger.parse(lat)
+      new NodeIterator(lat.bos_node()).toList
+    }) either match {
+      case Right(l) => l
+      case Left(t) => throw t.head
+    }
   }
 
 }
