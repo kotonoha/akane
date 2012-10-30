@@ -24,6 +24,7 @@ import java.io.{Reader, StringReader}
  */
 
 object UnicodeUtil {
+
   val kanjiRanges = Array(0x4e00 -> 0x9fff,
     0x3400 -> 0x4dbf,
     0x20000 -> 0x2a6df,
@@ -53,6 +54,8 @@ object UnicodeUtil {
   def isKatakana(s: String): Boolean = stream(s).forall(isKatakana(_))
 
   def isKana(p: Int) = isHiragana(p) || isKatakana(p)
+
+  def hasKanji(s: String) = stream(s).exists(isKanji(_))
 
   def isJapanese(s: String) = stream(s).take(50).forall {
     c => isKanji(c) || isHiragana(c) || isKatakana(c)
