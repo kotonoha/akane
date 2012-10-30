@@ -19,8 +19,9 @@ package ws.kotonoha.akane.juman
 import ws.kotonoha.akane.JumanEntry
 import scala.Some
 import util.matching.Regex.Groups
+import ws.kotonoha.akane.basic.ReadingAndWriting
 
-case class JumanDaihyou(writing: String, reading: String)
+case class JumanDaihyou(writing: String, reading: String) extends ReadingAndWriting
 
 object JumanUtil {
   private val regex = """代表表記:(.+?)/(.+?)\b""".r

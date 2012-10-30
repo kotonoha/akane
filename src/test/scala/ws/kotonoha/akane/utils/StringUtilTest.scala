@@ -42,4 +42,18 @@ class StringUtilTest extends FreeSpec with ShouldMatchers {
       StringUtil.commonTail("xfdic", "fdic") should equal (4)
     }
   }
+
+  "common head" - {
+    "returns 2 on ham and hax" in {
+      StringUtil.commonHead("ham", "hax") should equal (2)
+    }
+
+    "returns 0 on wax and hax" in {
+      StringUtil.commonHead("wax", "hax") should equal (0)
+    }
+
+    "returns 3 on wax and waxa" in {
+      StringUtil.commonHead("wax", "waxa") should equal (3)
+    }
+  }
 }

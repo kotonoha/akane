@@ -32,7 +32,6 @@ class ParserWorks extends FreeSpec with ShouldMatchers {
       val parser = new MecabParser
       val lst = parser.parse(str)
       lst should not be (Nil)
-      lst.foreach { x => println(x.info) }
       lst.map(_.surf).mkString should equal (str)
     }
   }
@@ -43,6 +42,31 @@ class ParserWorks extends FreeSpec with ShouldMatchers {
       val dread = "スリキラ"
       val vars = "すりきら/摺り切ら/摺切ら/擦り切ら/擦切ら"
       InfoExtractor.restoreWriting(dform, dread, vars) should equal("摺り切る")
+    }
+
+    "original reading is being restored" in {
+      //動詞,自立,*,*,一段,未然形,くぐり抜ける,クグリヌケ,クグリヌケ,くぐりぬけ/くぐり抜/くぐり抜け/潜り抜/潜り抜け/潜抜/潜抜け
+      val dform = "くぐり抜ける"
+      val info = "くぐりぬけ/くぐり抜/くぐり抜け/潜り抜/潜り抜け/潜抜/潜抜け"
+      InfoExtractor.restoreReading(dform, info) should equal ("くぐりぬける")
+    }
+
+    "original reading is being restored when form differs" in {
+      val dform = "くぐり抜ける"
+      val info = "くぐりぬけよ/くぐり抜けよ/くぐり抜よ/潜り抜けよ/潜り抜よ/潜抜けよ/潜抜よ"
+      InfoExtractor.restoreReading(dform, info) should equal ("くぐりぬける")
+    }
+
+    "original reading is being restored when form differs2" in {
+      val dform = "くぐり抜ける"
+      val info = "くぐりぬけりゃ/くぐり抜けりゃ/くぐり抜りゃ/潜り抜けりゃ/潜り抜りゃ/潜抜けりゃ/潜抜りゃ"
+      InfoExtractor.restoreReading(dform, info) should equal ("くぐりぬける")
+    }
+
+    "original reading is being restored when form differs3 godan" in {
+      val dform = "交ぜ返す"
+      val info = "まぜかえせ/まぜ返せ/交ぜかえせ/交ぜ返せ/混ぜかえせ/混ぜ返せ/雑ぜ返せ/雑返せ"
+      InfoExtractor.restoreReading(dform, info) should equal ("まぜかえす")
     }
   }
 }

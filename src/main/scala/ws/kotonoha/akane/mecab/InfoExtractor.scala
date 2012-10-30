@@ -18,6 +18,7 @@ package ws.kotonoha.akane.mecab
 
 import ws.kotonoha.akane.unicode.{KanaUtil, UnicodeUtil}
 import ws.kotonoha.akane.utils.StringUtil
+import ws.kotonoha.akane.basic.ReadingAndWriting
 
 /**
  * @author eiennohito
@@ -43,6 +44,48 @@ object InfoExtractor {
     }
   }
 
+  def restoreReading(df: String, nfo: String): String = {
+    UnicodeUtil.hasKanji(df) match {
+      case false => KanaUtil.kataToHira(df)
+      case true => {
+        val vars = nfo.split('/')
+        val sorted = vars.map {
+          w => (w, StringUtil.commonHead(w, df))
+        }.sortBy(-_._2)
+        val lst = sorted.headOption
+        lst match {
+          case Some((wr, head)) => {
+            val kanavar = vars(0) //should be so
+            if (head == wr.length) { //this means that writing is equals with info form
+              kanavar + df.substring(head)
+            } else {
+              val tail = StringUtil.commonTail(wr.substring(head), kanavar)
+              val h = head
+              val s1 = kanavar.substring(0, kanavar.length - tail)
+              s1 + df.substring(h)
+            }
+          }
+          case None => ""
+        }
+      }
+    }
+  }
+
+  case class JdicMecabInfo (
+                      pos: String,
+                      cat1: String,
+                      cat2: String,
+                      form: String,
+                      dictForm: String,
+                      instanceReading: String,
+                      normalizedReading: String,
+                      variants: String,
+                      metadata: String
+                      ) extends ReadingAndWriting {
+    lazy val reading = restoreReading(dictForm, variants)
+    lazy val writing = restoreWriting(dictForm, instanceReading, normalizedReading)
+  }
+
   //動詞,自立,*,*,五段・ラ行,未然形,すりきる,スリキラ,スリキラ,すりきら/摺り切ら/摺切ら/擦り切ら/擦切ら,
   def extractJdicInfo(strings: Array[String]) = {
     val pos = strings(0)
@@ -54,6 +97,11 @@ object InfoExtractor {
     val dreadnorm = strings(8)
     val writevariants = strings(9)
     val metadata = strings(10)
+    JdicMecabInfo (
+      pos, cat1, cat2,
+      form, dform, dread,
+      dreadnorm, writevariants, metadata
+    )
   }
 
   //動詞,自立,*,*,五段・ラ行,仮定形,すみわたる,スミワタレ,スミワタレ

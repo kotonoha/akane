@@ -14,40 +14,18 @@
  * limitations under the License.
  */
 
-package ws.kotonoha.akane.utils
+package ws.kotonoha.akane.basic
 
 /**
  * @author eiennohito
  * @since 30.10.12 
  */
 
-object StringUtil {
-  def commonTail(s1: String, s2: String): Int = {
-    var l1 = s1.length - 1
-    var l2 = s2.length - 1
-    var continue = true
-    while (l1 >= 0 && l2 >= 0 && continue) {
-      if (s1(l1) == s2(l2)) {
-        l1 -= 1
-        l2 -= 1
-      } else {
-        continue = false
-      }
-    }
-    s1.length - l1 - 1
-  }
+trait ReadingAndWriting {
+  def reading: String
+  def writing: String
+}
 
-  def commonHead(s1: String, s2: String): Int = {
-    val rest = s1.length min s2.length
-    var i = 0
-    var cont = true
-    while (i < rest && cont) {
-      if (s1(i) == s2(i)) {
-        i += 1
-      } else {
-        cont = false
-      }
-    }
-    i
-  }
+object ReadingAndWriting {
+  def unapply(in: ReadingAndWriting) = Some(in.reading, in.writing)
 }
