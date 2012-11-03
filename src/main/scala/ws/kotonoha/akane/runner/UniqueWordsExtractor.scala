@@ -28,6 +28,7 @@ import ws.kotonoha.akane.statistics.{UniqueWordsExtractor => WE}
 import akka.dispatch.Await
 import com.sun.org.apache.xml.internal.security.utils.ElementCheckerImpl.FullChecker
 import scalax.file.PathMatcher.{Exists, GlobNameMatcher}
+import ws.kotonoha.akane.utils.PathUtil
 
 /**
  * @author eiennohito
@@ -50,17 +51,8 @@ object UniqueWordsExtractor {
     val fn = Path.fromString(args(0))
     val enc = args(1)
     //PathMatcher.GlobPathMatcher()
-    val paths = args.toList.drop(2).map(Path.fromString(_))
-    val files = paths.map{p => (p.parent, p.name)}.map{
-      case (Some(dir), nm) => dir ** GlobNameMatcher(nm)
-      case (None, nm) => Path.fromString(nm)
-    }.reduce(_ +++ _).iterator.filter(Exists)
-    val ignore = files.foldLeft(new mutable.HashSet[String]()) {case (hs, p) => {
-      p.lines()(Codec.UTF8).filter(!_.startsWith("#")).
-        map (w => w.split("\\|").map(_.trim).filter(_.length > 0)).
-        foreach { hs ++= _ }
-      hs
-    }}.toSet[String]
+    val paths = PathUtil.enumerateStrings(args.toList.drop(2))
+    val ignore = PathUtil.stoplist(paths)
     for (is <- fn.inputStream) {
       val pw = new PrintWriter(args(0) + ".out", "utf-8")
       val sr = new InputStreamReader(is, enc)

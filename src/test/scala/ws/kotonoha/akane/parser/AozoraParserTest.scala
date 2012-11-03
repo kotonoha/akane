@@ -13,18 +13,25 @@ class AozoraParserTest extends org.scalatest.FunSuite with org.scalatest.matcher
     val inp = new AozoraStringInput("蟹に遭った戦場ヶ原も。\n　蝸牛に迷った八九寺も。")
     val parser = new AozoraParser(inp)
     val nodes = parser.toList
-    nodes should have length (2)
+    nodes should have length (3)
   }
 
   test("highlight") {
     val inp = new AozoraStringInput("「怪異を知ると怪異に絡む［＃「怪異を知ると怪異に絡む」に傍点］――ですからね。巻き込むのならともかく――そっちが本筋になってしまえば、むしろ巻き込まれるのは阿良々木さんということになります」")
     val parser = new AozoraParser(inp)
     val nodes = parser.toList
-    nodes should have length (2)
+    nodes should have length (3)
   }
 
   test("weird furigana") {
     val inp = new AozoraStringInput("その人垣を睨《にら》みつける。")
+    val parser = new AozoraParser(inp)
+    val nodes = parser.toList
+    nodes foreach (println(_))
+  }
+
+  test("2 bakutens a row") {
+    val inp = new AozoraStringInput("やい［＃「やい」に傍点］てる［＃「てる」に傍点］のね。")
     val parser = new AozoraParser(inp)
     val nodes = parser.toList
     nodes foreach (println(_))

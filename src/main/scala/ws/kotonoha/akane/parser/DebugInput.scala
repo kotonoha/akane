@@ -26,4 +26,7 @@ class DebugInput(inner: AozoraInput) extends AozoraInput {
   }
 
   override def toString = "(%d, %d), last 20 chars: %s".format(line, pos, lb.mkString(""))
+
+  def mark() = inner.mark()
+  def subseq(rel: Int) = inner.subseq(rel)
 }

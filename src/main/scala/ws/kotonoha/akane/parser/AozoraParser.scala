@@ -17,6 +17,8 @@ import ws.kotonoha.akane.unicode.UnicodeUtil
 trait AozoraInput {
   def peek: Int //doesn't go forward
   def next: Int //goes forward
+  def mark(): Unit
+  def subseq(rel: Int): Option[CharSequence]
 
   def skipMatch(s: String) = {
     var i = 0
@@ -28,9 +30,22 @@ trait AozoraInput {
     len == i
   }
 
-  def skipUntil(c: Char) {
-    while (c != peek) {
+  def skipUntil(c: Char) = {
+    mark()
+    while (c != peek && peek != -1) {
       next
+    }
+    val s = subseq(-1)
+    s match {
+      case Some(s) => {
+        val cnt = s.length()
+        if (cnt > 100) {
+          printf("attention: long skip for %d\n", cnt)
+        }
+      }
+      case None => {
+        printf("Skipped very very *very* much, this is a bug!")
+      }
     }
   }
 }
@@ -100,7 +115,7 @@ class AozoraParser(inp: AozoraInput) extends BufferedIterator[HighLvlNode] {
     }
   }
 
-  def handleSystem(buffer: ListBuffer[Node]) = {
+  def handleSystem(buffer: ListBuffer[Node]): Unit = {
     val prev = content
     if (inp.skipMatch("［＃「")) {
       var i = 0
@@ -138,7 +153,7 @@ class AozoraParser(inp: AozoraInput) extends BufferedIterator[HighLvlNode] {
       in.toChar match {
         case '｜' => bldr += StringNode(content)
         case '《' => handleRuby(bldr)
-        case '［' => handleSystem(bldr)
+        case '［' => handleSystem(bldr); return
         case '\n' | '\r' => return
         case c if AozoraParser.SENTENCE_SEPARATORS.contains(c) => handleSep(bldr); return
         case c => buf.append(c)
@@ -153,7 +168,10 @@ class AozoraParser(inp: AozoraInput) extends BufferedIterator[HighLvlNode] {
       Some(Sentence(StringNode(content)))
     } else {
       bldr += StringNode(content)
-      Some(Sentence(ListNode(bldr.toList)))
+      Some(Sentence(ListNode(bldr.toList.filter {
+        case StringNode("") => false
+        case _ => true
+      })))
     }
   }
 

@@ -19,6 +19,7 @@ package ws.kotonoha.akane.mecab
 import ws.kotonoha.akane.unicode.{KanaUtil, UnicodeUtil}
 import ws.kotonoha.akane.utils.StringUtil
 import ws.kotonoha.akane.basic.ReadingAndWriting
+import sun.reflect.generics.reflectiveObjects.NotImplementedException
 
 /**
  * @author eiennohito
@@ -104,6 +105,19 @@ object InfoExtractor {
     )
   }
 
+  case class DefaultMecabInfo(
+    pos: String,
+    cat1: String,
+    cat2: String,
+    form: String,
+    dform: String,
+    dread: String,
+    dreadnorm: String
+                               ) extends ReadingAndWriting {
+    def reading = KanaUtil.kataToHira(dform)
+    def writing = dform
+  }
+
   //動詞,自立,*,*,五段・ラ行,仮定形,すみわたる,スミワタレ,スミワタレ
   def extractDefaultInfo(strings: Array[String]) = {
     val pos = strings(0)
@@ -113,14 +127,15 @@ object InfoExtractor {
     val dform = strings(6)
     val dread = strings(7)
     val dreadnorm = strings(8)
+    DefaultMecabInfo(pos, cat1, cat2, form, dform, dread, dreadnorm)
   }
 
   def extract(info: String) = {
     val nfo = info.split("\\s*,\\s*")
     nfo.length match {
-      case 11 => extractJdicInfo(nfo)
-      case 9 => extractDefaultInfo(nfo)
-      case _ => throw new MalformattedInfoException(info)
+      case 11 => Some(extractJdicInfo(nfo))
+      case 9 => Some(extractDefaultInfo(nfo))
+      case _ => None
     }
   }
 }

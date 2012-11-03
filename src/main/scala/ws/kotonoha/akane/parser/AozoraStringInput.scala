@@ -19,6 +19,7 @@ package ws.kotonoha.akane.parser
 class AozoraStringInput(cont: String) extends AozoraInput {
   var pos = 0
   val max = cont.length
+  var mark_ : List[Int] = Nil
 
   def peek = {
     if (pos == max) -1 else cont(pos)
@@ -32,5 +33,21 @@ class AozoraStringInput(cont: String) extends AozoraInput {
     val c = peek
     pos += 1
     c
+  }
+
+  def mark() = {
+    mark_ = pos :: mark_
+  }
+
+  def subseq(rel: Int) = mark_ match {
+    case x :: xs => {
+      mark_ = xs
+      if (x == -1) {
+        None
+      } else {
+        Some(cont.substring(x, pos))
+      }
+    }
+    case Nil => None
   }
 }
