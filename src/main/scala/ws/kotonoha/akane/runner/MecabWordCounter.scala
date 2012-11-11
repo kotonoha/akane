@@ -16,15 +16,14 @@
 
 package ws.kotonoha.akane.runner
 
-import ws.kotonoha.akane.mecab.{InfoExtractor, MecabParser, MecabInit}
+import ws.kotonoha.akane.mecab.{InfoExtractor, MecabParser}
 import ws.kotonoha.akane.utils.PathUtil
-import java.io.{InputStreamReader, BufferedInputStream}
+import java.io.InputStreamReader
 import ws.kotonoha.akane.parser.{StreamReaderInput, AozoraParser}
 import ws.kotonoha.akane.ast.Sentence
 import ws.kotonoha.akane.render.MetaStringRenderer
 import collection.mutable
 import scalax.file.Path
-import java.util
 import scalax.io.Codec
 import scalax.file.PathMatcher.GlobNameMatcher
 
@@ -34,7 +33,6 @@ import scalax.file.PathMatcher.GlobNameMatcher
  */
 
 object MecabWordCounter {
-  MecabInit.init()
 
   def main(args: Array[String]) = {
     val prs = new MecabParser

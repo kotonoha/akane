@@ -16,34 +16,40 @@
 
 package ws.kotonoha.akane.mecab
 
-import org.chasen.mecab.{MeCabConstants, Node, Lattice, Tagger}
 import ws.kotonoha.akane.utils.CalculatingIterator
+import org.bridj.Pointer
+import mecab.{MecabLibrary, mecab_node_t}
 
 /**
  * @author eiennohito
  * @since 30.10.12 
  */
 
-case class MecabResult(surf: String, pos: String, info: String)
+case class MecabResult(surf: String, pos: Int, info: String)
 
-class NodeIterator(var node: Node) extends CalculatingIterator[MecabResult] {
+class NodeIterator(var node: Pointer[mecab_node_t]) extends CalculatingIterator[MecabResult] {
+  import  ws.kotonoha.akane.bridj.PointerUtil._
 
-  private def formatResult(node: Node): Option[MecabResult] = {
-    val r = MecabResult(node.getSurface, "", node.getFeature)
+  private def formatResult(node: mecab_node_t): Option[MecabResult] = {
+    val bts = node.surface()
+    val len = node.length()
+    val strbts = bts.getBytes(len)
+    val s = new String(strbts, "UTF-8")
+    val r = MecabResult(s, node.posid(), node.feature().u8s)
     Some(r)
   }
 
   protected def calculate(): Option[MecabResult] = {
-    import MeCabConstants._
+    import mecab.MecabLibrary._
     if (node == null) return None
-    val nv = node.getStat match {
+    val nv = node.get().stat().toInt match {
       case MECAB_BOS_NODE | MECAB_EOS_NODE | MECAB_EON_NODE => {
-        node = node.getNext
+        node = node.get().next()
         calculate()
       }
       case _ => {
-        val n = formatResult(node)
-        node = node.getNext
+        val n = formatResult(node.get())
+        node = node.get().next()
         n
       }
     }
@@ -53,17 +59,22 @@ class NodeIterator(var node: Node) extends CalculatingIterator[MecabResult] {
 
 class MecabParser {
 
-  private val tagger = new Tagger()
-
-  def parse(s: String): List[MecabResult] = {
-    resource.makeManagedResource(new Lattice())(_.delete())(Nil) map (lat => {
-      lat.set_sentence(s)
-      tagger.parse(lat)
-      new NodeIterator(lat.bos_node()).toList
-    }) either match {
-      case Right(l) => l
-      case Left(t) => throw t.head
-    }
+  private val tagger = {
+    val p = Pointer.allocateByte()
+    p.set(0.toByte)
+    val t = MecabLibrary.mecab_new2(p)
+    p.release()
+    t
   }
 
+  def parse(s: String): List[MecabResult] = {
+    val arr = s.getBytes("UTF-8")
+    val bytes = Pointer.pointerToArray[java.lang.Byte](arr)
+    val node = MecabLibrary.mecab_sparse_tonode2(tagger, bytes, arr.length)
+    new NodeIterator(node).toList
+  }
+
+  override def finalize() {
+    MecabLibrary.mecab_destroy(tagger)
+  }
 }

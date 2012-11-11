@@ -26,7 +26,6 @@ import org.scalatest.matchers.ShouldMatchers
 
 class ParserWorks extends FreeSpec with ShouldMatchers {
   "mecab parser" - {
-    MecabInit.init()
     "works" in {
       val str = "私は猫であるしぼまない"
       val parser = new MecabParser

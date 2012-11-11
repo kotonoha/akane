@@ -31,3 +31,7 @@ resolvers ++= Seq("jboss repo" at "http://repository.jboss.org/nexus/content/gro
 resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
 
 libraryDependencies += "commons-lang" % "commons-lang" % "2.4"
+
+resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/groups/public"
+
+libraryDependencies += "com.nativelibs4java" % "bridj" % "0.6.1"

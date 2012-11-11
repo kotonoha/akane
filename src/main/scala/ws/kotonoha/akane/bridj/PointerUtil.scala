@@ -14,31 +14,20 @@
  * limitations under the License.
  */
 
-package ws.kotonoha.akane.mecab
+package ws.kotonoha.akane.bridj
+
+import org.bridj.Pointer
+import java.nio.charset.Charset
 
 /**
  * @author eiennohito
- * @since 30.10.12 
+ * @since 11.11.12 
  */
 
-object MecabInit {
+class RichPointer[T](p: Pointer[T]) {
+  def u8s = p.getStringAtOffset(0L, Pointer.StringType.C, Charset.forName("UTF-8"))
+}
 
-  @volatile var loaded: Boolean = false
-
-  def init(name: Option[String] = None): Unit = {
-    if (loaded) return
-    name match {
-      case Some(nm) => init(nm)
-      case _ => init()
-    }
-    loaded = true
-  }
-
-  private def init(path: String): Unit = {
-    System.load(path)
-  }
-
-  private def init(): Unit = {
-    System.loadLibrary("mecab-java")
-  }
+object PointerUtil {
+  implicit def ponter2richPointer[T](p: Pointer[T]) = new RichPointer[T](p)
 }
