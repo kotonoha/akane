@@ -16,6 +16,8 @@
 
 package ws.kotonoha.akane.utils
 
+import util.parsing.json.JSON
+
 /**
  * @author eiennohito
  * @since 30.10.12 

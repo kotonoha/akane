@@ -29,3 +29,5 @@ libraryDependencies += "com.typesafe.akka" % "akka-actor" % "2.0.2"
 resolvers ++= Seq("jboss repo" at "http://repository.jboss.org/nexus/content/groups/public-jboss/")
 
 resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
+
+libraryDependencies += "commons-lang" % "commons-lang" % "2.4"
