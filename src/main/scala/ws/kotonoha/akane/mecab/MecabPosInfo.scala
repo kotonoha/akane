@@ -14,24 +14,10 @@
  * limitations under the License.
  */
 
-package ws.kotonoha.akane.tools
-
-import ws.kotonoha.akane.dict.jmdict.JMDictParser
-import scalax.file.Path
+package ws.kotonoha.akane.mecab
 
 /**
  * @author eiennohito
  * @since 14.11.12 
  */
-
-object JmdictWritings {
-  def main(args: Array[String]) {
-    val jmdic = Path.fromString(args(0))
-    val out = Path.fromString(args(0) + ".writ")
-    for (in <- jmdic.inputStream) {
-      val ents = JMDictParser.parse(in)
-      val ostrs = ents.map(_.writing).filter(_.length > 1).map(l => l.map(_.value).mkString(";")).filter(_.length > 2)
-      out.writeStrings(ostrs.toTraversable, "\n")
-    }
-  }
-}
+case class MecabPosInfo (pos: String, cat: String, group: String, conjClass: String, conjForm: String)

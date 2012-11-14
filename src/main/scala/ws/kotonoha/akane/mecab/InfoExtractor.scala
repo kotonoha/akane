@@ -19,7 +19,6 @@ package ws.kotonoha.akane.mecab
 import ws.kotonoha.akane.unicode.{KanaUtil, UnicodeUtil}
 import ws.kotonoha.akane.utils.StringUtil
 import ws.kotonoha.akane.basic.ReadingAndWriting
-import sun.reflect.generics.reflectiveObjects.NotImplementedException
 
 /**
  * @author eiennohito

@@ -58,6 +58,7 @@ class NodeIterator(var node: Pointer[mecab_node_t]) extends CalculatingIterator[
 }
 
 class MecabParser {
+  import java.lang.{Byte => JByte}
 
   private val tagger = {
     val p = Pointer.allocateByte()
@@ -67,14 +68,28 @@ class MecabParser {
     t
   }
 
+  private var bsize = 4 * 1024L
+  private var buffer: Pointer[JByte] = Pointer.allocateBytes(bsize)
+
+  def resize(sz: Long) = {
+    buffer.release()
+    bsize = sz
+    buffer = Pointer.allocateBytes(sz)
+  }
+
   def parse(s: String): List[MecabResult] = {
     val arr = s.getBytes("UTF-8")
-    val bytes = Pointer.pointerToArray[java.lang.Byte](arr)
-    val node = MecabLibrary.mecab_sparse_tonode2(tagger, bytes, arr.length)
+    val needed = arr.length
+    if (needed > bsize) {
+      resize(needed * 6 / 5) //needed * 1.2
+    }
+    buffer.setBytes(arr)
+    val node = MecabLibrary.mecab_sparse_tonode2(tagger, buffer, needed)
     new NodeIterator(node).toList
   }
 
   override def finalize() {
     MecabLibrary.mecab_destroy(tagger)
+    buffer.release()
   }
 }
