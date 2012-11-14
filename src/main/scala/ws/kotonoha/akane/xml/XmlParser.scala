@@ -99,7 +99,14 @@ class XmlIterator(in: XMLEventReader) extends CalculatingIterator[XmlData] {
         val path = state.pop() // TODO:check equality
         Some(XmlElEnd(name) at (path))
       }
-      case t: Characters => Some(XmlText(t.getData) at (state.top))
+      case t: Characters => {
+        var its: List[String] = t.getData :: Nil
+        while (in.peek() match {
+          case t: Characters => its = t.getData :: its; in.nextEvent(); true
+          case _ => false
+        }) {}
+        Some(XmlText(its.reverse.mkString) at (state.top))
+      }
       case er: EntityReference => Some(XmlERef(er.getName) at (state.top))
       case _ => None
     }
