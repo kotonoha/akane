@@ -55,13 +55,11 @@ object MecabWordCounter {
           }
           case _ => Nil
         }.foreach(mr => {
-          val wr = InfoExtractor.extract(mr.info)
-          wr foreach( wr => {
-            val s = wr.writing
-            if (!ignore.contains(s)) {
-              map(s) += 1
-            }
-          })
+          val wr = InfoExtractor.parseInfo(mr)
+          val s = wr.safeWriting
+          if (!ignore.contains(s)) {
+            map(s) += 1
+          }
         })
       } catch {
         case e => e.printStackTrace()

@@ -20,4 +20,33 @@ package ws.kotonoha.akane.mecab
  * @author eiennohito
  * @since 14.11.12 
  */
-case class MecabPosInfo (pos: String, cat: String, group: String, conjClass: String, conjForm: String)
+case class MecabPosInfo (pos: String, cat: String, i1: String, i2: String, conjClass: String, conjForm: String)
+
+object MecabPosInfo {
+  def apply(args: String*) = {
+    args match {
+      case Seq(a1, a2, a3, a4, a5, a6) => new MecabPosInfo(a1, a2, a3, a4, a5, a6)
+      case _ => throw new RuntimeException("Invalid arg count")
+    }
+  }
+}
+
+trait MecabEntryInfo {
+  def pos: MecabPosInfo
+  def surface: String
+  def dicForm: String
+  def dicWriting: Option[String]
+  def dicReading: Option[String]
+  def safeWriting = dicWriting getOrElse dicForm
+  def reading: String
+  def normReading: String
+}
+
+object MVerb {
+  def unapply(en: MecabEntryInfo) = {
+    en.pos match {
+      case MecabPosInfo("動詞", _, _, _, _, _) => Some(en)
+      case _ => None
+    }
+  }
+}

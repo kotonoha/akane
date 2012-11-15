@@ -71,71 +71,83 @@ object InfoExtractor {
     }
   }
 
-  case class JdicMecabInfo (
-                      pos: String,
-                      cat1: String,
-                      cat2: String,
-                      form: String,
-                      dictForm: String,
-                      instanceReading: String,
-                      normalizedReading: String,
-                      variants: String,
-                      metadata: String
-                      ) extends ReadingAndWriting {
-    lazy val reading = restoreReading(dictForm, variants)
-    lazy val writing = restoreWriting(dictForm, instanceReading, normalizedReading)
-  }
+  case class DefaultMecabInfo (
+    mecabNfo: MecabResult,
+    pos: MecabPosInfo,
+    dicForm: String,
+    reading: String,
+    normReading: String,
+    jdicNfo: String,
+    jdicXml: String,
+    dformNfo: Option[String]
+) extends MecabEntryInfo {
+    def surface = mecabNfo.surf
 
-  //動詞,自立,*,*,五段・ラ行,未然形,すりきる,スリキラ,スリキラ,すりきら/摺り切ら/摺切ら/擦り切ら/擦切ら,
-  def extractJdicInfo(strings: Array[String]) = {
-    val pos = strings(0)
-    val cat1 = strings(1)
-    val cat2 = strings(4)
-    val form = strings(5)
-    val dform = strings(6)
-    val dread = strings(7)
-    val dreadnorm = strings(8)
-    val writevariants = strings(9)
-    val metadata = strings(10)
-    JdicMecabInfo (
-      pos, cat1, cat2,
-      form, dform, dread,
-      dreadnorm, writevariants, metadata
-    )
-  }
+    def calcWritingFromNfo = {
+      if (jdicNfo.length == 0) None
+      else {
+        Some(restoreWriting(dicForm, reading, jdicNfo))
+      }
+    }
 
-  case class DefaultMecabInfo(
-    pos: String,
-    cat1: String,
-    cat2: String,
-    form: String,
-    dform: String,
-    dread: String,
-    dreadnorm: String
-                               ) extends ReadingAndWriting {
-    def reading = KanaUtil.kataToHira(dform)
-    def writing = dform
+    lazy val dicWriting = {
+      val v1 = dformNfo map(_.split("/")(0))
+      v1 orElse calcWritingFromNfo
+    }
+
+    lazy val dicReading = {
+      if (jdicNfo.length == 0) None
+      else {
+        Some(restoreReading(dicForm, jdicNfo))
+      }
+    }
   }
 
   //動詞,自立,*,*,五段・ラ行,仮定形,すみわたる,スミワタレ,スミワタレ
-  def extractDefaultInfo(strings: Array[String]) = {
-    val pos = strings(0)
-    val cat1 = strings(1)
-    val cat2 = strings(4)
-    val form = strings(5)
-    val dform = strings(6)
-    val dread = strings(7)
-    val dreadnorm = strings(8)
-    DefaultMecabInfo(pos, cat1, cat2, form, dform, dread, dreadnorm)
+
+  def parseDefaultInfo(en: MecabResult, info: Array[String]): MecabEntryInfo = {
+    val pinfo = info.take(6)
+    val mpi = MecabPosInfo(pinfo: _*)
+    val dform = info(6)
+    val read = info(7)
+    val readNorm = info(8)
+    val jdicVars = info(9)
+    val jdicMetaXml = info(10)
+    val dformVars = if (info.length == 12) Some(info(11)) else None
+    DefaultMecabInfo(en, mpi, dform, read, readNorm, jdicVars, jdicMetaXml, dformVars)
   }
 
-  def extract(info: String) = {
-    val nfo = info.split("\\s*,\\s*")
+  def parseModifiedInfo(en: MecabResult, info: Array[String]): MecabEntryInfo = {
+    parseDefaultInfo(en, info)
+  }
+
+  val splitRe = "\\s*,\\s*".r
+
+  case class UnkWordInfo(mr: MecabResult, pos: MecabPosInfo) extends MecabEntryInfo {
+    def surface = mr.surf
+    def dicForm = surface
+    def dicWriting = None
+    def dicReading = None
+    def reading = surface
+    def normReading = surface
+  }
+
+  def parseUnkWord(mr: MecabResult, nfo: Array[String]) = {
+    UnkWordInfo(mr, MecabPosInfo(nfo.take(6): _*))
+  }
+
+  def extract(en: MecabResult, info: String) = {
+    val nfo = splitRe.pattern.split(info, -1)
     nfo.length match {
-      case 11 => Some(extractJdicInfo(nfo))
-      case 9 => Some(extractDefaultInfo(nfo))
-      case _ => None
+      case 11 => parseDefaultInfo(en, nfo)
+      case 12 => parseModifiedInfo(en, nfo)
+      case 7 => parseUnkWord(en, nfo)
+      case _ => throw new MalformattedInfoException(info)
     }
+  }
+
+  def parseInfo(entry: MecabResult): MecabEntryInfo = {
+    extract(entry, entry.info)
   }
 }
 
