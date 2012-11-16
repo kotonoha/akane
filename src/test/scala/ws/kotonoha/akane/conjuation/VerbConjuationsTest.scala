@@ -46,14 +46,26 @@ class VerbConjuationsTest extends FreeSpec with ShouldMatchers {
     }
 
     "masu form works lol" in {
-      kaeru.masuStem.masu.past.render should be (Some("帰りました"))
+      kaeru.masuStem.masu.taStem.ta.render should be (Some("帰りました"))
+    }
+
+    "masu with masu" in {
+      val verb = Verb.godan("増す")
+      verb.masuStem.render.get should equal("増し")
     }
   }
 
   "chaining in conjuator" - {
     "works" in {
       val v = Verb.dummy
-      val rules = v.generate(2)
+      val verb = Verb.ichidan("食べる")
+      val rules = v.generate(5)
+      println("All chains (5) from verb")
+      rules.map(rule => {
+        val form = rule.tf(verb).render.get
+        val name = rule.chain.mkString("->")
+        "%s\t\t%s".format(form, name)
+      }).foreach(println(_))
       rules should not have length (0)
     }
   }
