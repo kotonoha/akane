@@ -16,6 +16,7 @@
 
 package ws.kotonoha.akane.conjuation
 
+
 /**
  * @author eiennohito
  * @since 13.11.12
@@ -63,7 +64,7 @@ trait Renderable {
   def render = obj.render
 }
 
-case class TaForm(obj: ConjObject) extends Renderable
+case class TaForm(obj: ConjObject) extends Renderable with Chaining[TaForm]
 
 
 case class TeForm(obj: ConjObject) extends Renderable {
@@ -81,26 +82,88 @@ case class TaStem(obj: ConjObject, patalize: Boolean = false) extends Renderable
   }
 }
 
-case class NaiStem(obj: ConjObject) extends Renderable {
+case class AdjStem(obj: ConjObject) extends Renderable {
 
 }
 
-trait Verb extends Renderable {
+trait Adjective extends Renderable with Chaining[Adjective]
+
+case class AdjI (obj: ConjObject) extends Adjective
+case class Nai(obj: ConjObject) extends Adjective
+
+case class NaiStem(obj: ConjObject) extends Renderable with Chaining[NaiStem] {
+  def nai: Adjective = Nai(obj.add("ない"))
+
+  override protected def rules = make(_.nai, "nai") :: Nil
+}
+
+case class MasuStem(obj: ConjObject) extends Renderable {
+  def masu = new GodanVerb(obj.add("ます"))
+  def tai = new AdjI(obj.add("たい"))
+}
+
+case class ConjRule[T <: Renderable](tf: T => Renderable, chain: List[String]) {
+  def chain[U <: Renderable](ctf: U => T, name: String): ConjRule[U] = ConjRule(tf.compose(ctf), name :: chain)
+}
+
+
+
+
+trait Chaining[T <: Renderable] extends Renderable { self : T =>
+  type Generator = Int => List[ConjRule[T]]
+
+  protected def rules: List[Generator] = Nil
+  def generate(depth: Int): List[ConjRule[T]] = {
+    assert(depth >= 0, "Depth should be non-negative")
+    if (depth == 0) {
+      return new ConjRule[T](x => x, Nil) :: Nil
+    }
+    rules flatMap (_(depth))
+  }
+
+  // hides T => U composition
+  def make[U <: Chaining[U]](rule: T => U, name: String): Generator = {
+    def generate(lvl: Int): List[ConjRule[T]] = {
+      val u = rule(self)
+      u.generate(lvl - 1).map(_.chain(rule, name))
+    }
+    generate
+  }
+
+  implicit def tuple2Generator[U <: Chaining[U]](rule: (T => U, String)) =
+    make(rule._1, rule._2)
+}
+
+trait Verb extends Renderable with Chaining[Verb] {
   def taStem: TaStem
+  def naiStem: NaiStem
+  def masuStem: MasuStem
 
   //shortcuts
   def past = taStem ta
   def teForm = taStem te
+
+  override protected def rules = make(_.naiStem, "naiStem") :: Nil
 }
 
 object Verb {
+  def dummy = new GodanVerb(ConjObject.Empty)
+  def godan(s: String) = new GodanVerb(new ConjObject(s :: Nil))
   def ichidan(s: String) = new IchidanVerb(new ConjObject(s :: Nil))
+}
+
+case class BaIf(obj: ConjObject) extends Renderable {}
+
+case class KateiStem(obj: ConjObject) extends Renderable {
+  def ba = BaIf(obj.add("ば"))
 }
 
 class IchidanVerb(protected val obj: ConjObject) extends Verb {
   def stem = obj.without("る")
   def taStem = TaStem(stem)
   def naiStem = NaiStem(stem)
+  def masuStem = MasuStem(stem)
+  def kateiStem = KateiStem(stem.add("れ"))
 }
 
 class GodanVerb(protected val obj: ConjObject) extends Verb {
@@ -114,4 +177,36 @@ class GodanVerb(protected val obj: ConjObject) extends Verb {
       case _ => new TaStem(ConjObject.Empty)
     }
   }
+
+  def naiStem = {
+    obj.last(1) match {
+      case Some("う") => new NaiStem(obj.without("う").add("わ"))
+      case Some(c) => {
+        val a = (c(0) - 2).toChar //a i u e o
+        new NaiStem(obj.without(c).add(a.toString))
+      }
+      case _ => new NaiStem(ConjObject.Empty)
+    }
+  }
+
+  def masuStem = {
+    obj.last(1) match {
+      case Some(c) => {
+        val a = (c(0) - 1).toChar //a i u e o
+        new MasuStem(obj.without(c).add(a.toString))
+      }
+      case _ => new MasuStem(ConjObject.Empty)
+    }
+  }
+
+  def kateiStem = {
+    obj.last(1) match {
+      case Some(c) => {
+        val a = (c(0) + 1).toChar //a i u e o
+        new KateiStem(obj.without(c).add(a.toString))
+      }
+      case _ => new KateiStem(ConjObject.Empty)
+    }
+  }
+
 }

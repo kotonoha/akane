@@ -25,10 +25,36 @@ import org.scalatest.matchers.ShouldMatchers
  */
 
 class VerbConjuationsTest extends FreeSpec with ShouldMatchers {
+
   "conjuator" - {
+    val taberu = Verb.ichidan("食べる")
+    val kaeru = Verb.godan("帰る")
+    val tatakau = Verb.godan("戦う")
     "te iru form of ichidan" in {
-      val c = Verb.ichidan("食べる")
-      c.teForm.iru.render should be (Some("食べている"))
+      taberu.teForm.iru.render should be (Some("食べている"))
+    }
+
+    "te iru form of godan" in {
+      kaeru.teForm.iru.render should be (Some("帰っている"))
+    }
+
+    "nai form is good" in {
+      def nai(in: Verb) = in.naiStem.nai.render.get
+      nai(tatakau) should equal("戦わない")
+      nai(taberu) should equal("食べない")
+      nai(kaeru) should equal("帰らない")
+    }
+
+    "masu form works lol" in {
+      kaeru.masuStem.masu.past.render should be (Some("帰りました"))
+    }
+  }
+
+  "chaining in conjuator" - {
+    "works" in {
+      val v = Verb.dummy
+      val rules = v.generate(2)
+      rules should not have length (0)
     }
   }
 }
