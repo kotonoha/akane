@@ -35,13 +35,22 @@ object HtmlJumanRenderer {
       }
       val out = Path.fromString(args(0) + ".html")
 
+      val doc =
+        <html>
+          <head>
+          </head>
+          <body>
+            {nodes.toList}
+          </body>
+        </html>
+
       val pw = new PrintWriter(out.path, "utf-8")
-      nodes foreach {n => {
-        sb.clear()
-        Utility.sequenceToXML(n, sb = sb, minimizeTags = true)
-        println(sb.toString())
-        pw.println(sb.toString())
-      }}
+
+      sb.clear()
+      Utility.sequenceToXML(doc, sb = sb, minimizeTags = true)
+      println(sb.toString())
+      pw.println(sb.toString())
+
       pw.close()
 
     }

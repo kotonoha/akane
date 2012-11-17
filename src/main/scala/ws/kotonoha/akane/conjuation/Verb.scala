@@ -16,6 +16,8 @@
 
 package ws.kotonoha.akane.conjuation
 
+import org.apache.commons.lang.NotImplementedException
+
 
 /**
  * @author eiennohito
@@ -229,7 +231,25 @@ trait Verb extends Renderable with Chaining[Verb] {
 
 object Verb {
   def dummy = new GodanVerb(ConjObject.Empty)
-  def godan(s: String) = new GodanVerb(new ConjObject(s :: Nil))
+
+  val v5re = "v5.".r
+  def fromJMDict(verb: String, tag: String): Verb = {
+    tag match {
+      case "v5k-s" => iku(verb)
+      case "v1" => ichidan(verb)
+      case v5re() => godan(verb)
+      case _ => throw new NotImplementedException(tag)
+    }
+  }
+
+  def godan(s: String) = {
+    new GodanVerb(new ConjObject(s :: Nil))
+  }
+
+  def iku(s: String) = {
+    new Iku(new ConjObject(s :: Nil))
+  }
+
   def ichidan(s: String) = new IchidanVerb(new ConjObject(s :: Nil))
 }
 
@@ -317,4 +337,8 @@ class GodanVerb(protected val obj: ConjObject) extends Verb {
   def you = Terminal(stemWithMap(GodanMappings.uo).add("う"))
 
   def meirei = MeireiForm(kateiStem.obj)
+}
+
+class Iku(obj: ConjObject) extends GodanVerb(obj) {
+  override def taStem = TaStem(obj.without("く").add("っ"))
 }
