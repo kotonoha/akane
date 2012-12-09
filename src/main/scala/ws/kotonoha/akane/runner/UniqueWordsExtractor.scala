@@ -16,9 +16,7 @@
 
 package ws.kotonoha.akane.runner
 
-import scalax.file.{PathMatcher, FileSystem, PathFinder, Path}
-import collection.mutable
-import scalax.io.Codec
+import scalax.file.Path
 import ws.kotonoha.akane.parser.{AozoraParser, StreamReaderInput}
 import java.io.{PrintWriter, InputStreamReader}
 import akka.actor.{Props, ActorSystem, Actor}
@@ -26,8 +24,6 @@ import ws.kotonoha.akane.{ParsedQuery, JumanQuery}
 import ws.kotonoha.akane.juman.{JumanDaihyou, PipeExecutor}
 import ws.kotonoha.akane.statistics.{UniqueWordsExtractor => WE}
 import akka.dispatch.Await
-import com.sun.org.apache.xml.internal.security.utils.ElementCheckerImpl.FullChecker
-import scalax.file.PathMatcher.{Exists, GlobNameMatcher}
 import ws.kotonoha.akane.utils.PathUtil
 
 /**
@@ -60,13 +56,12 @@ object UniqueWordsExtractor {
       val parser = new AozoraParser(inp) toArray
       val f = new WE(j, as.dispatcher)
       val fut = f.uniqueWords(parser, ignore)
-      val a = fut map (x => {
+      val a = fut foreach (x => {
         x.foreach {
           case JumanDaihyou(s, "") => pw.println(s)
           case JumanDaihyou(s, r) if hira(s).equals(r) => pw.println(s)
           case JumanDaihyou(s, r) => pw.printf("%s|%s\n", s, r)
         }
-        Nil
       })
       Await.ready(a, 1 day)
       pw.close()
