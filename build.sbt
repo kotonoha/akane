@@ -32,6 +32,10 @@ resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/release
 
 libraryDependencies += "commons-lang" % "commons-lang" % "2.4"
 
+libraryDependencies += "commons-io" % "commons-io" % "1.4"
+
 resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/groups/public"
 
 libraryDependencies += "com.nativelibs4java" % "bridj" % "0.6.1"
+
+libraryDependencies += "com.weiglewilczek.slf4s" % "slf4s_2.9.1" % "1.0.7"

@@ -31,5 +31,14 @@ class PipeExecutorTest extends FreeSpec with ShouldMatchers{
      lst should have length(1)
      ex.close()
    }
+
+   "test - different juman" in {
+     val path = "e:/Programming/c++/11/juman/x64/Release/juman.exe"
+     val enc = Some("utf-8")
+     val args = "-r" ::  "i:/dev/juman-7.0/juman-7.0/jumanrc.utf8" :: Nil
+     val ja = new PipeExecutor(path, args, enc)
+     val list = ja.parse("お前はもう死んでいる")
+     list should not have length(0)
+   }
  }
 }

@@ -3,26 +3,32 @@ package ws.kotonoha.akane.juman
 import java.io.{BufferedReader, InputStreamReader, Closeable}
 import collection.mutable.ListBuffer
 import ws.kotonoha.akane.JumanEntry
+import java.util
+import com.weiglewilczek.slf4s.Logging
+import org.apache.commons.io.IOUtils
 
 /**
  * @author eiennohito
  * @since 16.08.12
  */
 
-class PipeExecutor(path: String) extends Closeable {
+class PipeExecutor(path: String, args: List[String] = Nil, encoding: Option[String] = None) extends Closeable with Logging {
 
   private val encod = {
-    System.getProperty("sun.desktop") match {
+    encoding getOrElse (System.getProperty("sun.desktop") match {
       case "windows" => "shift_jis"
       case _ => "utf-8"
-    }
+    })
   }
 
   private var process = launch
 
 
   private def launch: Process = {
-    val procBldr = new ProcessBuilder(path)
+    val lst = new util.ArrayList[String]()
+    lst.add(path)
+    args.foreach(lst.add(_))
+    val procBldr = new ProcessBuilder(lst)
     procBldr.start()
   }
 
@@ -34,6 +40,10 @@ class PipeExecutor(path: String) extends Closeable {
     } catch {
       case e => {
         //retry one time with new process
+        val exv = process.exitValue()
+        val es = process.getErrorStream
+        logger.warn(IOUtils.toString(es, encod))
+        logger.warn("Process exited with return value %d".format(exv), e)
         process.destroy()
         process = launch
         parseInner(in)
