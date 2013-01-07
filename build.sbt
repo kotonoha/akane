@@ -24,7 +24,7 @@ libraryDependencies +=  "com.github.scala-incubator.io" %% "scala-io-file" % "0.
 
 libraryDependencies ++= Seq("org.jboss.netty" % "netty" % "3.2.7.Final")
  
-libraryDependencies += "com.typesafe.akka" % "akka-actor" % "2.0.2"
+libraryDependencies += "com.typesafe.akka" % "akka-actor" % "2.0.5"
 
 resolvers ++= Seq("jboss repo" at "http://repository.jboss.org/nexus/content/groups/public-jboss/")
 
