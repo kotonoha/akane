@@ -17,9 +17,9 @@
 package ws.kotonoha.akane.tools
 
 import scalax.file.Path
-import org.apache.commons.lang.StringUtils
 import util.Random
 import ws.kotonoha.akane.conjuation.{Renderable, Verb}
+import org.apache.commons.lang3.StringUtils
 
 /**
  * @author eiennohito
@@ -85,12 +85,12 @@ object VerbFormsOutput {
 
     val x = (1 to 60).map(x => Random.nextInt(renderers.length))
 
-    val res = candidates.zip(x) flatMap {
+    val res = candidates.zip(x).flatMap {
       case (w, ind) => {
         val r = renderers(ind)
         render(r._1, w.render, r._2(w).render)
       }
-    } toList
+    }.toList
 
     res.foreach(println(_))
   }

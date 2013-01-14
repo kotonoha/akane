@@ -16,9 +16,6 @@
 
 package ws.kotonoha.akane.conjuation
 
-import org.apache.commons.lang.NotImplementedException
-
-
 /**
  * @author eiennohito
  * @since 13.11.12
@@ -195,6 +192,8 @@ case class Terminal(obj: ConjObject) extends Chaining[Terminal] {
 case class MeireiForm(obj: ConjObject) extends Chaining[MeireiForm] {
   override protected def terminal = true
 }
+
+class NotImplementedException(msg: String) extends RuntimeException(msg)
 
 trait Verb extends Renderable with Chaining[Verb] {
   def taStem: TaStem

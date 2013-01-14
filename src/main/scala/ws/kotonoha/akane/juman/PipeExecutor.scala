@@ -4,8 +4,8 @@ import java.io.{BufferedReader, InputStreamReader, Closeable}
 import collection.mutable.ListBuffer
 import ws.kotonoha.akane.JumanEntry
 import java.util
-import com.weiglewilczek.slf4s.Logging
 import org.apache.commons.io.IOUtils
+import com.typesafe.scalalogging.slf4j.Logging
 
 /**
  * @author eiennohito
@@ -38,12 +38,12 @@ class PipeExecutor(path: String, args: List[String] = Nil, encoding: Option[Stri
     try {
       parseInner(in)
     } catch {
-      case e => {
+      case e: Throwable => {
         //retry one time with new process
         val exv = process.exitValue()
         val es = process.getErrorStream
         logger.warn(IOUtils.toString(es, encod))
-        logger.warn("Process exited with return value %d".format(exv), e)
+        logger.warn(s"Process exited with return value $exv", e)
         process.destroy()
         process = launch
         parseInner(in)

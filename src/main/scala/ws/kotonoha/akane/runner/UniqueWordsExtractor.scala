@@ -16,19 +16,16 @@
 
 package ws.kotonoha.akane.runner
 
-import scalax.file.{PathMatcher, FileSystem, PathFinder, Path}
-import collection.mutable
-import scalax.io.Codec
+import scalax.file.Path
 import ws.kotonoha.akane.parser.{AozoraParser, StreamReaderInput}
 import java.io.{PrintWriter, InputStreamReader}
 import akka.actor.{Props, ActorSystem, Actor}
 import ws.kotonoha.akane.{ParsedQuery, JumanQuery}
 import ws.kotonoha.akane.juman.{JumanDaihyou, PipeExecutor}
 import ws.kotonoha.akane.statistics.{UniqueWordsExtractor => WE}
-import akka.dispatch.Await
-import com.sun.org.apache.xml.internal.security.utils.ElementCheckerImpl.FullChecker
-import scalax.file.PathMatcher.{Exists, GlobNameMatcher}
 import ws.kotonoha.akane.utils.PathUtil
+import concurrent.{ExecutionContext, Await}
+import concurrent.duration._
 
 /**
  * @author eiennohito
@@ -37,16 +34,16 @@ import ws.kotonoha.akane.utils.PathUtil
 
 class SmallJumanActor extends Actor {
   val je = new PipeExecutor("juman.exe")
-  protected def receive = {
+  def receive = {
     case JumanQuery(q) => sender ! ParsedQuery(je.parse(q))
   }
 }
 
 object UniqueWordsExtractor {
-  import akka.util.duration._
   import ws.kotonoha.akane.unicode.KanaUtil.{kataToHira => hira}
   def main(args: Array[String]) {
     val as = ActorSystem("uwe")
+    implicit val ec: ExecutionContext = as.dispatcher
     val j = as.actorOf(Props[SmallJumanActor])
     val fn = Path.fromString(args(0))
     val enc = args(1)

@@ -2,19 +2,18 @@ import sbt._
 
 organization := "ws.kotonoha"
 
-scalaVersion := "2.9.2"
+scalaVersion := "2.10.0"
 
 name := "Akane"
 
-version := "0.1-SNAPSHOT"
+version := "0.2-SNAPSHOT"
 
 moduleName := "akane"
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "1.8" % "test"
+libraryDependencies += "org.scalatest" %% "scalatest" % "1.9.1" % "test"
 
-libraryDependencies ++=
-					Seq("org.scalaz" %% "scalaz-core" % "6.0.4",
-						"com.jsuereth" %% "scala-arm" % "1.2",
+libraryDependencies ++=	Seq(					
+						"net.liftweb" %% "lift-json" % "2.5-M4",
 						"javax.transaction" % "jta" % "1.0.1B" % "provided"
 					)
 
@@ -24,13 +23,13 @@ libraryDependencies +=  "com.github.scala-incubator.io" %% "scala-io-file" % "0.
 
 libraryDependencies ++= Seq("org.jboss.netty" % "netty" % "3.2.7.Final")
  
-libraryDependencies += "com.typesafe.akka" % "akka-actor" % "2.0.5"
+resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
+
+libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.1.0"
 
 resolvers ++= Seq("jboss repo" at "http://repository.jboss.org/nexus/content/groups/public-jboss/")
 
-resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
-
-libraryDependencies += "commons-lang" % "commons-lang" % "2.4"
+libraryDependencies += "org.apache.commons" % "commons-lang3" % "3.1"
 
 libraryDependencies += "commons-io" % "commons-io" % "1.4"
 
@@ -38,4 +37,4 @@ resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/groups/pub
 
 libraryDependencies += "com.nativelibs4java" % "bridj" % "0.6.1"
 
-libraryDependencies += "com.weiglewilczek.slf4s" % "slf4s_2.9.1" % "1.0.7"
+libraryDependencies += "com.typesafe" %% "scalalogging-slf4j" % "1.0.1"

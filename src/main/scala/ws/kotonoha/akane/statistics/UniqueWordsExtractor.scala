@@ -20,10 +20,10 @@ import akka.actor.ActorRef
 import akka.pattern.ask
 import ws.kotonoha.akane.{ParsedQuery, JumanQuery}
 import ws.kotonoha.akane.ast.{Sentence, HighLvlNode}
-import akka.dispatch.{ExecutionContext, Future}
 import ws.kotonoha.akane.render.MetaStringRenderer
 import ws.kotonoha.akane.juman.{JumanDaihyou, JumanUtil}
 import akka.util.Timeout
+import concurrent.{Future, ExecutionContext}
 
 /**
  * @author eiennohito
@@ -31,7 +31,7 @@ import akka.util.Timeout
  */
 
 class UniqueWordsExtractor(juman: ActorRef, ex: ExecutionContext) {
-  import akka.util.duration._
+  import concurrent.duration._
   implicit val timeout = Timeout(5 seconds)
   implicit val ec : ExecutionContext = ex
 
@@ -39,10 +39,10 @@ class UniqueWordsExtractor(juman: ActorRef, ex: ExecutionContext) {
 
   def uniqueWords(nodes: TraversableOnce[HighLvlNode], stoplist: Set[String] = Set()): Future[List[JumanDaihyou]] = {
     val mir = new MetaStringRenderer()
-    val items = nodes flatMap {
+    val items = nodes.flatMap {
       case Sentence(s) => List(mir.render(s).data)
       case _ => Nil
-    } toList
+    }.toList
     val f = items map { s => parse(s) }
     Future.sequence(f) map {
       i => i.flatMap {
@@ -51,7 +51,7 @@ class UniqueWordsExtractor(juman: ActorRef, ex: ExecutionContext) {
         } filterNot {
           j => stoplist.contains(j.writing) || stoplist.contains(j.reading)
         }
-      } distinct
+      }.distinct
     }
   }
 

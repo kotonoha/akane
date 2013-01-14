@@ -45,7 +45,8 @@ class StaticGrouper(in: Iterator[String]) extends CalculatingIterator[String] {
     } else frm :: Nil
 
     val self =  if (UnicodeUtil.hasKanji(frm)) frm :: Nil else Nil
-    (items.flatMap(JMDictGrouper.items.get(_).flatten) ++ items ++ self).distinct
+    val jmdict = items.flatMap(i => JMDictGrouper.items.get(i).map(_.toList)).flatten
+     (jmdict ++ items ++ self).distinct
   }
 
   def fillQueue(): Option[String] = {

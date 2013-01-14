@@ -1,6 +1,5 @@
 package ws.kotonoha.akane
 import akka.actor._
-import akka.pattern._
 import org.jboss.netty.channel._
 import org.jboss.netty.handler.codec.frame.{Delimiters, DelimiterBasedFrameDecoder}
 import org.jboss.netty.handler.codec.string.{StringEncoder, StringDecoder}
@@ -8,8 +7,6 @@ import org.jboss.netty.bootstrap.ClientBootstrap
 import socket.nio.NioClientSocketChannelFactory
 import java.util.concurrent.Executors
 import java.net.InetSocketAddress
-import akka.dispatch.Await
-import akka.util.Duration
 import sys.process._
 
 sealed trait JumanMessage

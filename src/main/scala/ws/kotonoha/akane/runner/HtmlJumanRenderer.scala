@@ -7,7 +7,7 @@ import ws.kotonoha.akane.transform.JumanTransformer
 import ws.kotonoha.akane.juman.PipeExecutor
 import ws.kotonoha.akane.ast.Sentence
 import ws.kotonoha.akane.render.HtmlRenderer
-import xml.Utility
+import xml.{MinimizeMode, Utility}
 
 /**
  * @author eiennohito
@@ -47,7 +47,7 @@ object HtmlJumanRenderer {
       val pw = new PrintWriter(out.path, "utf-8")
 
       sb.clear()
-      Utility.sequenceToXML(doc, sb = sb, minimizeTags = true)
+      Utility.sequenceToXML(doc, sb = sb, minimizeTags = MinimizeMode.Always)
       println(sb.toString())
       pw.println(sb.toString())
 

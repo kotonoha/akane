@@ -17,7 +17,7 @@
 package ws.kotonoha.akane.tools
 
 import scalax.file.Path
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 
 /**
  * @author eiennohito
