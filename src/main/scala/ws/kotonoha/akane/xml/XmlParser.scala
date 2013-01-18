@@ -80,10 +80,10 @@ class XmlIterator(in: XMLEventReader) extends CalculatingIterator[XmlData] {
     import scala.collection.JavaConversions._
     val iter = st.getAttributes
     if (!iter.hasNext) {
-      return Map[String, String]()
+      return Map.empty
     }
-    val x = iter.map(_.asInstanceOf[Attribute]).map(a => a.getName.getLocalPart -> a.getValue)
-    x.toMap
+    iter.map(_.asInstanceOf[Attribute])
+      .foldLeft(Map[String, String]())((m, a) => m.updated(a.getName.getLocalPart, a.getValue))
   }
 
   private def transform(next: XMLEvent): Option[XmlData] = {
@@ -127,6 +127,14 @@ class XmlIterator(in: XMLEventReader) extends CalculatingIterator[XmlData] {
 }
 
 class XmlParseTransformer(in: CalculatingIterator[XmlData]) {
+  def head = in.head
+
+  def self = this
+
+  def assertTag(s: String) = {
+    assert(in.head.data.equals(s), s"${head} should equal to $s")
+  }
+
 
   def next() = in.next()
 
@@ -139,6 +147,13 @@ class XmlParseTransformer(in: CalculatingIterator[XmlData]) {
         in.next()
       }
       //if (in.hasNext) in.next()
+    }
+  }
+
+  def skipTo(tag: String) = {
+    while (in.hasNext && in.head.data != tag) {
+      val n = in.next()
+      println(s"warning: skipped $n")
     }
   }
 
@@ -155,6 +170,24 @@ class XmlParseTransformer(in: CalculatingIterator[XmlData]) {
         }
       }
       None
+    }
+  }
+
+  def transOnly[T](name: String)(p: XmlParseTransformer => T): Iterator[T] = new CalculatingIterator[T] {
+    protected def calculate() = {
+      in.head match {
+        case XmlEl(`name`) => Some(trans(name)(p))
+        case _ => None
+      }
+    }
+  }
+
+  def traverse[T](name: String)(p: XmlParseTransformer => T): Iterator[T] = new CalculatingIterator[T] {
+    protected def calculate() = {
+      in.head match {
+        case XmlEl(`name`) => Some(p(self))
+        case _ => None
+      }
     }
   }
 
@@ -179,13 +212,48 @@ class XmlParseTransformer(in: CalculatingIterator[XmlData]) {
     while (work && in.hasNext) {
       val n = in.next()
       n match {
-        case XmlEl(nm) if nm == name => {
-          return body(untilEndTag(name))
+        case XmlEl(`name`) => {
+          val inp = untilEndTag(name)
+          val data = body(inp)
+          head match {
+            case XmlElEnd(`name`) => in.next()
+            case _ => //
+          }
+          return data
         }
         case _ => //do nothing
       }
     }
     throw new Exception("There wasn't tag " + name)
+  }
+
+  def transOpt[T](name: String)(body: XmlParseTransformer => T): Option[T] = {
+    in.head match {
+      case XmlEl(`name`) => {
+        in.next()
+        val res = Some(body(untilEndTag(name)))
+        head match {
+          case XmlElEnd(`name`) => in.next()
+          case _ =>
+        }
+        res
+      }
+      case _ => None
+    }
+  }
+
+  def skipAll() {
+    while (in.hasNext) {
+      val n = in.next()
+      println(s"warning: skipped $n")
+    }
+  }
+
+  def optTextOf(name: String): Option[String] = {
+    in.head match {
+      case XmlEl(`name`) => Some(textOf(name))
+      case _ => None
+    }
   }
 
   def textOf(name: String) = {
