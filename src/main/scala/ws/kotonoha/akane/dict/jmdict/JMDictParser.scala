@@ -22,14 +22,19 @@ package ws.kotonoha.akane.dict.jmdict
  */
 
 case class LocString(str: String, loc: String)
+
 case class Meaning(info: List[String], vals: List[LocString])
+
 case class Priority(value: String)
-case class JMString(priority: List[Priority], value: String)
+
+case class JMString(priority: List[Priority], info: List[String], value: String)
+
 case class JMRecord(id: Long, reading: List[JMString], writing: List[JMString], meaning: List[Meaning])
 
 import ws.kotonoha.akane.xml._
 import java.io.InputStream
 import javax.xml.stream.XMLInputFactory
+import collection.mutable.ListBuffer
 
 
 object JMDictParser {
@@ -44,15 +49,17 @@ object JMDictParser {
 
   import scala.collection.{mutable => mut}
 
-  def parseJmString(it: XmlParseTransformer, name: String, teb: String, tpri: String): JMString = {
-    it.trans(name) {it =>
-      val v = it.textOf(teb)
-      val pris = it.transSeq(tpri) ( it => it.next() match {
-        case XmlText(t) => Some(t)
-        case _ => None
-      }) filterNot(_.isEmpty) map (_.get)
-      val prs = pris.map(Priority(_)).toList
-      JMString(prs, v)
+  def parseJmString(it: XmlParseTransformer, name: String, teb: String, tpri: String, inf: String): JMString = {
+    it.trans(name) {
+      it =>
+        val v = it.textOf(teb)
+        val pris = new ListBuffer[Priority]()
+        val strs = new ListBuffer[String]()
+        it.selector {
+          case XmlEl(`tpri`) => pris += Priority(it.textOf(tpri))
+          case XmlEl(`inf`) => strs += it.textOf(inf)
+        }
+        JMString(pris.result(), strs.result(), v)
     }
   }
 
@@ -64,16 +71,17 @@ object JMDictParser {
   }
 
   def parseSense(it: XmlParseTransformer): Meaning = {
-    it.trans("sense") { it =>
-      val gl = new mut.ListBuffer[LocString]
-      val poss = new mut.ListBuffer[String]
-      val misc = new mut.ListBuffer[String]
-      it.selector {
-        case XmlEl("pos") =>  poss += it.textOf("pos") //rec.pos(JMDictAnnotations.safeValueOf(it.textOf("pos")))
-        case XmlEl("misc") => misc += it.textOf("misc")
-        case x @ XmlEl("gloss") => gl += LocString(it.textOf("gloss"), lang(x))
-      }
-      Meaning(info = poss.toList ++ misc.toList, vals = gl.toList)
+    it.trans("sense") {
+      it =>
+        val gl = new mut.ListBuffer[LocString]
+        val poss = new mut.ListBuffer[String]
+        val misc = new mut.ListBuffer[String]
+        it.selector {
+          case XmlEl("pos") => poss += it.textOf("pos") //rec.pos(JMDictAnnotations.safeValueOf(it.textOf("pos")))
+          case XmlEl("misc") => misc += it.textOf("misc")
+          case x@XmlEl("gloss") => gl += LocString(it.textOf("gloss"), lang(x))
+        }
+        Meaning(info = poss.toList ++ misc.toList, vals = gl.toList)
     }
   }
 
@@ -85,8 +93,9 @@ object JMDictParser {
     val reader = fact.createFilteredReader(fact.createXMLEventReader(stream, "UTF-8"), WhitespaceFilter)
     val parser = XmlParser.parse(reader)
     while (parser.hasNext && !isJmdicNode(parser.next())) {}
-    val entries = parser.transSeq("entry") { it =>
-      parseEntry(it)
+    val entries = parser.transSeq("entry") {
+      it =>
+        parseEntry(it)
     }
     entries
   }
@@ -97,8 +106,8 @@ object JMDictParser {
     val mns = new mut.ListBuffer[Meaning]
     val id = it.textOf("ent_seq").toLong
     it.selector {
-      case XmlEl("r_ele") => rds += parseJmString(it, "r_ele", "reb", "re_pri")
-      case XmlEl("k_ele") => wrs += parseJmString(it, "k_ele", "keb", "ke_pri")
+      case XmlEl("r_ele") => rds += parseJmString(it, "r_ele", "reb", "re_pri", "re_inf")
+      case XmlEl("k_ele") => wrs += parseJmString(it, "k_ele", "keb", "ke_pri", "ke_inf")
       case XmlEl("sense") => mns += parseSense(it)
     }
     JMRecord(
