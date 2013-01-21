@@ -50,17 +50,19 @@ object UnicodeUtil {
 
   def isKatakana(p: Int): Boolean = inRange(p, katakanaRange)
 
-  def isKatakana(s: String): Boolean = stream(s).forall(isKatakana(_))
+  def isKatakana(s: String): Boolean = stream(s).forall(isKatakana)
 
   def isKana(p: Int) = isHiragana(p) || isKatakana(p)
 
-  def hasKanji(s: String) = stream(s).exists(isKanji(_))
+  def hasKanji(s: String) = stream(s).exists(isKanji)
 
-  def hasKana(s: String) = stream(s).exists(isKana(_))
+  def hasKana(s: String) = stream(s).exists(isKana)
 
   def isJapanese(s: String) = stream(s).take(50).forall {
     c => isKanji(c) || isHiragana(c) || isKatakana(c)
   }
+
+  def kanji(s: String) = stream(s).filter(isKanji).map(cp => new String(Character.toChars(cp))).toList
 
   def stream(s: String): Stream[Int] = stream(new StringReader(s))
 
