@@ -28,29 +28,42 @@ import collection.mutable.ListBuffer
  * @since 17.01.13 
  */
 
-case class KanjidicEntry (
-  literal: String,
-  codepoints: List[Entry],
-  radicals: List[Entry],
-  misc: Misc,
-  dicRefs: List[DicRef],
-  codes: List[Entry],
-  rmgroups: List[RmGroup],
-  nanori: List[String]
-)
+case class KanjidicEntry(
+                          literal: String,
+                          codepoints: List[Entry],
+                          radicals: List[Entry],
+                          misc: Misc,
+                          dicRefs: List[DicRef],
+                          codes: List[Entry],
+                          rmgroups: List[RmGroup],
+                          nanori: List[String]
+                          )
 
-case class Misc (
-  strokes: List[Int],
-  variants: List[Entry],
-  freq: Option[Int],
-  grade: Option[Int],
-  jlpt: Option[String]
-)
+case class Misc(
+                 strokes: List[Int],
+                 variants: List[Entry],
+                 freq: Option[Int],
+                 grade: Option[Int],
+                 jlpt: Option[String]
+                 )
 
 case class DicRef(drType: String, pos: String, rest: Map[String, String] = Map())
+
 case class Entry(name: String, value: String)
 
-case class RmGroup(readings: List[Entry], meanings: List[LocString])
+case class RmGroup(readings: List[Entry], meanings: List[LocString]) {
+  lazy val onyomi = readings.filter(_.name == KanjidicTypes.onyomi).map(_.value)
+  lazy val kunyomi = readings.filter(_.name == KanjidicTypes.kunyomi).map(_.value)
+  //kunyomi without end of word marks
+  lazy val cleanKunyomi = kunyomi.map(_.replace(".", ""))
+}
+
+object KanjidicTypes {
+  val kunyomi = "ja_kun"
+  val onyomi = "ja_on"
+  val pinyin = "pinyin"
+  val korean_h = "korean_h"
+}
 
 object Kanjidic2Parser {
 
@@ -67,57 +80,70 @@ object Kanjidic2Parser {
 
   def parseKvp(it: XmlParseTransformer, tag: String, key: String) = {
     it.head match {
-      case t @ XmlEl(`tag`) => Entry(t(key), it.textOf(tag))
+      case t@XmlEl(`tag`) => Entry(t(key), it.textOf(tag))
       case x => throw new IllegalStateException(s"Tag ${x.data} should not been here, was waiting for $tag")
     }
   }
 
   def parseCol(it: XmlParseTransformer, outer: String, inner: String, key: String) = {
-    it.transOpt(outer) { it =>
-      it.traverse(inner) { parseKvp(_, inner, key) } toList
-    } getOrElse(Nil)
+    it.transOpt(outer) {
+      it =>
+        it.traverse(inner) {
+          parseKvp(_, inner, key)
+        } toList
+    } getOrElse (Nil)
   }
 
   def parseMisc(it: XmlParseTransformer) = {
-    it.trans("misc") { it =>
-      val scnt = new ListBuffer[Int]
-      val vars = new ListBuffer[Entry]
-      var grade, freq: Option[Int] = None
-      var jlpt: Option[String] = None
-      it.selector {
-        case XmlEl("grade") => grade = it.optTextOf("grade") map {_.toInt}
-        case XmlEl("stroke_count") => scnt += it.textOf("stroke_count").toInt
-        case XmlEl("variant") => vars += parseKvp(it, "variant", "var_type")
-        case XmlEl("freq") => freq = it.optTextOf("freq").map {_.toInt}
-        case XmlEl("jlpt") => jlpt = it.optTextOf("jlpt")
-      }
-      Misc(scnt.result(), vars.result(), freq, grade, jlpt)
+    it.trans("misc") {
+      it =>
+        val scnt = new ListBuffer[Int]
+        val vars = new ListBuffer[Entry]
+        var grade, freq: Option[Int] = None
+        var jlpt: Option[String] = None
+        it.selector {
+          case XmlEl("grade") => grade = it.optTextOf("grade") map {
+            _.toInt
+          }
+          case XmlEl("stroke_count") => scnt += it.textOf("stroke_count").toInt
+          case XmlEl("variant") => vars += parseKvp(it, "variant", "var_type")
+          case XmlEl("freq") => freq = it.optTextOf("freq").map {
+            _.toInt
+          }
+          case XmlEl("jlpt") => jlpt = it.optTextOf("jlpt")
+        }
+        Misc(scnt.result(), vars.result(), freq, grade, jlpt)
     }
   }
 
   def parseDref(it: XmlParseTransformer) = {
-    it.transOpt("dic_number") (_.traverse("dic_ref") { it =>
-      it.head match {
-        case e @ XmlEl("dic_ref") => DicRef(e("dr_type"), it.textOf("dic_ref"), e.attrs - "dr_type")
-        case _ => throw new IllegalStateException()
-      }
-    } toList ) getOrElse(Nil)
+    it.transOpt("dic_number")(_.traverse("dic_ref") {
+      it =>
+        it.head match {
+          case e@XmlEl("dic_ref") => DicRef(e("dr_type"), it.textOf("dic_ref"), e.attrs - "dr_type")
+          case _ => throw new IllegalStateException()
+        }
+    } toList) getOrElse (Nil)
   }
 
   def parseRm(it: XmlParseTransformer) = {
-    it.transOpt("reading_meaning") { it =>
-      val grps = it.transSeq("rmgroup") { it =>
-        val rds = new ListBuffer[Entry]
-        val mns = new ListBuffer[LocString]
-        it.selector {
-          case XmlEl("reading") => rds += parseKvp(it, "reading", "r_type")
-          case x @ XmlEl("meaning") => mns += LocString(it.textOf("meaning"), x.attrs.get("m_lang").getOrElse("en"))
-        }
-        RmGroup(rds.result(), mns.result())
-      } toList
-      val nanori = it.transSeq("nanori") { _.textOf("nanori") } toList ;
-      (grps, nanori)
-    } getOrElse((Nil, Nil))
+    it.transOpt("reading_meaning") {
+      it =>
+        val grps = it.transSeq("rmgroup") {
+          it =>
+            val rds = new ListBuffer[Entry]
+            val mns = new ListBuffer[LocString]
+            it.selector {
+              case XmlEl("reading") => rds += parseKvp(it, "reading", "r_type")
+              case x@XmlEl("meaning") => mns += LocString(it.textOf("meaning"), x.attrs.get("m_lang").getOrElse("en"))
+            }
+            RmGroup(rds.result(), mns.result())
+        } toList
+        val nanori = it.transSeq("nanori") {
+          _.textOf("nanori")
+        } toList;
+        (grps, nanori)
+    } getOrElse ((Nil, Nil))
   }
 
   def parseEntry(it: XmlParseTransformer): KanjidicEntry = {
@@ -141,8 +167,9 @@ object Kanjidic2Parser {
 
     while (parser.hasNext && !isKanjidicNode(parser.next())) {}
 
-    val entries = parser.transSeq("character") { it =>
-      parseEntry(it)
+    val entries = parser.transSeq("character") {
+      it =>
+        parseEntry(it)
     }
     entries
   }
