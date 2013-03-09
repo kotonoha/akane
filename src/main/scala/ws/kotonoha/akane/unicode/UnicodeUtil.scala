@@ -46,13 +46,17 @@ object UnicodeUtil {
 
   def isKanji(c: Int) = inRange(c, kanjiRanges)
 
-  def isHiragana(p: Int) = inRange(p, hiraganaRange)
+  def isHiragana(p: Int): Boolean = inRange(p, hiraganaRange)
+
+  def isHiragana(s: String): Boolean = stream(s).forall(isHiragana)
 
   def isKatakana(p: Int): Boolean = inRange(p, katakanaRange)
 
   def isKatakana(s: String): Boolean = stream(s).forall(isKatakana)
 
-  def isKana(p: Int) = isHiragana(p) || isKatakana(p)
+  def isKana(p: Int): Boolean = isHiragana(p) || isKatakana(p)
+
+  def isKana(s: String): Boolean = stream(s).forall(isKana)
 
   def hasKanji(s: String) = stream(s).exists(isKanji)
 
