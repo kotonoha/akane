@@ -2,7 +2,7 @@ import sbt._
 
 organization := "ws.kotonoha"
 
-scalaVersion := "2.10.0"
+scalaVersion := "2.10.1"
 
 name := "Akane"
 
@@ -13,7 +13,7 @@ moduleName := "akane"
 libraryDependencies += "org.scalatest" %% "scalatest" % "1.9.1" % "test"
 
 libraryDependencies ++=	Seq(					
-						"net.liftweb" %% "lift-json" % "2.5-M4",
+						"net.liftweb" %% "lift-json" % "2.5-RC2",
 						"javax.transaction" % "jta" % "1.0.1B" % "provided"
 					)
 
