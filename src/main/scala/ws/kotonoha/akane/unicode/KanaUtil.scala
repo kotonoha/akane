@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 eiennohito
+ * Copyright 2012-2013 eiennohito
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,30 +14,33 @@
  * limitations under the License.
  */
 
-package ws.kotonoha.akane.unicode;
+package ws.kotonoha.akane.unicode
 
 /**
  * @author eiennohito
- * @since 22.10.12
+ * @since 19.03.13 
  */
-
 /**
  * Miscellaneous text utilities
  */
-public class KanaUtil {
+object KanaUtil {
   /**
    * Converts all Katakana characters to hiragana characters
    */
-  public static String kataToHira(String input) {
-    StringBuffer buf = new StringBuffer(input);
-    int length = buf.length();
-    for (int i = 0; i < length; ++i) {
-      char ch = buf.charAt(i);
-      //if katakana then convert to hiragana
+  def kataToHira(input: String): String = {
+    val buf: StringBuffer = new StringBuffer(input)
+    val length: Int = buf.length
+    var i: Int = 0
+    while (i < length) {
+      val ch: Char = buf.charAt(i)
       if (ch >= 0x30a1 && ch < 0x30f4) {
-        buf.setCharAt(i, (char)(ch - 96));
+        buf.setCharAt(i, (ch - 96).toChar)
       }
+      i += 1
     }
-    return buf.toString();
+    buf.toString
   }
 }
+
+
+

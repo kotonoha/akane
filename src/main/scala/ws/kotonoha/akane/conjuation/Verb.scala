@@ -228,6 +228,10 @@ trait Verb extends Renderable with Chaining[Verb] {
   )
 }
 
+object AdjI {
+  def apply(in: String) = new AdjI(ConjObject(in :: Nil))
+}
+
 object Verb {
   def dummy = new GodanVerb(ConjObject.Empty)
 
