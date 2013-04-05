@@ -8,13 +8,14 @@ import ws.kotonoha.akane.ast.Image
 import annotation.tailrec
 import collection.immutable.HashSet
 import ws.kotonoha.akane.unicode.UnicodeUtil
+import com.typesafe.scalalogging.slf4j.Logging
 
 /**
  * @author eiennohito
  * @since 16.08.12
  */
 
-trait AozoraInput {
+trait AozoraInput extends Logging {
   def peek: Int //doesn't go forward
   def next: Int //goes forward
   def mark(): Unit
@@ -30,21 +31,30 @@ trait AozoraInput {
     len == i
   }
 
-  def skipUntil(c: Char) = {
+  def skipUntil(c: Char, max: Int = -1) = {
     mark()
-    while (c != peek && peek != -1) {
-      next
+    if (max > 0) {
+      var cnt = max
+      while (c != peek && cnt > 0 && peek != -1) {
+        next
+        cnt -= 1
+      }
+    } else {
+      while (c != peek && peek != -1) {
+        next
+      }
     }
+
     val s = subseq(-1)
     s match {
       case Some(s) => {
         val cnt = s.length()
         if (cnt > 100) {
-          printf("attention: long skip for %d\n", cnt)
+          logger.warn(s"attention: long skip for $cnt, \n${s.toString}")
         }
       }
       case None => {
-        printf("Skipped very very *very* much, this is a bug!")
+        logger.warn("Skipped very very *very* much, this is a bug!")
       }
     }
   }
@@ -56,7 +66,7 @@ object AozoraParser {
   val SENTENCE_SEPARATORS = HashSet('。', '？', '！', '?', '!', '」')
 }
 
-class AozoraParser(inp: AozoraInput) extends BufferedIterator[HighLvlNode] {
+class AozoraParser(inp: AozoraInput) extends BufferedIterator[HighLvlNode] with Logging {
   private val buf = CharBuffer.allocate(16 * 1024) // there shouldn't be sentences larger than 16kbtytes, rly
 
   private def content = {
@@ -67,13 +77,20 @@ class AozoraParser(inp: AozoraInput) extends BufferedIterator[HighLvlNode] {
 
   def parseImgTag(): Option[HighLvlNode] = {
     if (inp.skipMatch("<img src=\"")) {
-      while (inp.peek != '\"') {
+      var cnt = 0
+      while (inp.peek != '\"' && cnt < 250) {
         buf.append(inp.next.toChar)
+        cnt += 1
       }
-      inp.skipUntil('>')
-      Some(Image(content))
+      if (cnt == 250) {
+        inp.skipUntil('\n', 250)
+        None
+      } else {
+        inp.skipUntil('>', 250)
+        Some(Image(content))
+      }
     } else {
-      inp.skipUntil('>')
+      inp.skipUntil('>', 250)
       calculateNextNode()
     }
   }
@@ -91,7 +108,7 @@ class AozoraParser(inp: AozoraInput) extends BufferedIterator[HighLvlNode] {
     if (inp.skipMatch("［＃改ページ］")) {
       Some(PageBreak)
     } else {
-      inp.skipUntil('］')
+      inp.skipUntil('］', 150)
       calculateNextNode()
     }
   }
@@ -100,8 +117,14 @@ class AozoraParser(inp: AozoraInput) extends BufferedIterator[HighLvlNode] {
   def handleRuby(bldr: ListBuffer[Node]): Unit = {
     inp.next
     val prev = content
-    while (inp.peek != '》') {
+    var cnt = 0
+    while (inp.peek != '》' && cnt < 100) {
       buf.append(inp.next.toChar)
+      cnt += 1
+    }
+    if (cnt == 100) {
+      logger.warn(s"skipped 500 chars after:\n$prev\nchars are\n$content")
+      inp.skipUntil('\n', 250)
     }
     var i = prev.length - 1
     while (i >= 0 && UnicodeUtil.isKanji(prev(i))) {
@@ -124,15 +147,18 @@ class AozoraParser(inp: AozoraInput) extends BufferedIterator[HighLvlNode] {
         inp.next
       }
       if (inp.skipMatch("」に傍点］")) {
-        val text = prev.substring(0, prev.length - i)
-        val hled = prev.substring(text.length)
-        buffer += StringNode(text)
-        buffer += HighlightNode(StringNode(hled))
+        val end = prev.length - i
+        if (end > 0) {
+          val text = prev.substring(0, end)
+          val hled = prev.substring(text.length)
+          buffer += StringNode(text)
+          buffer += HighlightNode(StringNode(hled))
+        }
       } else {
-        inp.skipUntil('］') //some mistype
+        inp.skipUntil('］', 50) //some mistype
       }
     } else {
-      inp.skipUntil('］')
+      inp.skipUntil('］', 150)
       buf.append(prev) //restore buffer
     }
   }

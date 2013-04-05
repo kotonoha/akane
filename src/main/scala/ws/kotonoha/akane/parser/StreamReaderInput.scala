@@ -1,7 +1,8 @@
 package ws.kotonoha.akane.parser
 
-import java.io.InputStreamReader
+import java.io.{Reader, InputStreamReader}
 import java.nio.CharBuffer
+import ws.kotonoha.akane.unicode.UnicodeUtil
 
 /**
  * @author eiennohito
@@ -24,7 +25,16 @@ class StreamReaderInput(in: InputStreamReader) extends AozoraInput {
     mark_ = mark_ map { m => (m - sz) max (-1) }
   }
 
-  end = in.read(charbuf)
+  private def checkJapanese(cnt: Int) {
+    val total = charbuf.take(cnt).count(UnicodeUtil.isJapanese(_))
+    if (total < cnt / 10) throw new IllegalArgumentException("Too few japanese characters")
+  }
+
+  end = {
+    val cnt = in.read(charbuf)
+    checkJapanese(cnt)
+    cnt
+  }
 
   def peek = {
     if (eof) {
@@ -45,6 +55,8 @@ class StreamReaderInput(in: InputStreamReader) extends AozoraInput {
     }
     def length() = len
     def subSequence(start: Int, end: Int) = new MyString(cur + start, len - (end - start))
+
+    override def toString = new String(charbuf, cur, len)
   }
 
   def subseq(rel: Int) = {

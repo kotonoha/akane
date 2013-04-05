@@ -10,7 +10,7 @@ import ws.kotonoha.akane.ast.ListNode
  * @since 17.08.12
  */
 
-case class MetaInfo
+case class MetaInfo()
 
 case class MetaString(data: String, info: MetaInfo)
 

@@ -38,3 +38,7 @@ resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/groups/pub
 libraryDependencies += "com.nativelibs4java" % "bridj" % "0.6.1"
 
 libraryDependencies += "com.typesafe" %% "scalalogging-slf4j" % "1.0.1"
+
+javacOptions ++= Seq("-encoding", "utf8")
+
+libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.9"

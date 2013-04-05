@@ -62,9 +62,9 @@ object UnicodeUtil {
 
   def hasKana(s: String) = stream(s).exists(isKana)
 
-  def isJapanese(s: String) = stream(s).take(50).forall {
-    c => isKanji(c) || isHiragana(c) || isKatakana(c)
-  }
+  def isJapanese(c: Int): Boolean = isKanji(c) || isHiragana(c) || isKatakana(c)
+
+  def isJapanese(s: String): Boolean = stream(s).take(50).forall { isJapanese }
 
   def kanji(s: String) = stream(s).filter(isKanji).map(cp => new String(Character.toChars(cp))).toList
 

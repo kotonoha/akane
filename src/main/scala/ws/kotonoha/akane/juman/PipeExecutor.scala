@@ -51,8 +51,22 @@ class PipeExecutor(path: String, args: List[String] = Nil, encoding: Option[Stri
     }
   }
 
+  def sanitize(s: String) = {
+    val buf = new StringBuilder(s.length)
+    val len = s.length
+    var i = 0
+    while (i < len) {
+      val c = s(i)
+      if (c >= 0x20)
+        buf.append(c)
+      i += 1
+    }
+    buf.toString()
+  }
 
-  private def parseInner(in: String): List[JumanEntry] = {
+
+  private def parseInner(raw: String): List[JumanEntry] = {
+    val in = sanitize(raw)
     val os = process.getOutputStream
     os.write(in.getBytes(encod))
     if (!in.endsWith("\n")) {
