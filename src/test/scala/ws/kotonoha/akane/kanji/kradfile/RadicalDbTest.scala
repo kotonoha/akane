@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 eiennohito
+ * Copyright 2012-2013 eiennohito
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,28 +14,31 @@
  * limitations under the License.
  */
 
-package ws.kotonoha.akane.dict.jmdict
+package ws.kotonoha.akane.kanji.kradfile
 
-import org.scalatest.FreeSpec
 import org.scalatest.matchers.ShouldMatchers
-import ws.kotonoha.akane.dict.kanjidic2.Kanjidic2Parser
+import org.scalatest.FreeSpec
 
 /**
  * @author eiennohito
- * @since 17.01.13 
+ * @since 08.07.13 
  */
 
-class KanjidicParserSpec extends FreeSpec with ShouldMatchers {
+class RadicalDbTest extends FreeSpec with ShouldMatchers {
+  "RadicalDb" - {
+    "finds some kanji" in {
+      val list = RadicalDb.table.get("私")
+      print(list)
+    }
 
-  "kradfile parser" - {
-    "parses something" in {
-      val inp = getClass.getClassLoader.getResourceAsStream("kanjidic_frag_01.xml")
-      val kanji = Kanjidic2Parser.parse(inp)
-      val lst = kanji.toList
-      lst should have length (1)
-      val item = lst.head
-      item.literal should be ("唖")
+    "finds reverse kanji" in {
+      val reverse = RadicalDb.reverse.get("厶")
+      println(reverse)
+    }
+
+    "finds similar kanji" in {
+      val similar = SimilarKanji.find("私")
+      println(similar)
     }
   }
-
 }
