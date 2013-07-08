@@ -37,7 +37,7 @@ class JMDictParserTest extends org.scalatest.FunSuite with org.scalatest.matcher
     val d = p("""<k_ele>
     <keb>a</keb>
     </k_ele>""")
-    val i = JMDictParser.parseJmString(d, "k_ele", "keb", "whatever")
+    val i = JMDictParser.parseJmString(d, "k_ele", "keb", "whatever", "none")
     i.value should equal ("a")
   }
 
@@ -46,7 +46,7 @@ class JMDictParserTest extends org.scalatest.FunSuite with org.scalatest.matcher
     <keb>a</keb>
     <ke_pri>ichi2</ke_pri>
     </k_ele>""")
-    val i = JMDictParser.parseJmString(d, "k_ele", "keb", "ke_pri")
+    val i = JMDictParser.parseJmString(d, "k_ele", "keb", "ke_pri", "none")
     i.value should equal ("a")
     i.priority.head should equal (Priority("ichi2"))
   }
