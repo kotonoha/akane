@@ -26,7 +26,7 @@ case class SimilarKanji(text: String, rads: Seq[String], common: Seq[String], di
 object SimilarKanji {
 
   def findSimilar(rads: Seq[String]) = {
-    val cands = RadicalDb.reverse(rads.head) //get all kanji that have first radical
+    val cands = rads.flatMap(x => RadicalDb.reverse(x)).distinct //get all kanji that have first radical
     cands.map { k =>
       val krads = RadicalDb.table(k)
       val common = rads.intersect(krads)
