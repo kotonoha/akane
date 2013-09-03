@@ -1,7 +1,7 @@
 package ws.kotonoha.akane.config
 
 import java.net.InetAddress
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
 
 /**
  * @author eiennohito
@@ -16,20 +16,22 @@ object Configuration {
     }.map(_.mkString("."))
   }
 
-  def withUsername(name: String): List[String] = {
-    val uname = System.getProperty("user.name")
+  def withUsername(name: String, config: Config = ConfigFactory.defaultOverrides()): List[String] = {
+    val uname = config.getString("user.name")
     s"$uname.$name" :: Nil
   }
 
-  def possibleNamesFor(name: String): List[String] = {
-    val c1 = name :: withHostname(name) ::: withUsername(name).flatMap(withHostname)
+  def possibleNamesFor(name: String, defaults: Config = ConfigFactory.defaultOverrides()): List[String] = {
+    val c1 = name :: withHostname(name) ::: withUsername(name, defaults).flatMap(withHostname)
     c1.map(_ + ".conf").distinct
   }
 
-  def makeConfigFor(name: String) = {
-    val names = possibleNamesFor(name)
-    names.foldLeft(ConfigFactory.defaultOverrides()) {
-      case (c, cname) => c.withFallback(ConfigFactory.parseResources(cname))
+  def makeConfigFor(name: String, defaults: Config = ConfigFactory.defaultOverrides()) = {
+    val names = possibleNamesFor(name, defaults)
+    names.foldLeft(defaults) {
+      case (c, cname) =>
+        val config = ConfigFactory.parseResources(cname)
+        config.withFallback(c)
     }
   }
 }
@@ -37,4 +39,35 @@ object Configuration {
 
 object AkaneConfig {
   lazy val default = Configuration.makeConfigFor("akane")
+}
+
+class JumanConfig(val executable: String, val encoding: String, val params: List[String])
+object JumanConfig {
+  val jumanEx = "akane.juman.executable"
+  val jumanArgs = "akane.juman.args"
+  val jumanEncoding = "akane.juman.encoding"
+
+  def apply(config: Config = ConfigFactory.empty()) = {
+    import scala.collection.JavaConversions._
+    val merged = config.withFallback(AkaneConfig.default)
+    val exec = merged.getString(jumanEx)
+    val enc = merged.getString(jumanEncoding)
+    val args = merged.getStringList(jumanArgs).toList
+    new JumanConfig(exec, enc, args)
+  }
+}
+
+class KnpConfig(val juman: JumanConfig, val executable: String, val params: List[String])
+object KnpConfig {
+  val knpEx = "akane.knp.executable"
+  val knpArgs = "akane.knp.args"
+
+  def apply(config: Config = ConfigFactory.empty()) = {
+    import scala.collection.JavaConversions._
+    val juman = JumanConfig(config)
+    val merged = config.withFallback(AkaneConfig.default)
+    val knp = merged.getString(knpEx)
+    val args = merged.getStringList(knpArgs).toList
+    new KnpConfig(juman, knp, args)
+  }
 }

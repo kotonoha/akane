@@ -21,7 +21,7 @@ import ws.kotonoha.akane.parser.{AozoraParser, StreamReaderInput}
 import java.io.{PrintWriter, InputStreamReader}
 import akka.actor.{Props, ActorSystem, Actor}
 import ws.kotonoha.akane.{ParsedQuery, JumanQuery}
-import ws.kotonoha.akane.juman.{JumanDaihyou, PipeExecutor}
+import ws.kotonoha.akane.juman.{JumanDaihyou, JumanPipeExecutor}
 import ws.kotonoha.akane.statistics.{UniqueWordsExtractor => WE}
 import ws.kotonoha.akane.utils.PathUtil
 import concurrent.{ExecutionContext, Await}
@@ -33,7 +33,7 @@ import concurrent.duration._
  */
 
 class SmallJumanActor extends Actor {
-  val je = new PipeExecutor("juman.exe")
+  val je = JumanPipeExecutor.apply()
   def receive = {
     case JumanQuery(q) => sender ! ParsedQuery(je.parse(q))
   }

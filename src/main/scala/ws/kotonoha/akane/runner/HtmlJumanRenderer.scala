@@ -4,7 +4,7 @@ import ws.kotonoha.akane.parser.{AozoraParser, StreamReaderInput}
 import scalax.file.Path
 import java.io.{PrintWriter, InputStreamReader}
 import ws.kotonoha.akane.transform.JumanTransformer
-import ws.kotonoha.akane.juman.PipeExecutor
+import ws.kotonoha.akane.juman.JumanPipeExecutor
 import ws.kotonoha.akane.ast.Sentence
 import ws.kotonoha.akane.render.HtmlRenderer
 import xml.{MinimizeMode, Utility}
@@ -18,7 +18,7 @@ object HtmlJumanRenderer {
   def main(args: Array[String]) = {
     val fn = args(0)
     val res = Path.fromString(fn) inputStream
-    val pe = new PipeExecutor("juman.exe")
+    val pe = JumanPipeExecutor.apply()
     val jt = new JumanTransformer(pe)
     for (is <- res) {
       val rdr = new InputStreamReader(is, args(1))

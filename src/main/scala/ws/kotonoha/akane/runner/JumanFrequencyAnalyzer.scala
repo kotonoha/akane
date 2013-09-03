@@ -3,7 +3,7 @@ package ws.kotonoha.akane.runner
 import scalax.file.Path
 import java.io.{PrintWriter, InputStreamReader}
 import ws.kotonoha.akane.parser.{DebugInput, AozoraParser, StreamReaderInput}
-import ws.kotonoha.akane.juman.PipeExecutor
+import ws.kotonoha.akane.juman.JumanPipeExecutor
 import ws.kotonoha.akane.statistics.FrequencyAnalyzer
 import scalax.io.Codec
 import collection.mutable
@@ -16,7 +16,7 @@ import collection.mutable
 object JumanFrequencyAnalyzer {
   def main(args: Array[String]) = {
     val path = Path(args(0))
-    val pex = new PipeExecutor("juman.exe")
+    val pex = JumanPipeExecutor.apply()
     val enc = args(1)
     val ignore = args.slice(2, args.length).foldLeft (new mutable.HashSet[String]()) {case (hs, path) => {
       val p = Path(path)
