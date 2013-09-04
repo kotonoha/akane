@@ -31,6 +31,7 @@ object KnpParser extends Logging {
         val cinfo = info match {
           case KList(Nil) => ""
           case KAtom(s) => s
+          case x => logger.warn("unknown cinfo " + x); ""
         }
         KnpLexeme(
           surf, read, writ,

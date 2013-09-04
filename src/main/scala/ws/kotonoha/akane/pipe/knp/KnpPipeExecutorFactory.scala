@@ -12,8 +12,7 @@ import java.util
  * @author eiennohito
  * @since 2013-09-03
  */
-class KnpPipeExecutorFactory(config: KnpConfig) {
-  implicit val ec: ExecutionContext = ExecutionContext.global
+class KnpPipeExecutorFactory(config: KnpConfig)(implicit val ec: ExecutionContext = ExecutionContext.global) {
   def launch() = {
     val juman = config.juman
     val jumanArgs = new util.ArrayList[String]()

@@ -8,6 +8,7 @@ import java.io.{BufferedReader, InputStreamReader, OutputStreamWriter}
 import ws.kotonoha.akane.pipe.knp.lisp.{KList, LispParser}
 import scala.util.parsing.input.StreamReader
 import com.typesafe.scalalogging.slf4j.Logging
+import scala.concurrent.ExecutionContext
 
 /**
  * @author eiennohito
@@ -36,8 +37,8 @@ class KnpPipeAnalyzer(juman: Process, knp: Process, pipe: String, enc: String) e
 
     val rd = new BufferedReader(reader)
     val parseInput = StreamReader.apply(rd)
-    val lisp = parseInput match {
-      case LispParser.Success(lisp, _) => Some(lisp.asInstanceOf[KList])
+    val lisp = parser(parseInput) match {
+      case LispParser.Success(res, _) => Some(res.asInstanceOf[KList])
       case x => logger.warn("can't parse knp output " + x); None
     }
     lisp.flatMap(KnpParser.parseTree)
@@ -46,7 +47,7 @@ class KnpPipeAnalyzer(juman: Process, knp: Process, pipe: String, enc: String) e
 
 class KnpPipeParser private(factory: () => KnpPipeAnalyzer) extends AbstractRetryExecutor[Option[KnpNode]](factory)
 object KnpPipeParser {
-  def apply(config: Config = ConfigFactory.empty()) = {
+  def apply(config: Config = ConfigFactory.empty())(implicit ec: ExecutionContext) = {
     val knpConfig = KnpConfig.apply(config)
     val factory = new KnpPipeExecutorFactory(knpConfig)
     new KnpPipeParser(factory.launch)
