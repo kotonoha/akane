@@ -17,6 +17,8 @@ libraryDependencies ++=	Seq(
 						"javax.transaction" % "jta" % "1.0.1B" % "provided"
 					)
 
+resolvers += "java.net" at "http://download.java.net/maven/2/"
+
 libraryDependencies += "com.github.scala-incubator.io" %% "scala-io-core" % "0.4.2"
 
 libraryDependencies +=  "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.2"
