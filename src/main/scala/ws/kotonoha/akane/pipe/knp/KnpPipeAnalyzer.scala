@@ -5,19 +5,23 @@ import com.typesafe.config.{ConfigFactory, Config}
 import ws.kotonoha.akane.config.KnpConfig
 import scalax.file.Path
 import java.io.{BufferedReader, InputStreamReader, OutputStreamWriter}
-import scala.collection.mutable.ListBuffer
+import ws.kotonoha.akane.pipe.knp.lisp.{KList, LispParser}
+import scala.util.parsing.input.StreamReader
+import com.typesafe.scalalogging.slf4j.Logging
 
 /**
  * @author eiennohito
  * @since 2013-09-03
  */
-class KnpPipeAnalyzer(juman: Process, knp: Process, pipe: String, enc: String) extends Analyzer[List[String]] {
+class KnpPipeAnalyzer(juman: Process, knp: Process, pipe: String, enc: String) extends Analyzer[Option[KnpNode]] with Logging {
 
   def close() {
     knp.destroy()
     juman.destroy()
     Path.fromString(pipe).delete(force = true)
   }
+
+  val parser = LispParser.list
 
   def analyze(in: String) = {
     val input = juman.getOutputStream
@@ -31,21 +35,16 @@ class KnpPipeAnalyzer(juman: Process, knp: Process, pipe: String, enc: String) e
     writer.flush()
 
     val rd = new BufferedReader(reader)
-    val lines = new ListBuffer[String]
-    var ok = true
-    do {
-      val line = rd.readLine()
-      line match {
-        case "EOS" => ok = false
-        case x if x.startsWith("#") => //skip comment
-        case x => lines += x
-      }
-    } while (ok)
-    lines.result()
+    val parseInput = StreamReader.apply(rd)
+    val lisp = parseInput match {
+      case LispParser.Success(lisp, _) => Some(lisp.asInstanceOf[KList])
+      case x => logger.warn("can't parse knp output " + x); None
+    }
+    lisp.flatMap(KnpParser.parseTree)
   }
 }
 
-class KnpPipeParser private(factory: () => KnpPipeAnalyzer) extends AbstractRetryExecutor[List[String]](factory)
+class KnpPipeParser private(factory: () => KnpPipeAnalyzer) extends AbstractRetryExecutor[Option[KnpNode]](factory)
 object KnpPipeParser {
   def apply(config: Config = ConfigFactory.empty()) = {
     val knpConfig = KnpConfig.apply(config)

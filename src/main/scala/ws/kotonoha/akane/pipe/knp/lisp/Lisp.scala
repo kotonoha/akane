@@ -25,7 +25,7 @@ object KInt {
 object LispParser extends RegexParsers {
 
 
-  override val whiteSpace = """(\s+)|(#[^\n\r]*[\n\r])""".r
+  override val whiteSpace = """(\s+)|(#[^\n\r]*[\n\r])|(EOS)""".r
 
   def quotedString = "(?:\"(?:[^\"\\\\]|\\\\.)*\")".r ^^ (s => KAtom(s.substring(1, s.length - 1)))
 
