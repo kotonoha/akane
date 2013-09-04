@@ -1,36 +1,17 @@
-package ws.kotonoha.akane.knp
+package ws.kotonoha.akane.pipe.knp
 
-import java.io._
-import java.util
-import scala.collection.mutable.ListBuffer
 import org.scalatest.FreeSpec
 import org.scalatest.matchers.ShouldMatchers
-import scalax.file.Path
-import java.util.concurrent.atomic.AtomicInteger
-import java.lang.ProcessBuilder.Redirect
-import scala.concurrent.{Await, ExecutionContext}
-import java.util.concurrent.TimeUnit
-import ws.kotonoha.akane.config.KnpConfig
-import ws.kotonoha.akane.pipe.{NamedPipes, AbstractRetryExecutor, Analyzer}
-import com.typesafe.config.{ConfigFactory, Config}
-import ws.kotonoha.akane.pipe.knp.{KnpPipeExecutorFactory, KnpPipeAnalyzer}
+import ws.kotonoha.akane.pipe.knp.lisp._
+import scala.util.parsing.input.{CharSequenceReader, Reader}
+import ws.kotonoha.akane.pipe.knp.lisp.KList
+import java.io.InputStreamReader
+import org.apache.commons.io.IOUtils
 
 /**
  * @author eiennohito
  * @since 2013-08-12
  */
-class KnpParser {
-
-}
-
-
-
-
-
-
-
-
-
 
 class KnpExecutorText extends FreeSpec with ShouldMatchers {
   "knp executor" - {
@@ -43,28 +24,42 @@ class KnpExecutorText extends FreeSpec with ShouldMatchers {
   }
 }
 
+class KnpParserTest extends FreeSpec with ShouldMatchers {
+  implicit def input(s: String): Reader[Char] = {
+    new CharSequenceReader(s, 0)
+  }
 
-//かわったり かわったり かわる 動詞 2 * 0 子音動詞ラ行 10 タ系連用タリ形 15 "代表表記:代わる/かわる 自他動詞:他:代える/かえる"
-case class KnpLexeme(
-surface: String,
-reading: String,
-dicForm: String,
-pos: String,
-fld1: Int,
-fld2: Option[String],
-fld3: Int,
-posType: String,
-fld4: Int,
-form: String,
-fld5: Int,
-info: String,
-tags: List[String]
-                      )
+  def parseString(s: String): KList = LispParser.list(s) match {
+    case LispParser.Success(s, _) => s.asInstanceOf[KList]
+    case x => throw new RuntimeException(x.toString)
+  }
 
-case class KnpItem(num: Int, star: String, plus: String, lexems: Seq[KnpLexeme])
+  val smallResult = """((2 (type:D) ((回る まわる 回る 動詞 2 * 0 子音動詞ラ行 10 基本形 2 "代表表記:回る/まわる 付属動詞候補（基本） 自他動詞:他:回す/まわす" (代表表記:回る/まわる 付属動詞候補（基本） 自他動詞:他:回す/まわす 正規化代表表記:回る/まわる 文末 表現文末 かな漢字 活用語 自立 内容語 タグ単位始 文節始 文節主辞))) (文末 用言:動 レベル:C 区切:5-5 ID:（文末） 提題受:30 主節 動態述語 正規化代表表記:回る/まわる 主辞代表表記:回る/まわる) NIL)
+    ((1 (type:D) ((町 まち 町 名詞 6 普通名詞 1 * 0 * 0 "代表表記:町/まち 漢字読み:訓 住所末尾 カテゴリ:組織・団体;場所-その他 ドメイン:政治" (代表表記:町/まち 漢字読み:訓 住所末尾 カテゴリ:組織・団体;場所-その他 ドメイン:政治 正規化代表表記:町/まち 漢字 かな漢字 名詞相当語 自立 内容語 タグ単位始 文節始 文節主辞))(が が が 助詞 9 格助詞 1 * 0 * 0 NIL (かな漢字 ひらがな 付属 ))) (SM-主体 SM-組織 ガ 助詞 体言 一文字漢字 係:ガ格 区切:0-0 格要素 連用要素 正規化代表表記:町/まち 主辞代表表記:町/まち) NIL))
+    ((0 (type:D) ((それ それ それ 指示詞 7 名詞形態指示詞 1 * 0 * 0 "疑似代表表記 代表表記:それ/それ" (疑似代表表記 代表表記:それ/それ 正規化代表表記:それ/それ 文頭 かな漢字 ひらがな 自立 内容語 タグ単位始 文節始 文節主辞))(でも でも でも 助詞 9 副助詞 2 * 0 * 0 NIL (かな漢字 ひらがな 付属 ))) (文頭 デモ 助詞 体言 指示詞 修飾 係:デ格 並キ:名:&ST:2.5&&デモ 区切:1-4 並列タイプ:AND 格要素 連用要素 正規化代表表記:それ/それ 主辞代表表記:それ/それ 並列類似度:-100.000) NIL)))"""
 
-object KnpParser {
-  def parseTab(lines: Seq[String]) = {
-    val buffer = new collection.mutable.ArrayBuffer[KnpItem]()
+  "knp parser" - {
+    "parses surface" in {
+      val nodes = parseString("(繰り返す くりかえす 繰り返す 動詞 2 * 0 子音動詞サ行 5 基本形 2 \"代表表記:繰り返す/くりかえす 補文ト\" (代表表記:繰り返す/くりかえす 補文ト 正規化代表表記:繰り返す/くりかえす 文末 表現文末 かな漢字 活用語 自立 内容語 タグ単位始 文節始 文節主辞))) (文末 補文ト 用言:動 レベル:C 区切:5-5 ID:（文末） 提題受:30 主節 動態述語 正規化代表表記:繰り返す/くりかえす 主辞代表表記:繰り返す/くりかえす) NIL)")
+      val res = KnpParser.parseSurface(nodes :: Nil)
+      res should not be Nil
+      val item :: Nil = res
+      item.surface should be ("繰り返す")
+    }
+
+    "parses small tree" in {
+      val sexp = parseString(smallResult)
+      val res = KnpParser.parseTree(sexp)
+      res should not be None
+    }
+
+    "parses a knp output" in {
+      val resource = getClass.getClassLoader.getResourceAsStream("knp.answer.txt")
+      val reader = new InputStreamReader(resource, "utf-8")
+      val sexp = parseString(IOUtils.toString(reader))
+      reader.close()
+      val tree = KnpParser.parseTree(sexp)
+      tree should not be None
+    }
   }
 }
