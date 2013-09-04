@@ -1,7 +1,7 @@
 package ws.kotonoha.akane.transform
 
 import ws.kotonoha.akane.ast.{ListNode, RubyNode, StringNode, Sentence}
-import ws.kotonoha.akane.juman.PipeExecutor
+import ws.kotonoha.akane.juman.JumanPipeExecutor
 import ws.kotonoha.akane.render.MetaStringRenderer
 import ws.kotonoha.akane.JumanRW
 import ws.kotonoha.akane.ruby.AfterLexical
@@ -11,7 +11,7 @@ import ws.kotonoha.akane.ruby.AfterLexical
  * @since 17.08.12
  */
 
-class JumanTransformer(j: PipeExecutor) {
+class JumanTransformer(j: JumanPipeExecutor) {
   def transformSentence(s: Sentence): Sentence = {
     val info = new MetaStringRenderer().render(s.s)
     val parsed = j.parse(info.data)

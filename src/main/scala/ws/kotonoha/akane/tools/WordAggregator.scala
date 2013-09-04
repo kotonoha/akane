@@ -5,7 +5,7 @@ import scala.concurrent.{Await, Future, ExecutionContext}
 import scalax.file.Path
 import java.io.{InputStreamReader, Reader}
 import ws.kotonoha.akane.parser.{AozoraParser, StreamReaderInput}
-import ws.kotonoha.akane.juman.{JumanDaihyou, PipeExecutor}
+import ws.kotonoha.akane.juman.{JumanDaihyou, JumanPipeExecutor}
 import ws.kotonoha.akane.render.MetaStringRenderer
 import ws.kotonoha.akane.ast.Sentence
 import com.typesafe.scalalogging.slf4j.Logging
@@ -39,12 +39,8 @@ object WordAggregator extends Logging {
   object juman extends LazyTheadLocal(makeJuman)
 
 
-  def makeJuman: PipeExecutor = {
-    new PipeExecutor(
-      "e:/Programming/c++/11/juman/x64/Release/juman.exe",
-      List("-r", "i:/dev/juman-7.0/juman-7.0/jumanrc.utf8"),
-      Some("utf-8")
-    )
+  def makeJuman: JumanPipeExecutor = {
+    JumanPipeExecutor.apply()
   }
 
   def loadNs(path: Path, level: String) = {

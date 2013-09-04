@@ -1,7 +1,7 @@
 package ws.kotonoha.akane.statistics
 
 import ws.kotonoha.akane.ast.{Node, Sentence, HighLvlNode}
-import ws.kotonoha.akane.juman.{JumanUtil, PipeExecutor}
+import ws.kotonoha.akane.juman.{JumanUtil, JumanPipeExecutor}
 import collection.mutable
 import ws.kotonoha.akane.render.MetaStringRenderer
 import ws.kotonoha.akane.JumanEntry
@@ -17,7 +17,7 @@ case class FrequencyInfo(cnt: Int, items: List[FreqItem])
 
 
 
-class FrequencyAnalyzer (juman: PipeExecutor, stoplist: Set[String] = Set()) {
+class FrequencyAnalyzer (juman: JumanPipeExecutor, stoplist: Set[String] = Set()) {
   val msr = new MetaStringRenderer()
 
   def processSentence(node: Node, cnts: mutable.Map[String, Int]): Int = {
