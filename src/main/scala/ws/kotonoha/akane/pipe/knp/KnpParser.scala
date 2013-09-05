@@ -82,10 +82,10 @@ object KnpParser extends Logging {
     tree match {
       case KList(KAtom("noun_para") :: children) =>
         val cnodes = parseItems(children)
-        Some(KnpNode(-2, "type:N", Nil, Nil, cnodes))
+        Some(KnpNode(-2, "type:PN", Nil, Nil, cnodes))
       case KList(KAtom("pred_para") :: children) =>
         val cnodes = parseItems(children)
-        Some(KnpNode(-3, "type:P", Nil, Nil, cnodes))
+        Some(KnpNode(-3, "type:PP", Nil, Nil, cnodes))
       case KList(l) if l.tail == Nil =>
         val lst = parseItems(l)
         lst.headOption
