@@ -20,7 +20,12 @@ object NamedPipes {
 }
 
 object UnixPipeGenerator extends PipeGenerator{
-  val directory = Path.fromString("/tmp/kotonoha/pipes/")
+  val directory = {
+    val p = Path.fromString("/tmp/kotonoha/pipes/")
+    if (p.nonExistent)
+      p.createDirectory(createParents = true)
+    p
+  }
   val counter = new AtomicInteger(directory.children().count(_ => true) + 1)
 
   def apply() = {
