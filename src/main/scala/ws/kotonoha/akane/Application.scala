@@ -16,7 +16,7 @@ case class DelayedJumanQuery(input: String, returnAdress: ActorRef) extends Juma
 case class ParsedQuery(inner : List[JumanEntry]) extends JumanMessage
 
 case class JumanEntry(writing: String, reading: String, dictForm: String, spPart: String, comment: String) extends JumanMessage {
-  def daihyou = JumanUtil.daihyouWriting(this)
+  @transient lazy val daihyou = JumanUtil.daihyouWriting(this)
   def tag(tag: String) = JumanUtil.extractTag(this, tag)
   def tags = JumanUtil.extractTags(this)
 }

@@ -71,7 +71,7 @@ class JumanPipeAnalyzer (process: Process, encoding: String) extends Analyzer[Li
       val line = buf.readLine()
       line match {
         case "EOS" => ok = false
-        case x if x.startsWith("@") => //ignore
+        case x if x.startsWith("@") =>
         case x => bldr += JumanEntry.parse(line)
       }
     } while (ok)

@@ -18,8 +18,9 @@ package ws.kotonoha.akane.juman
 
 import ws.kotonoha.akane.JumanEntry
 import scala.Some
-import util.matching.Regex.Groups
 import ws.kotonoha.akane.basic.ReadingAndWriting
+import scala.util.matching.Regex.Groups
+import java.util.regex.Pattern
 
 case class JumanDaihyou(writing: String, reading: String) extends ReadingAndWriting
 
@@ -65,11 +66,20 @@ object JumanUtil {
     str
   }
 
+  private val daihyoJava = Pattern.compile("""代表表記:(.+?)/(.+?)\b""")
+
   def daihyouWriting(ent: JumanEntry) = {
     val pos = ent.spPart
-    daihyoRE.findFirstMatchIn(ent.comment) match {
-      case Some(Groups(wr, rd)) => JumanDaihyou(stripDa(wr, pos), stripDa(rd, pos))
-      case _ => JumanDaihyou(stripDa(ent.dictForm, pos), "")
+    val m = daihyoJava.matcher(ent.comment)
+    if (m.find()) {
+      val wr = m.group(1)
+      val rd = m.group(2)
+      JumanDaihyou(
+        stripDa(wr, pos),
+        stripDa(rd, pos)
+      )
+    } else {
+      JumanDaihyou(stripDa(ent.dictForm, pos), "")
     }
   }
 
