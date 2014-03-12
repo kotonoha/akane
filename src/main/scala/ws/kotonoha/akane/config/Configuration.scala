@@ -11,9 +11,12 @@ object Configuration {
   def withHostname(name: String): List[String] = {
     val localhost = InetAddress.getLocalHost.getHostName
     val dots = localhost.split("\\.").toList
-    dots.scanLeft(List(name)) {
+
+    (dots.scanLeft(List(name)) {
       case (l, part) => part :: l
-    }.map(_.mkString("."))
+    } ++ dots.scanRight(List[String](name)) {
+      case (l, part) => l :: part
+    }).map(_.mkString(".")).filter(_.length > 2).distinct
   }
 
   def withUsername(name: String, config: Config = ConfigFactory.defaultOverrides()): List[String] = {
