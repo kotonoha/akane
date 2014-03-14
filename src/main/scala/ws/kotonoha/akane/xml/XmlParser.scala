@@ -257,14 +257,27 @@ class XmlParseTransformer(in: CalculatingIterator[XmlData]) {
   }
 
   def textOf(name: String) = {
-    def check(b: String, e: String) = {
-      b == name && e == name
-    }
-    val tags = in.take(3).toList
-    tags match {
-      case XmlEl(ns) :: XmlText(t) :: XmlElEnd(ne) :: Nil if check(ns, ne) => t
-      case XmlEl(ns) :: XmlERef(t) :: XmlElEnd(ne) :: Nil if check(ns, ne) => t
-      case _ => throw new RuntimeException("there wasn't tag " + name + " but there was " + tags)
+    val first = in.next()
+
+    first match {
+      case XmlEl(`name`) =>
+        val sec = in.next()
+        val cont = sec match {
+          case XmlText(t) => Some(t)
+          case XmlERef(t) => Some(t)
+          case XmlElEnd(`name`) => None
+          case _ => throw new JMDictParseException(s"error when parsing xml: invalid sequence $first, $sec")
+        }
+        cont match {
+          case None => ""
+          case Some(x) =>
+            val third = in.next()
+            third match {
+              case XmlElEnd(`name`) => x
+              case _ => throw new JMDictParseException(s"invalid closing tag when parsing xml: $first, $sec, $third")
+            }
+        }
+      case _ => throw new JMDictParseException(s"first element is not an opening tag $first")
     }
   }
 
@@ -286,6 +299,8 @@ class XmlParseTransformer(in: CalculatingIterator[XmlData]) {
     })
   }
 }
+
+class JMDictParseException(msg: String) extends RuntimeException(msg)
 
 object XmlParser {
   implicit def iterator2parsetransformer(in: CalculatingIterator[XmlData]) = new XmlParseTransformer(in)

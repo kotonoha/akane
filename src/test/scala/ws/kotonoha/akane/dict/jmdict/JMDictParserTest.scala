@@ -19,6 +19,7 @@ package ws.kotonoha.akane.dict.jmdict
 import javax.xml.stream.XMLInputFactory
 import java.io.ByteArrayInputStream
 import ws.kotonoha.akane.xml.{WhitespaceFilter, XmlParser, XmlParseTransformer}
+import scalax.file.Path
 
 
 class JMDictParserTest extends org.scalatest.FunSuite with org.scalatest.matchers.ShouldMatchers {
@@ -80,5 +81,28 @@ class JMDictParserTest extends org.scalatest.FunSuite with org.scalatest.matcher
     m0.info should equal ("n" :: Nil)
     m0.vals should have size (2)
     e.reading.head.value should equal ("どうじょう")
+  }
+
+  test("jmdict entry with empty gloss parses successfully") {
+    val testStr = """<entry>
+                    |<ent_seq>1030340</ent_seq>
+                    |<r_ele>
+                    |<reb>エレガンス</reb>
+                    |<re_pri>gai1</re_pri>
+                    |</r_ele>
+                    |<sense>
+                    |<pos>&adj-na;</pos>
+                    |<gloss>elegance</gloss>
+                    |<gloss xml:lang="ger">(f) Eleganz</gloss>
+                    |<gloss xml:lang="hun">választékosság</gloss>
+                    |<gloss xml:lang="spa">elegante</gloss>
+                    |<gloss xml:lang="spa"> </gloss>
+                    |<gloss xml:lang="swe">stilfullhet</gloss>
+                    |</sense>
+                    |</entry>""".stripMargin
+    val entry = p(testStr).trans("entry") (JMDictParser.parseEntry)
+    val m = entry.meaning
+    m should have length(1)
+    m.head.vals should have length(5)
   }
 }

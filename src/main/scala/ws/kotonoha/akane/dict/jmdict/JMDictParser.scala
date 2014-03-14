@@ -81,7 +81,7 @@ object JMDictParser {
           case XmlEl("misc") => misc += it.textOf("misc")
           case x@XmlEl("gloss") => gl += LocString(it.textOf("gloss"), lang(x))
         }
-        Meaning(info = poss.toList ++ misc.toList, vals = gl.toList)
+        Meaning(info = poss.toList ++ misc.toList, vals = gl.filter(_.str != "").toList)
     }
   }
 
