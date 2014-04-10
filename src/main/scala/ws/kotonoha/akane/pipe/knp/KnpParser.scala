@@ -2,8 +2,6 @@ package ws.kotonoha.akane.pipe.knp
 
 import ws.kotonoha.akane.pipe.knp.lisp._
 import com.typesafe.scalalogging.slf4j.Logging
-import ws.kotonoha.akane.pipe.knp.lisp.KAtom
-import scala.Some
 
 /**
  * @author eiennohito
