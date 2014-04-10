@@ -28,17 +28,17 @@ class RadicalDbTest extends FreeSpec with ShouldMatchers {
   "RadicalDb" - {
     "finds some kanji" in {
       val list = RadicalDb.table.get("私")
-      print(list)
+      list should (have size 2)
     }
 
     "finds reverse kanji" in {
       val reverse = RadicalDb.reverse.get("厶")
-      println(reverse)
+      reverse should not have size(0)
     }
 
     "finds similar kanji" in {
       val similar = SimilarKanji.find("私")
-      println(similar)
+      similar should not have size(0)
     }
   }
 }
