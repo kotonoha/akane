@@ -7,7 +7,7 @@ import com.typesafe.scalalogging.slf4j.Logging
  * @author eiennohito
  * @since 2013-09-04
  */
-object KnpParser extends Logging {
+object KnpSexpParser extends Logging {
 
   val intRe = "\\d+".r.unanchored
 

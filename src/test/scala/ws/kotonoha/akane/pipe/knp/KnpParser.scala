@@ -42,7 +42,7 @@ class KnpParserTest extends FreeSpec with ShouldMatchers {
   "knp parser" - {
     "parses surface" in {
       val nodes = parseString("(繰り返す くりかえす 繰り返す 動詞 2 * 0 子音動詞サ行 5 基本形 2 \"代表表記:繰り返す/くりかえす 補文ト\" (代表表記:繰り返す/くりかえす 補文ト 正規化代表表記:繰り返す/くりかえす 文末 表現文末 かな漢字 活用語 自立 内容語 タグ単位始 文節始 文節主辞))) (文末 補文ト 用言:動 レベル:C 区切:5-5 ID:（文末） 提題受:30 主節 動態述語 正規化代表表記:繰り返す/くりかえす 主辞代表表記:繰り返す/くりかえす) NIL)")
-      val res = KnpParser.parseSurface(nodes :: Nil)
+      val res = KnpSexpParser.parseSurface(nodes :: Nil)
       res should not be Nil
       val item :: Nil = res
       item.surface should be ("繰り返す")
@@ -50,7 +50,7 @@ class KnpParserTest extends FreeSpec with ShouldMatchers {
 
     "parses small tree" in {
       val sexp = parseString(smallResult)
-      val res = KnpParser.parseTree(sexp)
+      val res = KnpSexpParser.parseTree(sexp)
       res should not be None
     }
 
@@ -59,7 +59,7 @@ class KnpParserTest extends FreeSpec with ShouldMatchers {
       val reader = new InputStreamReader(resource, "utf-8")
       val sexp = parseString(IOUtils.toString(reader))
       reader.close()
-      val tree = KnpParser.parseTree(sexp)
+      val tree = KnpSexpParser.parseTree(sexp)
       tree should not be None
     }
   }

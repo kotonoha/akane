@@ -77,7 +77,7 @@ class KnpPipeAnalyzer(cont: KnpProcessContainer, enc: String) extends Analyzer[O
       case LispParser.Success(res, _) => Some(res.asInstanceOf[KList])
       case x => logger.warn("can't parse knp output " + x); None
     }
-    lisp.flatMap(KnpParser.parseTree)
+    lisp.flatMap(KnpSexpParser.parseTree)
   }
 }
 
