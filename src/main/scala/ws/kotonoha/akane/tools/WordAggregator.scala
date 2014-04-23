@@ -62,7 +62,7 @@ object WordAggregator extends Logging {
   def parse(in: InputStreamReader) = {
     val sri = new StreamReaderInput(in)
     val ap = new AozoraParser(sri)
-    val juman = this.juman.get
+    val juman = this.juman.get()
     val rend = new MetaStringRenderer
     var words = 0
     val res = ap.foldLeft(Map[Information, Int]().withDefaultValue(0)) {

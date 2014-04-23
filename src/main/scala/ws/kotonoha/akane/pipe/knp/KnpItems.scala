@@ -1,5 +1,7 @@
 package ws.kotonoha.akane.pipe.knp
 
+import org.apache.commons.lang3.StringUtils
+
 /**
  * @author eiennohito
  * @since 2013-09-04
@@ -16,6 +18,24 @@ case class KnpLexeme(
                       pos: JumanPosInfo,
                       info: String,
                       tags: List[String])
+
+object KnpLexeme {
+  val spaceRe = " ".r
+  def fromTabFormat(line: String) = {
+    val fields = spaceRe.pattern.split(line, 12)
+    val rest = fields(11)
+    val featuresBegin = rest.indexOf('<')
+    val info = StringUtils.strip(rest.substring(0, featuresBegin - 1), " \"")
+    val features = rest.substring(featuresBegin).split("><").map(s => StringUtils.strip(">< "))
+    KnpLexeme(fields(0), fields(1), fields(2),
+      JumanPosInfo(
+        PosItem(fields(3), fields(4).toInt),
+        PosItem(fields(5), fields(6).toInt),
+        PosItem(fields(7), fields(8).toInt),
+        PosItem(fields(9), fields(10).toInt)),
+      info, features.toList)
+  }
+}
 
 case class KnpItemRelation(to: Int, tags: List[String])
 
