@@ -26,7 +26,7 @@ object KnpLexeme {
     val rest = fields(11)
     val featuresBegin = rest.indexOf('<')
     val info = StringUtils.strip(rest.substring(0, featuresBegin - 1), " \"")
-    val features = rest.substring(featuresBegin).split("><").map(s => StringUtils.strip(">< "))
+    val features = rest.substring(featuresBegin).split("><").map(s => StringUtils.strip(s, ">< "))
     KnpLexeme(fields(0), fields(1), fields(2),
       JumanPosInfo(
         PosItem(fields(3), fields(4).toInt),
