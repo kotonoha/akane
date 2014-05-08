@@ -3,15 +3,12 @@ package ws.kotonoha.akane.pipe.knp
 import ws.kotonoha.akane.pipe.{Pipe, Analyzer, AbstractRetryExecutor}
 import com.typesafe.config.{ConfigFactory, Config}
 import ws.kotonoha.akane.config.KnpConfig
-import scalax.file.Path
 import java.io._
-import ws.kotonoha.akane.pipe.knp.lisp.{KList, LispParser}
-import scala.util.parsing.input.{CharSequenceReader, StreamReader}
+import ws.kotonoha.akane.pipe.knp.lisp.LispParser
+import scala.util.parsing.input.CharSequenceReader
 import com.typesafe.scalalogging.slf4j.Logging
 import scala.concurrent.ExecutionContext
 import ws.kotonoha.akane.pipe.knp.lisp.KList
-import scala.Some
-import ws.kotonoha.akane.pipe.knp.KnpNode
 
 /**
  * @author eiennohito
@@ -45,15 +42,18 @@ class PipedProcessKnpContaner(juman: Process, knp: Process, pipe: Pipe) extends 
   }
 }
 
-class KnpPipeAnalyzer(cont: KnpProcessContainer, enc: String) extends Analyzer[Option[KnpNode]] with Logging {
+trait KnpResultParser {
+  type Result
+  def parse(reader: BufferedReader): Result
+}
+
+class KnpPipeAnalyzer[RParser <: KnpResultParser](cont: KnpProcessContainer, enc: String, parser: RParser) extends Analyzer[RParser#Result] with Logging {
 
   def close() {
     cont.close()
   }
 
-  val parser = LispParser.list
-
-  def analyze(in: String) = {
+  def analyze(in: String): RParser#Result = {
     val writer = new OutputStreamWriter(cont.output, enc)
     val reader = new InputStreamReader(cont.input, enc)
 
@@ -61,8 +61,19 @@ class KnpPipeAnalyzer(cont: KnpProcessContainer, enc: String) extends Analyzer[O
     writer.write("\n")
     writer.flush()
 
-    val stringBuilder = new StringBuilder
     val rd = new BufferedReader(reader)
+    parser.parse(rd)
+  }
+}
+
+
+class SexpKnpResultParser extends KnpResultParser with Logging {
+  override type Result = Option[KnpNode]
+
+  val parser = LispParser.list
+
+  override def parse(rd: BufferedReader) = {
+    val stringBuilder = new StringBuilder
     var continue = true
     do {
       val line = rd.readLine()
@@ -81,11 +92,11 @@ class KnpPipeAnalyzer(cont: KnpProcessContainer, enc: String) extends Analyzer[O
   }
 }
 
-class KnpPipeParser private(factory: () => KnpPipeAnalyzer) extends AbstractRetryExecutor[Option[KnpNode]](factory)
-object KnpPipeParser {
+class KnpTreePipeParser private(factory: () => KnpPipeAnalyzer[SexpKnpResultParser]) extends AbstractRetryExecutor[Option[KnpNode]](factory)
+object KnpTreePipeParser {
   def apply(config: Config = ConfigFactory.empty())(implicit ec: ExecutionContext) = {
     val knpConfig = KnpConfig.apply(config)
-    val factory = new KnpPipeExecutorFactory(knpConfig)
-    new KnpPipeParser(factory.launch)
+    val factory = new KnpProcessFactory(knpConfig, KnpOutputType.sexp)
+    new KnpTreePipeParser(() => new KnpPipeAnalyzer(factory.launch(), knpConfig.juman.encoding, new SexpKnpResultParser))
   }
 }

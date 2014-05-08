@@ -17,7 +17,7 @@ class KnpExecutorText extends FreeSpec with ShouldMatchers {
   import scala.concurrent.ExecutionContext.Implicits.global
   "knp executor" - {
     "works" in {
-      val knp = KnpPipeParser()
+      val knp = KnpTreePipeParser()
       val lines = knp.parse("私は何も知りません")
       lines.foreach(println)
       knp.close()

@@ -5,13 +5,14 @@ import scala.util.matching.Regex.Groups
 import ws.kotonoha.akane.utils.{XDouble, XInt}
 import org.apache.commons.lang3.StringUtils
 import com.typesafe.scalalogging.slf4j.Logging
-import ws.kotonoha.akane.pipe.knp.{KnpNode, KnpLexeme}
+import ws.kotonoha.akane.pipe.knp.{KnpResultParser, KnpNode, KnpLexeme}
+import java.io.{BufferedReader, InputStreamReader}
 
 /**
  * @author eiennohito
  * @since 2014-04-10
  */
-class KnpTreeParser extends Logging {
+class KnpTreeParser extends KnpResultParser with Logging {
 
   val initRe = """(\*|\+) (-?\d+)([DP]) (.*)""".r.anchored
 
@@ -50,6 +51,28 @@ class KnpTreeParser extends Logging {
     }
     proc.result
   }
+
+  override type Result = Option[KnpTable]
+
+  override def parse(reader: BufferedReader): Option[KnpTable] = {
+    val iter = new KnpOutputIterator(reader)
+    Some(this.parse(iter))
+  }
+}
+
+class KnpOutputIterator (val reader: BufferedReader) extends BufferedIterator[String] {
+
+  var string: String = reader.readLine()
+
+  override def head = string
+
+  override def next() = {
+    val data = string
+    string = reader.readLine()
+    data
+  }
+
+  override def hasNext = string == null || "EOS" == string || !reader.ready()
 }
 
 case class KnpInfo(id: Int, version: String, date: String, score: Double)
@@ -102,7 +125,7 @@ case class TableUnit(number: Int, depNumber: Int, depType: String, features: Arr
 
 case class KnpTable(info: KnpInfo, lexemes: Array[KnpLexeme], bunsetsu: Array[TableUnit], kihonku: Array[TableUnit]) {
 
-  private def makeNode(unit: TableUnit, units: TraversableOnce[TableUnit]): KnpNode = {
+  private def makeNode(unit: TableUnit, units: Traversable[TableUnit]): KnpNode = {
     val node = unit.toNode
     val children = units.filter(_.depNumber == unit.number)
     node.copy(children = children.map(n => makeNode(n, units)).toList)
