@@ -10,7 +10,7 @@ import scalax.io.Resource
  */
 class KnpTabParserTest extends FreeSpec with ShouldMatchers {
   "KnpTabParser" - {
-    val parser = new KnpTreeParser
+    val parser = new KnpTabFormatParser
     "parses a small tree" in {
       val lines = Resource.fromClasspath("knp.tab.txt").lines()
       val result = parser.parse(lines)

@@ -9,6 +9,7 @@ import scala.util.parsing.input.CharSequenceReader
 import com.typesafe.scalalogging.slf4j.Logging
 import scala.concurrent.ExecutionContext
 import ws.kotonoha.akane.pipe.knp.lisp.KList
+import ws.kotonoha.akane.parser.{KnpTable, KnpTabFormatParser}
 
 /**
  * @author eiennohito
@@ -94,9 +95,18 @@ class SexpKnpResultParser extends KnpResultParser with Logging {
 
 class KnpTreePipeParser private(factory: () => KnpPipeAnalyzer[SexpKnpResultParser]) extends AbstractRetryExecutor[Option[KnpNode]](factory)
 object KnpTreePipeParser {
-  def apply(config: Config = ConfigFactory.empty())(implicit ec: ExecutionContext) = {
+  def apply(config: Config = ConfigFactory.empty()) = {
     val knpConfig = KnpConfig.apply(config)
     val factory = new KnpProcessFactory(knpConfig, KnpOutputType.sexp)
     new KnpTreePipeParser(() => new KnpPipeAnalyzer(factory.launch(), knpConfig.juman.encoding, new SexpKnpResultParser))
+  }
+}
+
+class KnpTabPipeParser private(factory: () => KnpPipeAnalyzer[KnpTabFormatParser]) extends AbstractRetryExecutor[Option[KnpTable]](factory)
+object KnpTabPipeParser {
+  def apply(config: Config = ConfigFactory.empty()) = {
+    val knpConfig = KnpConfig.apply(config)
+    val factory = new KnpProcessFactory(knpConfig, KnpOutputType.tab)
+    new KnpTabPipeParser(() => new KnpPipeAnalyzer(factory.launch(), knpConfig.juman.encoding, new KnpTabFormatParser))
   }
 }

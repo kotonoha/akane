@@ -12,7 +12,7 @@ import java.io.{BufferedReader, InputStreamReader}
  * @author eiennohito
  * @since 2014-04-10
  */
-class KnpTreeParser extends KnpResultParser with Logging {
+class KnpTabFormatParser extends KnpResultParser with Logging {
 
   val initRe = """(\*|\+) (-?\d+)([DP]) (.*)""".r.anchored
 
@@ -26,7 +26,7 @@ class KnpTreeParser extends KnpResultParser with Logging {
 
   def parse(lines: TraversableOnce[String]) = {
 
-    val proc = new KnpTreeParseProcess
+    val proc = new KnpTabParseProcess
     for (line <- lines) {
       initRe.findPrefixMatchOf(line) match {
         case Some(Groups("+", XInt(depNum), depType, features)) => //kihonku begin with + in knp output
@@ -92,7 +92,7 @@ class TreeTableBuilder(val myNumber: Int, val depNumber: Int, val depType: Strin
 }
 
 
-class KnpTreeParseProcess {
+class KnpTabParseProcess {
   val lexemes = new ArrayBuffer[KnpLexeme]()
   val bunsetsu = new ArrayBuffer[TreeTableBuilder]()
   val kihonku = new ArrayBuffer[TreeTableBuilder]()
