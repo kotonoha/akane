@@ -21,6 +21,7 @@ import collection.mutable.Stack
 import javax.xml.stream.events._
 import scala.None
 import ws.kotonoha.akane.utils.CalculatingIterator
+import scala.collection.mutable
 
 
 trait XmlData {
@@ -68,7 +69,7 @@ private[xml] class ParserState {
 
   def pop() = stack.pop()
 
-  val stack = Stack[List[String]]()
+  val stack = mutable.Stack[List[String]]()
 
   def top = stack.top
 }
