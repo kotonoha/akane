@@ -29,9 +29,9 @@ class KnpTreeParser extends Logging {
     for (line <- lines) {
       initRe.findPrefixMatchOf(line) match {
         case Some(Groups("+", XInt(depNum), depType, features)) => //kihonku begin with + in knp output
-          proc.kihonku += new TreeTableBuilder(depNum, depType.intern(), parseFeatures(features))
+          proc.kihonku += new TreeTableBuilder(proc.kihonku.size, depNum, depType.intern(), parseFeatures(features))
         case Some(Groups("*", XInt(depNum), depType, features)) => //bunsetsu begin with * in knp output
-          proc.bunsetsu += new TreeTableBuilder(depNum, depType.intern(), parseFeatures(features))
+          proc.bunsetsu += new TreeTableBuilder(proc.bunsetsu.size, depNum, depType.intern(), parseFeatures(features))
         case _ if line == "EOS" => //do nothing
         case None if !startRe.pattern.matcher(line).find() => //it's a morpheme
           val lexeme = KnpLexeme.fromTabFormat(line)
@@ -60,8 +60,8 @@ case class KnpInfo(id: Int, version: String, date: String, score: Double)
  * @param depType type of dependency
  * @param features features that are present in bunsetsu
  */
-class TreeTableBuilder(val depNumber: Int, val depType: String, val features: Array[String])  {
-  def result: TableUnit = TableUnit(depNumber, depType, features, lexemes.toArray)
+class TreeTableBuilder(val myNumber: Int, val depNumber: Int, val depType: String, val features: Array[String])  {
+  def result: TableUnit = TableUnit(myNumber, depNumber, depType, features, lexemes.toArray)
 
   val lexemes = new ArrayBuffer[KnpLexeme]()
 
@@ -87,10 +87,29 @@ class KnpTreeParseProcess {
   }
 }
 
-case class TableUnit(depNumber: Int, depType: String, features: Array[String], lexemes: Array[KnpLexeme]) {
-
+/**
+ * A unit of knp table entry that represents either a bunsetsu
+ * dependency tree or a kihonku dependency tree
+ * @param number number of entry
+ * @param depNumber number of direct dependency
+ * @param depType type of dependency
+ * @param features features that are assigned to table entry
+ * @param lexemes list of lexemes that compose this entry
+ */
+case class TableUnit(number: Int, depNumber: Int, depType: String, features: Array[String], lexemes: Array[KnpLexeme]) {
+  def toNode = KnpNode(number, depType, lexemes.toList, features.toList, Nil)
 }
 
 case class KnpTable(info: KnpInfo, lexemes: Array[KnpLexeme], bunsetsu: Array[TableUnit], kihonku: Array[TableUnit]) {
-  def tree: KnpNode = ???
+
+  private def makeNode(unit: TableUnit, units: TraversableOnce[TableUnit]): KnpNode = {
+    val node = unit.toNode
+    val children = units.filter(_.depNumber == unit.number)
+    node.copy(children = children.map(n => makeNode(n, units)).toList)
+  }
+
+  def bunsetsuTree: KnpNode = {
+    val root = bunsetsu.find(_.depNumber == -1).getOrElse(throw new NullPointerException("There is no root node in tree!"))
+    makeNode(root, bunsetsu)
+  }
 }

@@ -12,7 +12,7 @@ class KnpTabParserTest extends FreeSpec with ShouldMatchers {
   "KnpTabParser" - {
     val parser = new KnpTreeParser
     "parses a small tree" in {
-      val lines = Resource.fromInputStream(getClass.getClassLoader.getResourceAsStream("knp.tab.txt")).lines()
+      val lines = Resource.fromClasspath("knp.tab.txt").lines()
       val result = parser.parse(lines)
       result.bunsetsu should have length(11)
       result.bunsetsu(10).lexemes.head.reading should be("ある")
