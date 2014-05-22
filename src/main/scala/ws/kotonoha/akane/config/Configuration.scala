@@ -2,12 +2,13 @@ package ws.kotonoha.akane.config
 
 import java.net.InetAddress
 import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.scalalogging.slf4j.Logging
 
 /**
  * @author eiennohito
  * @since 2013-09-02
  */
-object Configuration {
+object Configuration extends Logging {
   def withHostname(name: String): List[String] = {
     val localhost = InetAddress.getLocalHost.getHostName
     val dots = localhost.split("\\.").toList
@@ -31,10 +32,14 @@ object Configuration {
 
   def makeConfigFor(name: String, defaults: Config = ConfigFactory.defaultOverrides()) = {
     val names = possibleNamesFor(name, defaults)
+    logger.debug(s"For config {$name} trying [${names.mkString(", ")}]")
     names.foldLeft(defaults) {
       case (c, cname) =>
         val config = ConfigFactory.parseResources(cname)
-        config.withFallback(c)
+        if (!config.isEmpty) {
+          logger.debug(s"Loaded config from file $cname")
+          config.withFallback(c)
+        } else c
     }
   }
 }
