@@ -53,7 +53,7 @@ class KnpProcessFactory(config: KnpConfig, kind: KnpOutputType.Value)(implicit v
   private def unixLaunch() = {
 
     val args = new util.ArrayList[String]()
-    args.add("sh")
+    args.add("/bin/sh")
     args.add("-c")
 
     val quoted = new ListBuffer[String]
@@ -66,7 +66,7 @@ class KnpProcessFactory(config: KnpConfig, kind: KnpOutputType.Value)(implicit v
     quoted ++= config.params
     quoted += normKind
 
-    args.add(quoted.mkString("'", " ", "'"))
+    args.add(quoted.mkString(" "))
 
     val pb = new ProcessBuilder(args)
 

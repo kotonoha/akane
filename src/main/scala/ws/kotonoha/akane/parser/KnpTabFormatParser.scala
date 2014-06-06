@@ -72,7 +72,7 @@ class KnpOutputIterator (val reader: BufferedReader) extends BufferedIterator[St
     data
   }
 
-  override def hasNext = string == null || "EOS" == string || !reader.ready()
+  override def hasNext = reader.ready() && string != "EOS"
 }
 
 case class KnpInfo(id: Int, version: String, date: String, score: Double)
