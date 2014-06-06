@@ -135,4 +135,26 @@ case class KnpTable(info: KnpInfo, lexemes: Array[KnpLexeme], bunsetsu: Array[Ta
     val root = bunsetsu.find(_.depNumber == -1).getOrElse(throw new NullPointerException("There is no root node in tree!"))
     makeNode(root, bunsetsu)
   }
+
+  def toJson: JsonKnpTable = {
+    def jsonize(units: Array[TableUnit]): Array[JsonTableUnit] = {
+      units.map { u => JsonTableUnit(u.number, u.depNumber, u.depType, u.features, u.lexemes.size)  }
+    }
+
+    JsonKnpTable(info, lexemes,jsonize(bunsetsu), jsonize(kihonku))
+  }
 }
+
+
+case class JsonKnpTable(info: KnpInfo, lexemes: Array[KnpLexeme], bunsetsu: Array[JsonTableUnit], kihonku: Array[JsonTableUnit]) {
+  def toModel: KnpTable = {
+    def normalize(units: Array[JsonTableUnit]) = {
+      val starts = units.map(_.lexemes).scan(0)(_+_)
+      units.zip(starts).map {
+        case (u, s) => TableUnit(u.number, u.depNumber, u.depType, u.features, (s to s + u.lexemes).map(lexemes(_)).toArray)
+      }
+    }
+    KnpTable(info, lexemes, normalize(bunsetsu), normalize(kihonku))
+  }
+}
+case class JsonTableUnit(number: Int, depNumber: Int, depType: String, features: Array[String], lexemes: Int)
