@@ -14,13 +14,13 @@ import java.io.{BufferedReader, InputStreamReader}
  */
 class KnpTabFormatParser extends KnpResultParser with Logging {
 
-  val initRe = """(\*|\+) (-?\d+)([DP]) (.*)""".r.anchored
+  val initRe = """(\*|\+) (-?\d+)([A-Z]) (.*)""".r.anchored
 
   def parseFeatures(in: String): Array[String] = {
     in.split("><").map(StringUtils.strip(_, "<>"))
   }
 
-  val startRe = """^\*|\+|\#""".r
+  val startRe = """^(?:\*|\+|\#)""".r
 
   val infoRe = """# S-ID:(\d+) KNP:([^ ]+) DATE:([^ ]+) SCORE:([-\d\.]+)""".r
 
