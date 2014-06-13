@@ -1,13 +1,11 @@
 package ws.kotonoha.akane.pipe.knp
 
-import ws.kotonoha.akane.config.KnpConfig
-import scala.concurrent.{Await, ExecutionContext}
-import ws.kotonoha.akane.pipe.NamedPipes
-import java.lang.ProcessBuilder.Redirect
-import java.io.File
-import java.util.concurrent.TimeUnit
 import java.util
+
+import ws.kotonoha.akane.config.KnpConfig
+
 import scala.collection.mutable.ListBuffer
+import scala.concurrent.ExecutionContext
 
 /**
  * @author eiennohito

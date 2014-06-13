@@ -1,15 +1,15 @@
 package ws.kotonoha.akane.pipe.knp
 
-import ws.kotonoha.akane.pipe.{Pipe, Analyzer, AbstractRetryExecutor}
-import com.typesafe.config.{ConfigFactory, Config}
-import ws.kotonoha.akane.config.KnpConfig
 import java.io._
-import ws.kotonoha.akane.pipe.knp.lisp.LispParser
-import scala.util.parsing.input.CharSequenceReader
+
+import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.slf4j.Logging
-import scala.concurrent.ExecutionContext
-import ws.kotonoha.akane.pipe.knp.lisp.KList
-import ws.kotonoha.akane.parser.{KnpTable, KnpTabFormatParser}
+import ws.kotonoha.akane.config.KnpConfig
+import ws.kotonoha.akane.parser.{KnpTabFormatParser, KnpTable}
+import ws.kotonoha.akane.pipe.knp.lisp.{KList, LispParser}
+import ws.kotonoha.akane.pipe.{AbstractRetryExecutor, Analyzer, Pipe}
+
+import scala.util.parsing.input.CharSequenceReader
 
 /**
  * @author eiennohito
