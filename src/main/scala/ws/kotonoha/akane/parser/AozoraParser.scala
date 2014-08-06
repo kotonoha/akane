@@ -1,21 +1,20 @@
 package ws.kotonoha.akane.parser
 
+import com.typesafe.scalalogging.StrictLogging
 import ws.kotonoha.akane.ast._
 import java.nio.CharBuffer
 import collection.mutable.ListBuffer
-import scala.Some
 import ws.kotonoha.akane.ast.Image
 import annotation.tailrec
 import collection.immutable.HashSet
 import ws.kotonoha.akane.unicode.UnicodeUtil
-import com.typesafe.scalalogging.slf4j.Logging
 
 /**
  * @author eiennohito
  * @since 16.08.12
  */
 
-trait AozoraInput extends Logging {
+trait AozoraInput extends StrictLogging {
   def peek: Int //doesn't go forward
   def next: Int //goes forward
   def mark(): Unit
@@ -66,7 +65,7 @@ object AozoraParser {
   val SENTENCE_SEPARATORS = HashSet('。', '？', '！', '?', '!', '」')
 }
 
-class AozoraParser(inp: AozoraInput) extends BufferedIterator[HighLvlNode] with Logging {
+class AozoraParser(inp: AozoraInput) extends BufferedIterator[HighLvlNode] with StrictLogging {
   private val buf = CharBuffer.allocate(16 * 1024) // there shouldn't be sentences larger than 16kbtytes, rly
 
   private def content = {

@@ -16,24 +16,25 @@
 
 package ws.kotonoha.akane.kanji.kradfile
 
-import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.FreeSpec
+import org.scalatest.{FreeSpec, Matchers}
 
 /**
  * @author eiennohito
  * @since 08.07.13 
  */
 
-class RadicalDbTest extends FreeSpec with ShouldMatchers {
+class RadicalDbTest extends FreeSpec with Matchers {
   "RadicalDb" - {
     "finds some kanji" in {
       val list = RadicalDb.table.get("私")
-      list should (have size 2)
+      list should not be (None)
+      list.get should (have size 2)
     }
 
     "finds reverse kanji" in {
       val reverse = RadicalDb.reverse.get("厶")
-      reverse should not have size(0)
+      reverse should not be (None)
+      reverse.get should not have size(0)
     }
 
     "finds similar kanji" in {

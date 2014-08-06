@@ -1,18 +1,20 @@
 package ws.kotonoha.akane.parser
 
+import java.io.BufferedReader
+
+import com.typesafe.scalalogging.StrictLogging
+import org.apache.commons.lang3.StringUtils
+import ws.kotonoha.akane.pipe.knp.{KnpLexeme, KnpNode, KnpResultParser}
+import ws.kotonoha.akane.utils.{XDouble, XInt}
+
 import scala.collection.mutable.ArrayBuffer
 import scala.util.matching.Regex.Groups
-import ws.kotonoha.akane.utils.{XDouble, XInt}
-import org.apache.commons.lang3.StringUtils
-import com.typesafe.scalalogging.slf4j.Logging
-import ws.kotonoha.akane.pipe.knp.{KnpResultParser, KnpNode, KnpLexeme}
-import java.io.{BufferedReader, InputStreamReader}
 
 /**
  * @author eiennohito
  * @since 2014-04-10
  */
-class KnpTabFormatParser extends KnpResultParser with Logging {
+class KnpTabFormatParser extends KnpResultParser with StrictLogging {
 
   val initRe = """(\*|\+) (-?\d+)([A-Z]) (.*)""".r.anchored
 

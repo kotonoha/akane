@@ -3,7 +3,7 @@ package ws.kotonoha.akane.pipe.knp
 import java.io._
 
 import com.typesafe.config.{Config, ConfigFactory}
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.StrictLogging
 import ws.kotonoha.akane.config.KnpConfig
 import ws.kotonoha.akane.parser.{KnpTabFormatParser, KnpTable}
 import ws.kotonoha.akane.pipe.knp.lisp.{KList, LispParser}
@@ -48,7 +48,7 @@ trait KnpResultParser {
   def parse(reader: BufferedReader): Result
 }
 
-class KnpPipeAnalyzer[RParser <: KnpResultParser](cont: KnpProcessContainer, enc: String, parser: RParser) extends Analyzer[RParser#Result] with Logging {
+class KnpPipeAnalyzer[RParser <: KnpResultParser](cont: KnpProcessContainer, enc: String, parser: RParser) extends Analyzer[RParser#Result] with StrictLogging {
 
   def close() {
     cont.close()
@@ -68,7 +68,7 @@ class KnpPipeAnalyzer[RParser <: KnpResultParser](cont: KnpProcessContainer, enc
 }
 
 
-class SexpKnpResultParser extends KnpResultParser with Logging {
+class SexpKnpResultParser extends KnpResultParser with StrictLogging {
   override type Result = Option[KnpNode]
 
   val parser = LispParser.list

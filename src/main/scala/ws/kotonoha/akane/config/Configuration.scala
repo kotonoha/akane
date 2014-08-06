@@ -1,14 +1,15 @@
 package ws.kotonoha.akane.config
 
 import java.net.InetAddress
+
 import com.typesafe.config.{Config, ConfigFactory}
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.StrictLogging
 
 /**
  * @author eiennohito
  * @since 2013-09-02
  */
-object Configuration extends Logging {
+object Configuration extends StrictLogging {
   def withHostname(name: String): List[String] = {
     val localhost = InetAddress.getLocalHost.getHostName
     val dots = localhost.split("\\.").toList

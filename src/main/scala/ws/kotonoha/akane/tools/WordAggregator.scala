@@ -1,14 +1,16 @@
 package ws.kotonoha.akane.tools
 
-import scala.concurrent.forkjoin.ForkJoinPool
-import scala.concurrent.{Await, Future, ExecutionContext}
-import scalax.file.Path
-import java.io.{InputStreamReader, Reader}
-import ws.kotonoha.akane.parser.{AozoraParser, StreamReaderInput}
-import ws.kotonoha.akane.juman.{JumanDaihyou, JumanPipeExecutor}
-import ws.kotonoha.akane.render.MetaStringRenderer
+import java.io.InputStreamReader
+
+import com.typesafe.scalalogging.StrictLogging
 import ws.kotonoha.akane.ast.Sentence
-import com.typesafe.scalalogging.slf4j.Logging
+import ws.kotonoha.akane.juman.{JumanDaihyou, JumanPipeExecutor}
+import ws.kotonoha.akane.parser.{AozoraParser, StreamReaderInput}
+import ws.kotonoha.akane.render.MetaStringRenderer
+
+import scala.concurrent.forkjoin.ForkJoinPool
+import scala.concurrent.{Await, ExecutionContext, Future}
+import scalax.file.Path
 
 /**
  * @author eiennohito
@@ -30,7 +32,7 @@ class LazyTheadLocal[T <: AnyRef](factory: => T) {
   def clear() = value.remove()
 }
 
-object WordAggregator extends Logging {
+object WordAggregator extends StrictLogging {
   implicit val context = {
     val ex = new ForkJoinPool(8)
     ExecutionContext.fromExecutor(ex)
@@ -104,7 +106,7 @@ object WordAggregator extends Logging {
         )
     }
 
-    import concurrent.duration._
+    import scala.concurrent.duration._
 
     val extracted = Future.sequence(ents.toSeq).map(x => x.flatten)
     val res = Await.result(extracted, 1 hour)

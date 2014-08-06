@@ -2,10 +2,11 @@
 package ws.kotonoha.akane.juman
 
 import java.io.{BufferedReader, InputStreamReader}
+import com.typesafe.scalalogging.StrictLogging
+
 import collection.mutable.ListBuffer
 import ws.kotonoha.akane.JumanEntry
 import org.apache.commons.io.IOUtils
-import com.typesafe.scalalogging.slf4j.Logging
 import ws.kotonoha.akane.pipe.{AbstractRetryExecutor, Analyzer}
 import com.typesafe.config.{ConfigFactory, Config}
 import ws.kotonoha.akane.config.JumanConfig
@@ -32,7 +33,7 @@ trait ProcessSupport {
  * @since 16.08.12
  */
 
-class JumanPipeAnalyzer (process: Process, encoding: String) extends Analyzer[List[JumanEntry]] with Logging with ProcessSupport {
+class JumanPipeAnalyzer (process: Process, encoding: String) extends Analyzer[List[JumanEntry]] with StrictLogging with ProcessSupport {
 
   def analyze(input: String) = withProcess(process, encoding) { parseInner(input) }
 

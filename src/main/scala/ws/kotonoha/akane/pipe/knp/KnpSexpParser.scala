@@ -1,13 +1,13 @@
 package ws.kotonoha.akane.pipe.knp
 
+import com.typesafe.scalalogging.StrictLogging
 import ws.kotonoha.akane.pipe.knp.lisp._
-import com.typesafe.scalalogging.slf4j.Logging
 
 /**
  * @author eiennohito
  * @since 2013-09-04
  */
-object KnpSexpParser extends Logging {
+object KnpSexpParser extends StrictLogging {
 
   val intRe = "\\d+".r.unanchored
 

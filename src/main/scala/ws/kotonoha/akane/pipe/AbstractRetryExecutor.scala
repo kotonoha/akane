@@ -1,8 +1,9 @@
 package ws.kotonoha.akane.pipe
 
 import java.io.Closeable
+import com.typesafe.scalalogging.StrictLogging
+
 import scala.util.control.NonFatal
-import com.typesafe.scalalogging.slf4j.Logging
 
 /**
  * @author eiennohito
@@ -13,7 +14,7 @@ trait Analyzer[RType] extends Closeable {
   def analyze(input: String): RType
 }
 
-class AbstractRetryExecutor[RType] (factory: () => Analyzer[RType]) extends Logging with Closeable {
+class AbstractRetryExecutor[RType] (factory: () => Analyzer[RType]) extends StrictLogging with Closeable {
   val maxRetries = 3
 
   var analyzer: Analyzer[RType] = _
