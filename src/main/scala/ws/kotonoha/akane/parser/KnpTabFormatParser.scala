@@ -153,7 +153,7 @@ case class JsonKnpTable(info: KnpInfo, lexemes: Array[KnpLexeme], bunsetsu: Arra
     def normalize(units: Array[JsonTableUnit]) = {
       val starts = units.map(_.lexemes).scan(0)(_+_)
       units.zip(starts).map {
-        case (u, s) => TableUnit(u.number, u.depNumber, u.depType, u.features, (s to s + u.lexemes).map(lexemes(_)).toArray)
+        case (u, s) => TableUnit(u.number, u.depNumber, u.depType, u.features, (s until s + u.lexemes).map(lexemes(_)).toArray)
       }
     }
     KnpTable(info, lexemes, normalize(bunsetsu), normalize(kihonku))
