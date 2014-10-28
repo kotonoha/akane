@@ -21,7 +21,7 @@ case class KnpLexeme(
 
 object KnpLexeme {
   val spaceRe = " ".r
-  def fromTabFormat(line: String) = {
+  def fromTabFormat(line: CharSequence) = {
     val fields = spaceRe.pattern.split(line, 12)
     val rest = fields(11)
     val featuresBegin = rest.indexOf('<')

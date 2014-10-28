@@ -26,7 +26,7 @@ class KnpTabFormatParser extends KnpResultParser with StrictLogging {
 
   val infoRe = """# S-ID:(\d+) KNP:([^ ]+) DATE:([^ ]+) SCORE:([-\d\.]+)""".r
 
-  def parse(lines: TraversableOnce[String]) = {
+  def parse(lines: TraversableOnce[CharSequence]) = {
 
     val proc = new KnpTabParseProcess
     for (line <- lines) {
@@ -41,7 +41,7 @@ class KnpTabFormatParser extends KnpResultParser with StrictLogging {
           proc.lexemes += lexeme
           proc.kihonku.last.addLexeme(lexeme)
           proc.bunsetsu.last.addLexeme(lexeme)
-        case None if line.startsWith("#") =>
+        case None if line.charAt(0) == '#' =>
           line match {
             case infoRe(XInt(id), version, date, XDouble(score)) =>
               proc.setInfo(KnpInfo(id, version, date, score))
