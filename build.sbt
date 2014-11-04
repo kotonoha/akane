@@ -2,7 +2,7 @@ import sbt._
 
 organization := "ws.kotonoha"
 
-scalaVersion := "2.11.1"
+scalaVersion := "2.11.4"
 
 name := "Akane"
 
