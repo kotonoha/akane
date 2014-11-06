@@ -4,6 +4,7 @@ import java.io.BufferedReader
 
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.commons.lang3.StringUtils
+import org.apache.commons.lang3.builder.ToStringBuilder
 import ws.kotonoha.akane.pipe.knp.{KnpLexeme, KnpNode, KnpResultParser}
 import ws.kotonoha.akane.utils.{XDouble, XInt}
 
@@ -22,7 +23,7 @@ class KnpTabFormatParser extends KnpResultParser with StrictLogging {
     in.split("><").map(StringUtils.strip(_, "<>"))
   }
 
-  val startRe = """^(?:\*|\+|\#)""".r
+  val startRe = """^(?:;;|\*|\+|\#)""".r
 
   val infoRe = """# S-ID:(\d+) KNP:([^ ]+) DATE:([^ ]+) SCORE:([-\d\.]+)""".r
 
@@ -123,6 +124,9 @@ class KnpTabParseProcess {
  */
 case class TableUnit(number: Int, depNumber: Int, depType: String, features: Array[String], lexemes: Array[KnpLexeme]) {
   def toNode = KnpNode(number, depType, lexemes.toList, features.toList, Nil)
+  override def toString = {
+    s"TableUnit($number,$depNumber,$depType,[${lexemes.map(_.surface).mkString}}])"
+  }
 }
 
 case class KnpTable(info: KnpInfo, lexemes: Array[KnpLexeme], bunsetsu: Array[TableUnit], kihonku: Array[TableUnit]) {
