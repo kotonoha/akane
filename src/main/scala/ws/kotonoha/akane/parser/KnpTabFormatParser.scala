@@ -174,25 +174,36 @@ case class Bunsetsu(lexs: LexemeStorage, kihs: KihonkuStorage,
   def toNode = KnpNode(number, depType, lexemes.toList, features.toList, Nil)
 
   override def toString = {
-    s"TableUnit($number,$depNumber,$depType,[${lexemes.map(_.surface).mkString}}])"
+    s"Bunsetsu($number,$depNumber,$depType,[${lexemes.map(_.surface).mkString}}])"
   }
 }
 
 case class Kihonku(lexs: LexemeStorage, number: Int, depNumber: Int, depType: String, features: Array[String],
                    lexemeStart: Int, lexemeCnt: Int) extends LexemeHelper {
+  override def toString = {
+    s"Bunsetsu($number,$depNumber,$depType,[${lexemes.map(_.surface).mkString}}])"
+  }
 }
 
-trait LexemeHelper {
+trait LexemeAccess {
+  def lexeme(idx: Int): KnpLexeme
+  def lexemeStart: Int
+  def lexemeEnd: Int
+  def lexemeCnt: Int
+}
+
+trait LexemeHelper extends LexemeAccess {
   def lexs: LexemeStorage
   def lexemeStart: Int
   def lexemeCnt: Int
+  def lexemeEnd = lexemeStart + lexemeCnt
 
-  def lexemes = lexs.lexemes(lexemeStart, lexemeStart + lexemeCnt)
+  def lexemes = lexs.lexemes(lexemeStart, lexemeEnd)
 
   def lexeme(idx: Int) = {
-    assert(idx > 0)
-    assert(idx < lexemeCnt)
-    lexs.lexeme(lexemeStart + idx)
+    assert(idx >= lexemeStart)
+    assert(idx < lexemeEnd)
+    lexs.lexeme(idx)
   }
 }
 
