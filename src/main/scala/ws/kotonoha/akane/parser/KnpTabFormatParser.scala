@@ -4,10 +4,10 @@ import java.io.BufferedReader
 
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.commons.lang3.StringUtils
-import org.apache.commons.lang3.builder.ToStringBuilder
 import ws.kotonoha.akane.pipe.knp.{KnpLexeme, KnpNode, KnpResultParser}
 import ws.kotonoha.akane.utils.{XDouble, XInt}
 
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.util.matching.Regex.Groups
 
@@ -33,15 +33,18 @@ class KnpTabFormatParser extends KnpResultParser with StrictLogging {
     for (line <- lines) {
       initRe.findPrefixMatchOf(line) match {
         case Some(Groups("+", XInt(depNum), depType, features)) => //kihonku begin with + in knp output
-          proc.kihonku += new TreeTableBuilder(proc.kihonku.size, depNum, depType.intern(), parseFeatures(features))
+          proc.kihonku += new KihonkuBuilder(proc.kihonku.size, depNum, depType.intern(),
+            parseFeatures(features), proc.lexemes.size)
+          proc.bunsetsu.last.addKihonku()
         case Some(Groups("*", XInt(depNum), depType, features)) => //bunsetsu begin with * in knp output
-          proc.bunsetsu += new TreeTableBuilder(proc.bunsetsu.size, depNum, depType.intern(), parseFeatures(features))
+          proc.bunsetsu += new BunsetsuBuilder(proc.bunsetsu.size, depNum, depType.intern(),
+            parseFeatures(features), proc.lexemes.size, proc.kihonku.size)
         case _ if line == "EOS" => //do nothing
         case None if !startRe.pattern.matcher(line).find() => //it's a morpheme
           val lexeme = KnpLexeme.fromTabFormat(line)
           proc.lexemes += lexeme
-          proc.kihonku.last.addLexeme(lexeme)
-          proc.bunsetsu.last.addLexeme(lexeme)
+          proc.kihonku.last.addLexeme()
+          proc.bunsetsu.last.addLexeme()
         case None if line.charAt(0) == '#' =>
           line match {
             case infoRe(XInt(id), version, date, XDouble(score)) =>
@@ -86,31 +89,72 @@ case class KnpInfo(id: Int, version: String, date: String, score: Double)
  * @param depType type of dependency
  * @param features features that are present in bunsetsu
  */
-class TreeTableBuilder(val myNumber: Int, val depNumber: Int, val depType: String, val features: Array[String])  {
-  def result: TableUnit = TableUnit(myNumber, depNumber, depType, features, lexemes.toArray)
+class BunsetsuBuilder(val myNumber: Int, val depNumber: Int, val depType: String,
+                      val features: Array[String],
+                      val lexemeStart: Int, val kihonkuStart: Int)  {
+  def result(lexs: LexemeStorage, kihs: KihonkuStorage): Bunsetsu =
+    Bunsetsu(lexs, kihs, myNumber, depNumber, depType, features, lexemeStart, lexemeCnt, kihonkuStart, kihonkuCnt)
 
-  val lexemes = new ArrayBuffer[KnpLexeme]()
+  var lexemeCnt = 0
+  def addLexeme() = lexemeCnt += 1
 
-  def addLexeme(lexeme: KnpLexeme) = lexemes += lexeme
+  var kihonkuCnt = 0
+  def addKihonku() = kihonkuCnt += 1
+}
+
+class KihonkuBuilder(val myNumber: Int, val depNumber: Int, val depType: String,
+                     val features: Array[String],
+                     val lexemeStart: Int)  {
+  def result(lexs: LexemeStorage): Kihonku =
+    Kihonku(lexs, myNumber, depNumber, depType, features, lexemeStart, lexemeCnt)
+
+  var lexemeCnt = 0
+  def addLexeme() = lexemeCnt += 1
 }
 
 
 class KnpTabParseProcess {
   val lexemes = new ArrayBuffer[KnpLexeme]()
-  val bunsetsu = new ArrayBuffer[TreeTableBuilder]()
-  val kihonku = new ArrayBuffer[TreeTableBuilder]()
+  val bunsetsu = new ArrayBuffer[BunsetsuBuilder]()
+  val kihonku = new ArrayBuffer[KihonkuBuilder]()
 
   var info: KnpInfo = _
   def setInfo(info: KnpInfo) = this.info = info
 
   def result = {
+    val lexData = lexemes.toArray
+    val lexSt = new ArrayLexemeStorage(lexData)
+    val kiData = kihonku.map(_.result(lexSt)).toArray
+    val kst = new ArrayKihonkuStorage(kiData)
     new KnpTable(
       info,
-      lexemes.toArray,
-      bunsetsu.map(_.result).toArray,
-      kihonku.map(_.result).toArray
+      lexData,
+      bunsetsu.map(_.result(lexSt, kst)).toArray,
+      kiData
     )
   }
+}
+
+trait LexemeStorage {
+  def lexeme(num: Int): KnpLexeme
+  def lexemeCnt: Int
+  def lexemes(from: Int, until: Int): IndexedSeq[KnpLexeme]
+}
+
+class ArrayLexemeStorage(data: Array[KnpLexeme]) extends LexemeStorage {
+  override def lexeme(num: Int) = data(num)
+  override def lexemes(from: Int, until: Int) = data.slice(from, until)
+  override def lexemeCnt = data.length
+}
+
+trait KihonkuStorage {
+  def kihonku(num: Int): Kihonku
+  def kihonkuCnt: Int
+}
+
+class ArrayKihonkuStorage(data: Array[Kihonku]) extends KihonkuStorage {
+  override def kihonku(num: Int) = data(num)
+  override def kihonkuCnt = data.length
 }
 
 /**
@@ -120,47 +164,95 @@ class KnpTabParseProcess {
  * @param depNumber number of direct dependency
  * @param depType type of dependency
  * @param features features that are assigned to table entry
- * @param lexemes list of lexemes that compose this entry
+ * @param lexs lexeme storage
  */
-case class TableUnit(number: Int, depNumber: Int, depType: String, features: Array[String], lexemes: Array[KnpLexeme]) {
+case class Bunsetsu(lexs: LexemeStorage, kihs: KihonkuStorage,
+                    number: Int, depNumber: Int, depType: String, features: Array[String],
+                    lexemeStart: Int, lexemeCnt: Int,
+                    kihonkuStart: Int, kihonkuCnt: Int) extends LexemeHelper {
+
   def toNode = KnpNode(number, depType, lexemes.toList, features.toList, Nil)
+
   override def toString = {
     s"TableUnit($number,$depNumber,$depType,[${lexemes.map(_.surface).mkString}}])"
   }
 }
 
-case class KnpTable(info: KnpInfo, lexemes: Array[KnpLexeme], bunsetsu: Array[TableUnit], kihonku: Array[TableUnit]) {
+case class Kihonku(lexs: LexemeStorage, number: Int, depNumber: Int, depType: String, features: Array[String],
+                   lexemeStart: Int, lexemeCnt: Int) extends LexemeHelper {
+}
 
-  private def makeNode(unit: TableUnit, units: Traversable[TableUnit]): KnpNode = {
+trait LexemeHelper {
+  def lexs: LexemeStorage
+  def lexemeStart: Int
+  def lexemeCnt: Int
+
+  def lexemes = lexs.lexemes(lexemeStart, lexemeStart + lexemeCnt)
+
+  def lexeme(idx: Int) = {
+    assert(idx > 0)
+    assert(idx < lexemeCnt)
+    lexs.lexeme(lexemeStart + idx)
+  }
+}
+
+case class KnpTable(info: KnpInfo, lexemes: Array[KnpLexeme], bunsetsu: Array[Bunsetsu], kihonku: Array[Kihonku]) {
+
+  private def makeNode(unit: Bunsetsu, units: Traversable[Bunsetsu]): KnpNode = {
     val node = unit.toNode
     val children = units.filter(_.depNumber == unit.number)
     node.copy(children = children.map(n => makeNode(n, units)).toList)
   }
 
   def bunsetsuTree: KnpNode = {
-    val root = bunsetsu.find(_.depNumber == -1).getOrElse(throw new NullPointerException("There is no root node in tree!"))
+    val root = bunsetsu.find(_.depNumber == -1)
+      .getOrElse(throw new NullPointerException("There is no root node in tree!"))
     makeNode(root, bunsetsu)
   }
 
   def toJson: JsonKnpTable = {
-    def jsonize(units: Array[TableUnit]): Array[JsonTableUnit] = {
-      units.map { u => JsonTableUnit(u.number, u.depNumber, u.depType, u.features, u.lexemes.size)  }
+    def jsonizeB(units: Array[Bunsetsu]): Array[JsonTableUnit] = {
+      units.map { u => JsonTableUnit(u.number, u.depNumber, u.depType, u.features, u.lexemeCnt, u.kihonkuCnt)  }
     }
 
-    JsonKnpTable(info, lexemes,jsonize(bunsetsu), jsonize(kihonku))
+    def jsonizeK(units: Array[Kihonku]): Array[JsonTableUnit] = {
+      units.map { u => JsonTableUnit(u.number, u.depNumber, u.depType, u.features, u.lexemeCnt, 0)  }
+    }
+
+    JsonKnpTable(info, lexemes, jsonizeB(bunsetsu), jsonizeK(kihonku))
   }
 }
 
 
-case class JsonKnpTable(info: KnpInfo, lexemes: Array[KnpLexeme], bunsetsu: Array[JsonTableUnit], kihonku: Array[JsonTableUnit]) {
+case class JsonKnpTable(info: KnpInfo, lexemes: Array[KnpLexeme],
+                        bunsetsu: Array[JsonTableUnit], kihonku: Array[JsonTableUnit]) {
   def toModel: KnpTable = {
-    def normalize(units: Array[JsonTableUnit]) = {
-      val starts = units.map(_.lexemes).scan(0)(_+_)
-      units.zip(starts).map {
-        case (u, s) => TableUnit(u.number, u.depNumber, u.depType, u.features, (s until s + u.lexemes).map(lexemes(_)).toArray)
+    def normalizeK(lexs: LexemeStorage, units: Array[JsonTableUnit]) = {
+      val bldr = new mutable.ArrayBuilder.ofRef[Kihonku]()
+      var start = 0
+      for (k <- units) {
+        bldr += Kihonku(lexs, k.number, k.depNumber, k.depType, k.features, start, k.lexemes)
+        start += k.lexemes
       }
+      bldr.result()
     }
-    KnpTable(info, lexemes, normalize(bunsetsu), normalize(kihonku))
+    def normalizeB(lexs: LexemeStorage, kis: KihonkuStorage, data: Array[JsonTableUnit]) = {
+      val bldr = new mutable.ArrayBuilder.ofRef[Bunsetsu]()
+      var lexStart = 0
+      var kiStart = 0
+      for (b <- data) {
+        bldr += Bunsetsu(lexs, kis, b.number, b.depNumber, b.depType, b.features,
+          lexStart, b.lexemes, kiStart, b.kihonku)
+        lexStart += b.lexemes
+        kiStart += b.kihonku
+      }
+      bldr.result()
+    }
+    val lexs = new ArrayLexemeStorage(lexemes)
+    val kh = normalizeK(lexs, kihonku)
+    val khs = new ArrayKihonkuStorage(kh)
+    KnpTable(info, lexemes, normalizeB(lexs, khs, bunsetsu), kh)
   }
 }
-case class JsonTableUnit(number: Int, depNumber: Int, depType: String, features: Array[String], lexemes: Int)
+case class JsonTableUnit(number: Int, depNumber: Int, depType: String, features: Array[String],
+                         lexemes: Int, kihonku: Int)
