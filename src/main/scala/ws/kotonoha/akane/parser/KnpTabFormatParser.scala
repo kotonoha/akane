@@ -169,7 +169,7 @@ class ArrayKihonkuStorage(data: Array[Kihonku]) extends KihonkuStorage {
 case class Bunsetsu(lexs: LexemeStorage, kihs: KihonkuStorage,
                     number: Int, depNumber: Int, depType: String, features: Array[String],
                     lexemeStart: Int, lexemeCnt: Int,
-                    kihonkuStart: Int, kihonkuCnt: Int) extends LexemeHelper {
+                    kihonkuStart: Int, kihonkuCnt: Int) extends LexemeHelper with KihonkuHelper {
 
   def toNode = KnpNode(number, depType, lexemes.toList, features.toList, Nil)
 
@@ -181,7 +181,7 @@ case class Bunsetsu(lexs: LexemeStorage, kihs: KihonkuStorage,
 case class Kihonku(lexs: LexemeStorage, number: Int, depNumber: Int, depType: String, features: Array[String],
                    lexemeStart: Int, lexemeCnt: Int) extends LexemeHelper {
   override def toString = {
-    s"Bunsetsu($number,$depNumber,$depType,[${lexemes.map(_.surface).mkString}}])"
+    s"Kihonku($number,$depNumber,$depType,[${lexemes.map(_.surface).mkString}}])"
   }
 }
 
@@ -204,6 +204,24 @@ trait LexemeHelper extends LexemeAccess {
     assert(idx >= lexemeStart)
     assert(idx < lexemeEnd)
     lexs.lexeme(idx)
+  }
+}
+
+trait KihonkuAccess {
+  def kihonku(idx: Int): Kihonku
+  def kihonkuStart: Int
+  def kihonkuCnt: Int
+  def kihonkuEnd: Int
+}
+
+trait KihonkuHelper extends KihonkuAccess {
+  def kihs: KihonkuStorage
+  def kihonkuEnd = kihonkuStart + kihonkuCnt
+
+  def kihonku(idx: Int) = {
+    assert(idx >= kihonkuStart)
+    assert(idx < kihonkuEnd)
+    kihs.kihonku(idx)
   }
 }
 
