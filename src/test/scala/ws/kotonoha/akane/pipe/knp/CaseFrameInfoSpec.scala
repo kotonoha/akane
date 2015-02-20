@@ -17,7 +17,7 @@ class CaseFrameInfoSpec extends FreeSpec with Matchers {
         val res = CaseFrameInfo.parseUsages(usage)
         res should have length (1)
         val item = res.head
-        item should have ('frame ("修飾"), 'writing ("何も"), 'kihonku (4))
+        item should have ('kaku ("修飾"), 'writing ("何も"), 'kihonku (4))
       }
 
       "unapplied ones should be ignored" in {

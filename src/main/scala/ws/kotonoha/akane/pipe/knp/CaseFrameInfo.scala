@@ -13,7 +13,7 @@ case class CaseFrameInfo (wordRepr: String, kind: String, usages: Seq[CaseUsage]
 /**
  * http://nlp.ist.i.kyoto-u.ac.jp/index.php?KNP%2F%E6%A0%BC%E8%A7%A3%E6%9E%90%E7%B5%90%E6%9E%9C%E6%9B%B8%E5%BC%8F
  */
-case class CaseUsage(frame: String, flag: Char, writing: String, kihonku: Int, prevSentIdx: Int, sentId: Int)
+case class CaseUsage(kaku: String, flag: Char, writing: String, kihonku: Int, prevSentIdx: Int, sentId: Int)
 
 object CaseFrameInfo extends StrictLogging {
 
