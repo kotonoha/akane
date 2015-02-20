@@ -169,7 +169,7 @@ class ArrayKihonkuStorage(data: Array[Kihonku]) extends KihonkuStorage {
 case class Bunsetsu(lexs: LexemeStorage, kihs: KihonkuStorage,
                     number: Int, depNumber: Int, depType: String, features: Array[String],
                     lexemeStart: Int, lexemeCnt: Int,
-                    kihonkuStart: Int, kihonkuCnt: Int) extends LexemeHelper with KihonkuHelper {
+                    kihonkuStart: Int, kihonkuCnt: Int) extends LexemeHelper with KihonkuHelper with FeatureLocation {
 
   def toNode = KnpNode(number, depType, lexemes.toList, features.toList, Nil)
 
@@ -179,9 +179,49 @@ case class Bunsetsu(lexs: LexemeStorage, kihs: KihonkuStorage,
 }
 
 case class Kihonku(lexs: LexemeStorage, number: Int, depNumber: Int, depType: String, features: Array[String],
-                   lexemeStart: Int, lexemeCnt: Int) extends LexemeHelper {
+                   lexemeStart: Int, lexemeCnt: Int) extends LexemeHelper with FeatureLocation {
   override def toString = {
     s"Kihonku($number,$depNumber,$depType,[${lexemes.map(_.surface).mkString}}])"
+  }
+}
+
+trait FeatureLocation {
+  def features: Array[String]
+
+  def findFeature(name: String): Option[String] = {
+    val fs = features
+    var i = 0
+    val end = fs.length
+
+    while (i < end) {
+      val f = fs(i)
+      if (f.startsWith(name)) {
+        if (name.length == f.length) {
+          return Some("")
+        } else {
+          return Some(f.substring(name.length + 1))
+        }
+      }
+      i += 1
+    }
+    None
+  }
+
+  def noParamFeatureExists(name: String): Boolean = {
+    val fs = features
+    var i = 0
+    val end = fs.length
+
+    val code = name.##
+
+    while (i < end) {
+      val f = fs(i)
+      if (code == f.## && f.equals(name)) {
+        return true
+      }
+      i += 1
+    }
+    false
   }
 }
 
