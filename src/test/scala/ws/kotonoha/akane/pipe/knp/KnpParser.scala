@@ -1,6 +1,6 @@
 package ws.kotonoha.akane.pipe.knp
 
-import org.scalatest.FreeSpec
+import org.scalatest.{Matchers, FreeSpec}
 import org.scalatest.matchers.ShouldMatchers
 import ws.kotonoha.akane.pipe.knp.lisp._
 import scala.util.parsing.input.{CharSequenceReader, Reader}
@@ -13,7 +13,7 @@ import org.apache.commons.io.IOUtils
  * @since 2013-08-12
  */
 
-class KnpExecutorText extends FreeSpec with ShouldMatchers {
+class KnpExecutorText extends FreeSpec with Matchers {
   import scala.concurrent.ExecutionContext.Implicits.global
   "knp executor" - {
     "works" in {
@@ -25,7 +25,7 @@ class KnpExecutorText extends FreeSpec with ShouldMatchers {
   }
 }
 
-class KnpParserTest extends FreeSpec with ShouldMatchers {
+class KnpParserTest extends FreeSpec with Matchers {
   implicit def input(s: String): Reader[Char] = {
     new CharSequenceReader(s, 0)
   }
