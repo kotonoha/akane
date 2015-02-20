@@ -20,7 +20,12 @@ case class KnpLexeme(
                       tags: List[String]) {
 
   def findFeature(feature: String) = {
-    (for (t <- this.tags if t.startsWith(feature)) yield t).headOption.map(s => s.substring(feature.length + 1))
+    (for (t <- this.tags if t.startsWith(feature)) yield t).headOption.map {
+      s =>
+        if (s.length > feature.length && s.charAt(feature.length) == ':')
+          s.substring(feature.length + 1)
+        else Some("")
+    }
   }
 }
 
