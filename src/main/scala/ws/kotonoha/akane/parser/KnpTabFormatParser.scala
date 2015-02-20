@@ -190,6 +190,16 @@ trait LexemeAccess {
   def lexemeStart: Int
   def lexemeEnd: Int
   def lexemeCnt: Int
+
+  def lexemeIter: Iterator[KnpLexeme] = new Iterator[KnpLexeme] {
+    private var pos = lexemeStart
+    override def hasNext = pos < lexemeEnd
+    override def next() = {
+      val l = lexeme(pos)
+      pos += 1
+      l
+    }
+  }
 }
 
 trait LexemeHelper extends LexemeAccess {
@@ -212,6 +222,16 @@ trait KihonkuAccess {
   def kihonkuStart: Int
   def kihonkuCnt: Int
   def kihonkuEnd: Int
+
+  def kihonkuIter: Iterator[Kihonku] = new Iterator[Kihonku] {
+    private var pos = kihonkuStart
+    override def hasNext = pos < kihonkuEnd
+    override def next() = {
+      val k = kihonku(pos)
+      pos += 1
+      k
+    }
+  }
 }
 
 trait KihonkuHelper extends KihonkuAccess {
