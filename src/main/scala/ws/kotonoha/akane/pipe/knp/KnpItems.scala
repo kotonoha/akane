@@ -17,7 +17,12 @@ case class KnpLexeme(
                       dicForm: String,
                       pos: JumanPosInfo,
                       info: String,
-                      tags: List[String])
+                      tags: List[String]) {
+
+  def findFeature(feature: String) = {
+    (for (t <- this.tags if t.startsWith(feature)) yield t).headOption.map(s => s.substring(feature.length + 1))
+  }
+}
 
 object KnpLexeme {
   val spaceRe = " ".r
