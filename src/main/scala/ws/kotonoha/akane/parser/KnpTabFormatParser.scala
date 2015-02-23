@@ -4,10 +4,9 @@ import java.io.BufferedReader
 
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.commons.lang3.StringUtils
-import ws.kotonoha.akane.pipe.knp.{KnpLexeme, KnpNode, KnpResultParser}
+import ws.kotonoha.akane.pipe.knp.{KnpLexeme, KnpResultParser}
 import ws.kotonoha.akane.utils.{XDouble, XInt}
 
-import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.util.matching.Regex.Groups
 
