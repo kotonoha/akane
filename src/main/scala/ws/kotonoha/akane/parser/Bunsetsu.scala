@@ -44,14 +44,14 @@ case class Bunsetsu(lexs: LexemeStorage, kihs: KihonkuStorage,
   def toNode = KnpNode(number, depType, lexemes.toList, features.toList, Nil)
 
   override def toString = {
-    s"Bunsetsu($number,$depNumber,$depType,[${lexemes.map(_.surface).mkString}}])"
+    s"Bunsetsu($number,$depNumber,$depType,[${lexemes.map(_.surface).mkString}])"
   }
 }
 
 case class Kihonku(lexs: LexemeStorage, number: Int, depNumber: Int, depType: String, features: Array[String],
                    lexemeStart: Int, lexemeCnt: Int) extends LexemeHelper with FeatureLocation {
   override def toString = {
-    s"Kihonku($number,$depNumber,$depType,[${lexemes.map(_.surface).mkString}}])"
+    s"Kihonku($number,$depNumber,$depType,[${lexemes.map(_.surface).mkString}])"
   }
 }
 
