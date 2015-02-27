@@ -19,14 +19,16 @@ case class KnpLexeme(
                       info: String,
                       tags: List[String]) {
 
-  def findFeature(feature: String) = {
-    (for (t <- this.tags if t.startsWith(feature)) yield t).headOption.map {
+  def findFeature(feature: String): Option[String] = {
+    (for (t <- this.tags if t.startsWith(feature)) yield t).headOption.flatMap {
       s =>
         if (s.length > feature.length && s.charAt(feature.length) == ':')
-          s.substring(feature.length + 1)
+          Some(s.substring(feature.length + 1))
         else Some("")
     }
   }
+
+  def canonicForm(): String = findFeature("代表表記").getOrElse(s"$surface/$reading")
 }
 
 object KnpLexeme {
