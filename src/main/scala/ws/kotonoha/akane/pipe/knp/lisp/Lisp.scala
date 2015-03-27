@@ -44,4 +44,39 @@ object LispParser extends RegexParsers {
   def parser = list
 }
 
+object LispRenderer {
+
+  def renderByLines(data: TraversableOnce[KElement]) = {
+    val bldr = new StringBuilder
+    data.foreach { d =>
+      render(d, bldr)
+      bldr.append("\n")
+    }
+    bldr.result()
+  }
+
+  def renderAtom(atom: KAtom, builder: StringBuilder) = {
+    if (atom.content.contains(" ")) {
+      builder.append('\"').append(atom.content).append('\"').append(" ")
+    } else builder.append(atom.content).append(" ")
+  }
+
+  def renderList(list: KList, builder: StringBuilder) = {
+    builder.append('(')
+    list.items.foreach {
+      i => render(i, builder)
+    }
+    if (builder.last == ' ') {
+      builder(builder.length - 1) = ')'
+    } else builder.append(')')
+  }
+
+  def render(elem: KElement, bldr: StringBuilder): Unit = {
+    elem match {
+      case e: KAtom => renderAtom(e, bldr)
+      case e: KList => renderList(e, bldr)
+    }
+  }
+}
+
 
