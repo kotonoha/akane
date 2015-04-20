@@ -4,6 +4,14 @@ object XInt {
   def unapply(x: String): Option[Int] = try { Some(x.toInt) } catch { case e: NumberFormatException => None }
 }
 
+object XLong {
+  def unapply(x: String): Option[Long] = try {
+    Some(x.toLong)
+  } catch {
+    case e: NumberFormatException => None
+  }
+}
+
 object XDouble {
   def unapply(x: String): Option[Double] = try {
     Some(x.toDouble)
