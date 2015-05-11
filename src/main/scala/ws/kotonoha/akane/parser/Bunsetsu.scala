@@ -110,6 +110,18 @@ trait LexemeAccess {
       l
     }
   }
+
+  def charLength = {
+    var i = lexemeStart
+    val e = lexemeEnd
+    var len = 0
+    while (i < e) {
+      val l = lexeme(i)
+      len += l.surface.length
+      i += 1
+    }
+    len
+  }
 }
 
 trait LexemeHelper extends LexemeAccess {
