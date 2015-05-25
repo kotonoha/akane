@@ -17,11 +17,12 @@
 package ws.kotonoha.akane.xml
 
 import javax.xml.stream.XMLEventReader
-import collection.mutable.Stack
 import javax.xml.stream.events._
-import scala.None
+
 import ws.kotonoha.akane.utils.CalculatingIterator
+
 import scala.collection.mutable
+import scala.language.implicitConversions
 
 
 trait XmlData {
@@ -158,14 +159,18 @@ class XmlParseTransformer(in: CalculatingIterator[XmlData]) {
     }
   }
 
-  def transSeq[T](name: String)(processor: XmlParseTransformer => T): Iterator[T] = new CalculatingIterator[T] {
-    protected def calculate(): Option[T] = {
+  def transSeq[T](name: String)(processor: XmlParseTransformer => T): Iterator[T] = {
+     transformSeqFromTag(name)((_, it) => processor(it))
+  }
+
+  def transformSeqFromTag[T](name: String)(body: (XmlEl, XmlParseTransformer) => T): Iterator[T] = new CalculatingIterator[T] {
+    override protected def calculate(): Option[T] = {
       val work = true
       while (work && in.hasNext) {
         val n = in.next()
         n match {
-          case XmlEl(nm) if nm == name => {
-            return Some(processor(untilEndTag(name)))
+          case x @ XmlEl(`name`) => {
+            return Some(body(x, untilEndTag(name)))
           }
           case _ => //do nothing
         }
@@ -209,13 +214,19 @@ class XmlParseTransformer(in: CalculatingIterator[XmlData]) {
   }
 
   def trans[T](name: String)(body: XmlParseTransformer => T): T = {
+    transformFromTag(name) {
+      (_, inp) => body(inp)
+    }
+  }
+
+  def transformFromTag[T](name: String)(body: (XmlEl, XmlParseTransformer) => T): T = {
     val work = true
     while (work && in.hasNext) {
       val n = in.next()
       n match {
-        case XmlEl(`name`) => {
+        case el @ XmlEl(`name`) => {
           val inp = untilEndTag(name)
-          val data = body(inp)
+          val data = body(el, inp)
           head match {
             case XmlElEnd(`name`) => in.next()
             case _ => //
@@ -282,6 +293,13 @@ class XmlParseTransformer(in: CalculatingIterator[XmlData]) {
     }
   }
 
+  def textAndAttrs(name: String): (String, Map[String, String]) = {
+    in.head match {
+      case e @ XmlEl(`name`) => (textOf(name), e.attrs)
+      case _ => throw new JMDictParseException(s"first element is not an opening tag $name, but ${in.head}")
+    }
+  }
+
   def untilEndTag(name: String) = {
     new XmlParseTransformer(new CalculatingIterator[XmlData] {
       protected def calculate() = None
@@ -294,7 +312,7 @@ class XmlParseTransformer(in: CalculatingIterator[XmlData]) {
 
       override def hasNext = chead match {
         case None => false
-        case Some(XmlElEnd(nm)) if nm == name => false
+        case Some(XmlElEnd(`name`)) => false
         case _ => true
       }
     })
@@ -304,7 +322,7 @@ class XmlParseTransformer(in: CalculatingIterator[XmlData]) {
 class JMDictParseException(msg: String) extends RuntimeException(msg)
 
 object XmlParser {
-  implicit def iterator2parsetransformer(in: CalculatingIterator[XmlData]) = new XmlParseTransformer(in)
+  implicit def iterator2parsetransformer(in: CalculatingIterator[XmlData]): XmlParseTransformer = new XmlParseTransformer(in)
 
   def parse(in: XMLEventReader) = new XmlIterator(in)
 }
