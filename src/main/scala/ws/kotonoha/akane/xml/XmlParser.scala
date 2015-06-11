@@ -75,8 +75,18 @@ private[xml] class ParserState {
   def top = stack.top
 }
 
+class XmlParserException(msg: String, inner: Throwable) extends RuntimeException(msg, inner)
+
 class XmlIterator(in: XMLEventReader) extends CalculatingIterator[XmlData] {
   private lazy val state: ParserState = new ParserState
+
+  def die(inner: Throwable) = {
+    val el = in.peek()
+    val loc = el.getLocation
+    val line = loc.getLineNumber
+    val msg = s"error in parsing at line $line;\nstate: ${state.stack}"
+    throw new XmlParserException(msg, inner)
+  }
 
   private def extractAttributeMap(st: StartElement): Map[String, String] = {
     import scala.collection.JavaConversions._
@@ -152,6 +162,11 @@ class XmlParseTransformer(in: CalculatingIterator[XmlData]) {
     }
   }
 
+  def selectOne[T](pf: PartialFunction[XmlData, T]) = {
+    val item = in.next()
+    pf(item)
+  }
+
   def skipTo(tag: String) = {
     while (in.hasNext && in.head.data != tag) {
       val n = in.next()
@@ -203,7 +218,7 @@ class XmlParseTransformer(in: CalculatingIterator[XmlData]) {
       while (work && in.hasNext) {
         val n = in.next()
         n match {
-          case x @ XmlEl(nm) if nm == name && (!noattr || x.attrs.size == 0) => {
+          case x @ XmlEl(nm) if nm == name && (!noattr || x.attrs.isEmpty) => {
             return Some(processor(untilEndTag(name)))
           }
           case _ => //do nothing
