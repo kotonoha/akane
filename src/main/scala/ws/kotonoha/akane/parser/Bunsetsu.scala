@@ -193,6 +193,28 @@ case class KnpTable(info: KnpInfo, lexemes: Array[KnpLexeme], bunsetsu: Array[Bu
     JsonKnpTable(info, lexemes, jsonizeB(bunsetsu), jsonizeK(kihonku))
   }
 
+  def bunsetsuIdxForSurface(pos: Int): Int = {
+    var i = 0
+    var cnt = 0
+    val blen = bunsetsu.length
+    while (i < blen) {
+      val b = bunsetsu(i)
+      var j = b.lexemeStart
+      val jend = b.lexemeEnd
+
+      while (j < jend) {
+        val lex = lexemes(j)
+        cnt += lex.surface.length
+        if (cnt > pos)
+          return i
+        j += 1
+      }
+
+      i += 1
+    }
+    return -1
+  }
+
   override def kihonku(num: Int) = kihonku.apply(num)
 
   override def kihonkuCnt = kihonku.length
