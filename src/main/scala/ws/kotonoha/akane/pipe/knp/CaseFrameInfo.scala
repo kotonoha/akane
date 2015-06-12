@@ -32,6 +32,8 @@ object CaseFrameInfo extends StrictLogging {
         case Array(predInfo, code, data) =>
           val parsedUsages = parseUsages(data)
           Some(CaseFrameInfo(predInfo, code, parsedUsages))
+        case Array(predInfo, code) =>
+          Some(CaseFrameInfo(predInfo, code, Seq.empty))
         case _ =>
           logger.debug(s"could not parse case frame: $f")
           None
