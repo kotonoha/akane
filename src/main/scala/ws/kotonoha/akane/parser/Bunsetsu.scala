@@ -167,7 +167,7 @@ trait KihonkuHelper extends KihonkuAccess {
   }
 }
 
-case class KnpTable(info: KnpInfo, lexemes: Array[KnpLexeme], bunsetsu: Array[Bunsetsu], kihonku: Array[Kihonku]) extends KihonkuStorage {
+case class KnpTable(info: KnpInfo, lexemes: Array[KnpLexeme], bunsetsu: Array[Bunsetsu], kihonkuData: Array[Kihonku]) extends KihonkuStorage {
 
   private def makeNode(unit: Bunsetsu, units: Traversable[Bunsetsu]): KnpNode = {
     val node = unit.toNode
@@ -190,7 +190,7 @@ case class KnpTable(info: KnpInfo, lexemes: Array[KnpLexeme], bunsetsu: Array[Bu
       units.map { u => JsonTableUnit(u.number, u.depNumber, u.depType, u.features, u.lexemeCnt, 0)  }
     }
 
-    JsonKnpTable(info, lexemes, jsonizeB(bunsetsu), jsonizeK(kihonku))
+    JsonKnpTable(info, lexemes, jsonizeB(bunsetsu), jsonizeK(kihonkuData))
   }
 
   def bunsetsuIdxForSurface(pos: Int): Int = {
@@ -215,9 +215,9 @@ case class KnpTable(info: KnpInfo, lexemes: Array[KnpLexeme], bunsetsu: Array[Bu
     return -1
   }
 
-  override def kihonku(num: Int) = kihonku.apply(num)
+  override def kihonku(num: Int) = kihonkuData.apply(num)
 
-  override def kihonkuCnt = kihonku.length
+  override def kihonkuCnt = kihonkuData.length
 }
 
 

@@ -2,7 +2,7 @@ import sbt._
 
 organization := "ws.kotonoha"
 
-scalaVersion := "2.11.4"
+scalaVersion := "2.11.7"
 
 name := "Akane"
 
@@ -12,7 +12,7 @@ moduleName := "akane"
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.1" % "test"
 
-resolvers += "java.net" at "http://download.java.net/maven/2/"
+resolvers += JavaNet2Repository
 
 libraryDependencies ++= Seq(          
             "net.liftweb" %% "lift-json" % "2.6-RC1",
@@ -25,7 +25,7 @@ libraryDependencies +=  "com.github.scala-incubator.io" %% "scala-io-file" % "0.
 
 libraryDependencies += "io.netty" % "netty" % "3.9.2.Final"
 
-resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
+resolvers += Classpaths.typesafeReleases
 
 libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.3.4"
 
@@ -36,8 +36,6 @@ resolvers ++= Seq(
 libraryDependencies += "org.apache.commons" % "commons-lang3" % "3.3.2"
 
 libraryDependencies += "commons-io" % "commons-io" % "2.4"
-
-resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/groups/public"
 
 libraryDependencies += "com.nativelibs4java" % "bridj" % "0.6.2"
 
