@@ -12,12 +12,12 @@ moduleName := "akane"
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.1" % "test"
 
-libraryDependencies ++=	Seq(					
-						"net.liftweb" %% "lift-json" % "2.6-RC1",
-						"javax.transaction" % "jta" % "1.0.1B" % "provided"
-					)
-
 resolvers += "java.net" at "http://download.java.net/maven/2/"
+
+libraryDependencies ++= Seq(          
+            "net.liftweb" %% "lift-json" % "2.6-RC1",
+            "javax.transaction" % "jta" % "1.0.1B" % "provided"
+          )
 
 libraryDependencies += "com.github.scala-incubator.io" %% "scala-io-core" % "0.4.3"
 
@@ -29,7 +29,9 @@ resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/release
 
 libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.3.4"
 
-resolvers ++= Seq("jboss repo" at "http://repository.jboss.org/nexus/content/groups/public-jboss/")
+resolvers ++= Seq(
+    "jboss repo" at "http://repository.jboss.org/nexus/content/groups/public-jboss/"
+)
 
 libraryDependencies += "org.apache.commons" % "commons-lang3" % "3.3.2"
 
