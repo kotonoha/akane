@@ -46,7 +46,7 @@ class OtherTest extends FreeSpec with ShouldMatchers {
 
       //val data = t.get().parse(bts, len)
       val s = data.getStringAtOffset(0L, Pointer.StringType.C, Charset.forName("UTF-8"))
-      println(s)
+      //println(s)
       MecabLibrary.mecab_destroy(t)
     }
   }

@@ -21,7 +21,8 @@ class JumanTransformerTest extends FreeSpec with ShouldMatchers{
         case s: Sentence => jt.transformSentence(s)
         case n => n
       }
-      tfed foreach (println(_))
+      //tfed foreach (println(_))
+      tfed should not be empty
     }
   }
 }

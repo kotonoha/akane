@@ -1,7 +1,7 @@
 package ws.kotonoha.akane.parser
 
 
-class AozoraParserTest extends org.scalatest.FunSuite with org.scalatest.matchers.ShouldMatchers {
+class AozoraParserTest extends org.scalatest.FunSuite with org.scalatest.Matchers {
   test("parses something") {
     val inp = new AozoraStringInput("片足を棺桶《かんおけ》に突っ込んでる")
     val parser = new AozoraParser(inp)
@@ -27,13 +27,13 @@ class AozoraParserTest extends org.scalatest.FunSuite with org.scalatest.matcher
     val inp = new AozoraStringInput("その人垣を睨《にら》みつける。")
     val parser = new AozoraParser(inp)
     val nodes = parser.toList
-    nodes foreach (println(_))
+    nodes should not be empty
   }
 
   test("2 bakutens a row") {
     val inp = new AozoraStringInput("やい［＃「やい」に傍点］てる［＃「てる」に傍点］のね。")
     val parser = new AozoraParser(inp)
     val nodes = parser.toList
-    nodes foreach (println(_))
+    nodes should not be empty
   }
 }

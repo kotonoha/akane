@@ -61,11 +61,11 @@ class VerbConjuationsTest extends FreeSpec with ShouldMatchers {
       val verb = Verb.ichidan("食べる")
       val rules = v.generate(5)
       println("All chains (5) from verb")
-      rules.map(rule => {
+      /*rules.map(rule => {
         val form = rule.tf(verb).render.get
         val name = rule.chain.mkString("->")
         "%s\t\t%s".format(form, name)
-      }).foreach(println(_))
+      }).foreach(println(_))*/
       rules should not have length (0)
     }
   }
