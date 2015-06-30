@@ -14,9 +14,9 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.1" % "test"
 
 resolvers += JavaNet2Repository
 
-libraryDependencies ++= Seq(          
+libraryDependencies ++= Seq(
             "net.liftweb" %% "lift-json" % "2.6-RC1",
-            "javax.transaction" % "jta" % "1.0.1B" % "provided"
+            "com.jsuereth" %% "scala-arm" % "1.4"
           )
 
 libraryDependencies += "com.github.scala-incubator.io" %% "scala-io-core" % "0.4.3"
