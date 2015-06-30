@@ -13,13 +13,14 @@ import org.apache.commons.io.IOUtils
  * @since 2013-08-12
  */
 
-class KnpExecutorText extends FreeSpec with Matchers {
+class KnpExecutorTest extends FreeSpec with Matchers {
   import scala.concurrent.ExecutionContext.Implicits.global
   "knp executor" - {
     "works" in {
       val knp = KnpTreePipeParser()
       val lines = knp.parse("私は何も知りません")
-      lines.foreach(println)
+      //lines.foreach(println)
+      lines should not be empty
       knp.close()
     }
   }
