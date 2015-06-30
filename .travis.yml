@@ -8,6 +8,6 @@ cache:
     - $HOME/.ivy2
 sudo: required
 before_install:
-  sudo add-apt-repository ppa:gezakovacs/japanese-nlp -y
-  sudo apt-get update -qq
-  sudo apt-get install -y juman mecab
+  - sudo add-apt-repository ppa:gezakovacs/japanese-nlp -y
+  - sudo apt-get update -qq
+  - sudo apt-get install -y juman mecab
