@@ -4,4 +4,17 @@ scala:
 jdk:
   - oraclejdk8
 cache:
-  - $HOME/.ivy2
+  directories:
+    - $HOME/.ivy2
+before_install:
+  - mycurdir=$CWD
+  - wget http://nlp.ist.i.kyoto-u.ac.jp/nl-resource/juman/juman-7.0.tar.bz2 -O juman.tar.bz2
+  - tar -xjvf juman.tar.bz2
+  - cd juman-7.0 && ./configure --prefix=/tmp/usr && make && make install
+  - cd $mycurdir
+  - wget https://drive.google.com/uc?export=download&id=0B4y35FiV1wh7cENtOXlicTFaRUE -O mecab.tar.gz
+  - tar -xzvf mecab-0.996.tar.gz
+  - cd mecab-0.996 & ./configure --prefix=/tmp/usr && make && make install
+  - export LD_LIBRARY_PATH=/tmp/usr/lib:$LD_LIBRARY_PATH
+  - export PATH=/tmp/usr/bin:$PATH
+
