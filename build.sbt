@@ -37,7 +37,7 @@ libraryDependencies += "org.apache.commons" % "commons-lang3" % "3.3.2"
 
 libraryDependencies += "commons-io" % "commons-io" % "2.4"
 
-libraryDependencies += "com.nativelibs4java" % "bridj" % "0.6.2"
+libraryDependencies += "com.nativelibs4java" % "bridj" % "0.7.0"
 
 libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.0.0"
 
