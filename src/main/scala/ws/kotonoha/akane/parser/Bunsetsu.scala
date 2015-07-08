@@ -246,6 +246,25 @@ case class KnpTable(info: KnpInfo, lexemes: Array[KnpLexeme], bunsetsu: Array[Bu
     indices.toArray
   }
 
+  def bunsetsuIdxForKihonku(kih: Int): Int = {
+
+    var i = 0
+    var cnt = 0
+    val blen = bunsetsu.length
+
+    while (i < blen) {
+      val bnst = bunsetsu(i)
+
+      cnt += bnst.kihonkuCnt
+
+      if (cnt > kih) return i
+
+      i += 1
+    }
+
+    -1
+  }
+
   override def kihonku(num: Int) = kihonkuData.apply(num)
 
   override def kihonkuCnt = kihonkuData.length
