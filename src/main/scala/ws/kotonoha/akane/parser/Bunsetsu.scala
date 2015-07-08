@@ -215,6 +215,37 @@ case class KnpTable(info: KnpInfo, lexemes: Array[KnpLexeme], bunsetsu: Array[Bu
     return -1
   }
 
+  /**
+   * Transforms kihonku scope to bunsetsu scope
+   * @param kihonkuScope sorted array of kihonku indexes
+   * @return array of bunsetsu indices
+   */
+  def bunsetsuScope(kihonkuScope: Array[Int]): Array[Int] = {
+    val indices = new mutable.BitSet()
+
+    var curKih = 0
+
+    var i = 0
+    var cnt = 0
+    val blen = bunsetsu.length
+
+    while (i < blen) {
+      val bnst = bunsetsu(i)
+
+      cnt += bnst.kihonkuCnt
+
+      while (curKih < kihonkuScope.length &&
+             kihonkuScope(curKih) < cnt) {
+        indices += i
+        curKih += 1
+      }
+
+      i += 1
+    }
+
+    indices.toArray
+  }
+
   override def kihonku(num: Int) = kihonkuData.apply(num)
 
   override def kihonkuCnt = kihonkuData.length

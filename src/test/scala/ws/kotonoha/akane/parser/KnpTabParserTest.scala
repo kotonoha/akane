@@ -2,7 +2,7 @@ package ws.kotonoha.akane.parser
 
 import org.scalatest.{Matchers, FreeSpec}
 import org.scalatest.matchers.ShouldMatchers
-import scalax.io.Resource
+import scalax.io.{Codec, Resource}
 
 /**
  * @author eiennohito
@@ -17,5 +17,15 @@ class KnpTabParserTest extends FreeSpec with Matchers {
       result.bunsetsu should have length(5)
       result.bunsetsu(4).lexemes.head.reading should be("み")
     }
+  }
+}
+
+
+object TreeUtil {
+  def classpath(name: String) = {
+    val parser = new KnpTabFormatParser
+    val lines = Resource.fromClasspath(name).lines()(Codec.UTF8)
+    val res = parser.parse(lines)
+    res
   }
 }
