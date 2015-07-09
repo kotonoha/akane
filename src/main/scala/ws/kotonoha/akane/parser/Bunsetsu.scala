@@ -193,12 +193,12 @@ case class KnpTable(info: KnpInfo, lexemes: Array[KnpLexeme], bunsetsu: Array[Bu
     JsonKnpTable(info, lexemes, jsonizeB(bunsetsu), jsonizeK(kihonkuData))
   }
 
-  def bunsetsuIdxForSurface(pos: Int): Int = {
+  def kihonkuIdxForSurface(pos: Int): Int = {
     var i = 0
     var cnt = 0
-    val blen = bunsetsu.length
+    val blen = kihonkuCnt
     while (i < blen) {
-      val b = bunsetsu(i)
+      val b = kihonku(i)
       var j = b.lexemeStart
       val jend = b.lexemeEnd
 
