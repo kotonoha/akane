@@ -26,18 +26,20 @@ object CaseFrameInfo extends StrictLogging {
   }
 
   def inKihonku(kihonku: Kihonku) = {
-    kihonku.findFeature("格解析結果").flatMap { f =>
-      val items = StringUtils.split(f, ':')
-      items match {
-        case Array(predInfo, code, data) =>
-          val parsedUsages = parseUsages(data)
-          Some(CaseFrameInfo(predInfo, code, parsedUsages))
-        case Array(predInfo, code) =>
-          Some(CaseFrameInfo(predInfo, code, Seq.empty))
-        case _ =>
-          logger.debug(s"could not parse case frame: $f")
-          None
-      }
+    kihonku.findFeature("格解析結果").flatMap(parsePredarg)
+  }
+
+  def parsePredarg(f: String): Option[CaseFrameInfo] = {
+    val items = StringUtils.split(f, ':')
+    items match {
+      case Array(predInfo, code, data) =>
+        val parsedUsages = parseUsages(data)
+        Some(CaseFrameInfo(predInfo, code, parsedUsages))
+      case Array(predInfo, code) =>
+        Some(CaseFrameInfo(predInfo, code, Seq.empty))
+      case _ =>
+        logger.debug(s"could not parse case frame: $f")
+        None
     }
   }
 }
