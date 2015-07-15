@@ -23,8 +23,6 @@ libraryDependencies += "com.github.scala-incubator.io" %% "scala-io-core" % "0.4
 
 libraryDependencies +=  "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.3"
 
-libraryDependencies += "io.netty" % "netty" % "3.9.2.Final"
-
 resolvers += Classpaths.typesafeReleases
 
 libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.3.11"

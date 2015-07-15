@@ -3,9 +3,9 @@ package ws.kotonoha.akane.juman
 
 import java.io.{BufferedReader, InputStreamReader}
 import com.typesafe.scalalogging.StrictLogging
+import ws.kotonoha.akane.pipe.juman.JumanEntry
 
 import collection.mutable.ListBuffer
-import ws.kotonoha.akane.JumanEntry
 import org.apache.commons.io.IOUtils
 import ws.kotonoha.akane.pipe.{AbstractRetryExecutor, Analyzer}
 import com.typesafe.config.{ConfigFactory, Config}

@@ -2,9 +2,9 @@ package ws.kotonoha.akane.statistics
 
 import ws.kotonoha.akane.ast.{Node, Sentence, HighLvlNode}
 import ws.kotonoha.akane.juman.{JumanUtil, JumanPipeExecutor}
+import ws.kotonoha.akane.pipe.juman.JumanEntry
 import collection.mutable
 import ws.kotonoha.akane.render.MetaStringRenderer
-import ws.kotonoha.akane.JumanEntry
 import util.matching.Regex.{Groups, Match}
 import util.matching.Regex
 

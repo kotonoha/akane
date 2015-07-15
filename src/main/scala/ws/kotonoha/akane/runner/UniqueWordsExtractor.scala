@@ -16,11 +16,12 @@
 
 package ws.kotonoha.akane.runner
 
+import ws.kotonoha.akane.pipe.juman.{JumanQuery, ParsedQuery}
+
 import scalax.file.Path
 import ws.kotonoha.akane.parser.{AozoraParser, StreamReaderInput}
 import java.io.{PrintWriter, InputStreamReader}
 import akka.actor.{Props, ActorSystem, Actor}
-import ws.kotonoha.akane.{ParsedQuery, JumanQuery}
 import ws.kotonoha.akane.juman.{JumanDaihyou, JumanPipeExecutor}
 import ws.kotonoha.akane.statistics.{UniqueWordsExtractor => WE}
 import ws.kotonoha.akane.utils.PathUtil
@@ -31,6 +32,8 @@ import concurrent.duration._
  * @author eiennohito
  * @since 07.09.12
  */
+
+case class JumanQuary(q: String)
 
 class SmallJumanActor extends Actor {
   val je = JumanPipeExecutor.apply()

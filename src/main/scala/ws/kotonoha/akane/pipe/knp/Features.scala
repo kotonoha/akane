@@ -1,4 +1,4 @@
-package ws.eiennohito.nlp.knp
+package ws.kotonoha.akane.pipe.knp
 
 import ws.kotonoha.akane.parser.FeatureLocation
 

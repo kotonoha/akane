@@ -16,7 +16,8 @@
 
 package ws.kotonoha.akane.juman
 
-import ws.kotonoha.akane.JumanEntry
+import ws.kotonoha.akane.pipe.juman.JumanEntry
+
 import scala.Some
 import ws.kotonoha.akane.basic.ReadingAndWriting
 import scala.util.matching.Regex.Groups

@@ -18,8 +18,8 @@ package ws.kotonoha.akane.statistics
 
 import akka.actor.ActorRef
 import akka.pattern.ask
-import ws.kotonoha.akane.{ParsedQuery, JumanQuery}
 import ws.kotonoha.akane.ast.{Sentence, HighLvlNode}
+import ws.kotonoha.akane.pipe.juman.{ParsedQuery, JumanQuery}
 import ws.kotonoha.akane.render.MetaStringRenderer
 import ws.kotonoha.akane.juman.{JumanDaihyou, JumanUtil}
 import akka.util.Timeout

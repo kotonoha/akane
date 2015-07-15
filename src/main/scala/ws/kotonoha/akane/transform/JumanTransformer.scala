@@ -1,9 +1,9 @@
 package ws.kotonoha.akane.transform
 
-import ws.kotonoha.akane.ast.{ListNode, RubyNode, StringNode, Sentence}
+import ws.kotonoha.akane.ast.{ListNode, Sentence}
 import ws.kotonoha.akane.juman.JumanPipeExecutor
+import ws.kotonoha.akane.pipe.juman.JumanRW
 import ws.kotonoha.akane.render.MetaStringRenderer
-import ws.kotonoha.akane.JumanRW
 import ws.kotonoha.akane.ruby.AfterLexical
 
 /**
