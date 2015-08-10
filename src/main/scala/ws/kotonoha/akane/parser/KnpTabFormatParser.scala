@@ -32,11 +32,11 @@ class KnpTabFormatParser extends KnpResultParser with StrictLogging {
     for (line <- lines) {
       initRe.findPrefixMatchOf(line) match {
         case Some(Groups("+", XInt(depNum), depType, features)) => //kihonku begin with + in knp output
-          proc.kihonku += new KihonkuBuilder(proc.kihonku.size, depNum, depType.intern(),
+          proc.kihonku += new KihonkuBuilder(proc.kihonku.size, depNum, depType,
             parseFeatures(features), proc.lexemes.size)
           proc.bunsetsu.last.addKihonku()
         case Some(Groups("*", XInt(depNum), depType, features)) => //bunsetsu begin with * in knp output
-          proc.bunsetsu += new BunsetsuBuilder(proc.bunsetsu.size, depNum, depType.intern(),
+          proc.bunsetsu += new BunsetsuBuilder(proc.bunsetsu.size, depNum, depType,
             parseFeatures(features), proc.lexemes.size, proc.kihonku.size)
         case _ if line == "EOS" => //do nothing
         case None if !startRe.pattern.matcher(line).find() => //it's a morpheme
