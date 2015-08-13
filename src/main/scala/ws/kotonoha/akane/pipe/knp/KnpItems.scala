@@ -2,6 +2,7 @@ package ws.kotonoha.akane.pipe.knp
 
 import org.apache.commons.lang3.StringUtils
 import ws.kotonoha.akane.ParseUtil
+import ws.kotonoha.akane.parser.FeatureLocation
 
 import scala.collection.mutable.ListBuffer
 
@@ -9,6 +10,18 @@ import scala.collection.mutable.ListBuffer
  * @author eiennohito
  * @since 2013-09-04
  */
+trait JapaneseLexeme extends FeatureLocation {
+  def surface: String
+  def reading: String
+  def dicForm: String
+  def pos: JumanPosInfo
+  def info: String
+  def tags: Seq[String]
+  def canonicForm(): String
+
+  override protected def featureSeq = tags
+}
+
 case class PosItem(name: String, id: Int)
 
 case class JumanPosInfo(pos: PosItem, category: PosItem, conjType: PosItem, conjForm: PosItem)
@@ -20,16 +33,7 @@ case class KnpLexeme(
                       dicForm: String,
                       pos: JumanPosInfo,
                       info: String,
-                      tags: List[String]) {
-
-  def findFeature(feature: String): Option[String] = {
-    (for (t <- this.tags if t.startsWith(feature)) yield t).headOption.flatMap {
-      s =>
-        if (s.length > feature.length && s.charAt(feature.length) == ':')
-          Some(s.substring(feature.length + 1))
-        else Some("")
-    }
-  }
+                      tags: List[String]) extends JapaneseLexeme {
 
   def canonicForm(): String = findFeature("代表表記").getOrElse(s"$surface/$reading")
 }

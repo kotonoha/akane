@@ -46,6 +46,9 @@ case class Bunsetsu(lexs: LexemeStorage, kihs: KihonkuStorage,
   override def toString = {
     s"Bunsetsu($number,$depNumber,$depType,[${lexemes.map(_.surface).mkString}])"
   }
+
+  //TODO: move to key-value API
+  override protected def featureSeq = features
 }
 
 case class Kihonku(lexs: LexemeStorage, number: Int, depNumber: Int, depType: String, features: Array[String],
@@ -53,18 +56,22 @@ case class Kihonku(lexs: LexemeStorage, number: Int, depNumber: Int, depType: St
   override def toString = {
     s"Kihonku($number,$depNumber,$depType,[${lexemes.map(_.surface).mkString}])"
   }
+
+  //TODO: move to key-value API
+  override protected def featureSeq = features
 }
 
 trait FeatureLocation {
-  def features: Array[String]
+  //TODO: move to key-value API
+  protected def featureSeq: Traversable[String]
 
   def findFeature(name: String): Option[String] = {
-    val fs = features
-    var i = 0
-    val end = fs.length
+    val fts = featureSeq
 
-    while (i < end) {
-      val f = fs(i)
+    val iter = fts.toIterator
+
+    while (iter.hasNext) {
+      val f = iter.next()
       if (f.startsWith(name)) {
         if (name.length == f.length) {
           return Some("")
@@ -72,26 +79,20 @@ trait FeatureLocation {
           return Some(f.substring(name.length + 1))
         }
       }
-      i += 1
     }
+
     None
   }
 
   def noParamFeatureExists(name: String): Boolean = {
-    val fs = features
-    var i = 0
-    val end = fs.length
-
     val code = name.##
 
-    while (i < end) {
-      val f = fs(i)
-      if (code == f.## && f.equals(name)) {
-        return true
-      }
-      i += 1
+    val fiter = featureSeq.toIterator
+    while (fiter.hasNext) {
+      val f = fiter.next()
+      if (code == f.## && f.equals(name)) return true
     }
-    false
+    return false
   }
 }
 
