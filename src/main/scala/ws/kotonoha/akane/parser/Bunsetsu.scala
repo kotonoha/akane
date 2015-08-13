@@ -168,7 +168,14 @@ trait KihonkuHelper extends KihonkuAccess {
   }
 }
 
-case class KnpTable(info: KnpInfo, lexemes: Array[KnpLexeme], bunsetsu: Array[Bunsetsu], kihonkuData: Array[Kihonku]) extends KihonkuStorage {
+case class KnpTable(info: KnpInfo, lexemes: Array[KnpLexeme], bunsetsu: Array[Bunsetsu], kihonkuData: Array[Kihonku])
+  extends KihonkuStorage with LexemeAccess {
+
+  override def lexeme(idx: Int) = lexemes(idx)
+
+  override def lexemeStart = 0
+  override def lexemeEnd = lexemes.length
+  override def lexemeCnt = lexemes.length
 
   private def makeNode(unit: Bunsetsu, units: Traversable[Bunsetsu]): KnpNode = {
     val node = unit.toNode
