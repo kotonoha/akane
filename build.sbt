@@ -2,7 +2,9 @@ import sbt._
 
 organization := "ws.kotonoha"
 
-scalaVersion := "2.11.7"
+crossScalaVersions := Seq("2.11.7")
+
+// scalaVersion := "2.11.7"
 
 name := "Akane"
 
