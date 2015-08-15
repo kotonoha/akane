@@ -24,8 +24,7 @@ object KInt {
 
 object LispParser extends RegexParsers {
 
-
-  override val whiteSpace = """(\s+)|(#[^\n\r]*[\n\r])|(EOS)""".r
+  override val whiteSpace = """((\s+)|([#;][^\n\r]*[\n\r])|(EOS))+""".r
 
   def quotedString = "(?:\"(?:[^\"\\\\]|\\\\.)*\")".r ^^ (s => KAtom(s.substring(1, s.length - 1)))
 
@@ -37,9 +36,11 @@ object LispParser extends RegexParsers {
 
   def list: Parser[KList] = (lbracket ~> rep(expression)) <~ rbracket ^^ KList
 
+  def lists = rep(list)
+
   def nil = literal("NIL") ^^^ KList(Nil)
 
-  def expression = (list | nil | atom)
+  def expression = list | nil | atom
 
   def parser = list
 }
