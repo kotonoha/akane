@@ -27,7 +27,7 @@ libraryDependencies +=  "com.github.scala-incubator.io" %% "scala-io-file" % "0.
 
 resolvers += Classpaths.typesafeReleases
 
-libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.3.11"
+libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.4-M3"
 
 libraryDependencies += "com.typesafe" % "config" % "1.3.0"
 
