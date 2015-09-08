@@ -27,7 +27,7 @@ libraryDependencies +=  "com.github.scala-incubator.io" %% "scala-io-file" % "0.
 
 resolvers += Classpaths.typesafeReleases
 
-libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.4-M3"
+libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.4.0-RC2"
 
 libraryDependencies += "com.typesafe" % "config" % "1.3.0"
 
@@ -41,7 +41,7 @@ libraryDependencies += "commons-io" % "commons-io" % "2.4"
 
 libraryDependencies += "com.nativelibs4java" % "bridj" % "0.7.0"
 
-libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.0.0"
+libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0"
 
 javacOptions ++= Seq("-encoding", "utf8")
 
