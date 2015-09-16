@@ -16,8 +16,6 @@
 
 package ws.kotonoha.akane.utils
 
-import util.parsing.json.JSON
-
 /**
  * @author eiennohito
  * @since 30.10.12 
@@ -51,5 +49,26 @@ object StringUtil {
       }
     }
     i
+  }
+
+  def indexOfAny(seq: CharSequence, str: String, start: Int = 0): Int = {
+    var i = start
+    val seql = seq.length()
+    val strl = str.length
+    while (i < seql) {
+      val c = seq.charAt(i)
+
+      var j = 0
+      while (j < strl) {
+        val c2 = str.charAt(j)
+
+        if (c == c2) return i
+
+        j += 1
+      }
+
+      i += 1
+    }
+    -1
   }
 }
