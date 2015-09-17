@@ -22,11 +22,14 @@ trait JapaneseLexeme extends FeatureLocation {
   override protected def featureSeq = tags
 }
 
+@deprecated("use protobuf-based api")
 case class PosItem(name: String, id: Int)
 
+@deprecated("use protobuf-based api")
 case class JumanPosInfo(pos: PosItem, category: PosItem, conjType: PosItem, conjForm: PosItem)
 
-//かわったり かわったり かわる 動詞 2 * 0 子音動詞ラ行 10 タ系連用タリ形 15 "代表表記:代わる/かわる 自他動詞:他:代える/かえる"
+//かわったり かわったり かわる 動詞 2 * 0 子音動詞ラ行 10 タ系連用タリ形 15 "代表表記:代わる/かわる 自他動詞:他:代える/かえる
+@deprecated("use protobuf-based apis")
 case class KnpLexeme(
                       surface: String,
                       reading: String,

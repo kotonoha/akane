@@ -36,6 +36,7 @@ class ArrayKihonkuStorage(data: Array[Kihonku]) extends KihonkuStorage {
  * @param features features that are assigned to table entry
  * @param lexs lexeme storage
  */
+@deprecated("use protobuf-based apis")
 case class Bunsetsu(lexs: LexemeStorage, kihs: KihonkuStorage,
                     number: Int, depNumber: Int, depType: String, features: Array[String],
                     lexemeStart: Int, lexemeCnt: Int,
@@ -51,6 +52,7 @@ case class Bunsetsu(lexs: LexemeStorage, kihs: KihonkuStorage,
   override protected def featureSeq = features
 }
 
+@deprecated("use protobuf-based apis")
 case class Kihonku(lexs: LexemeStorage, number: Int, depNumber: Int, depType: String, features: Array[String],
                    lexemeStart: Int, lexemeCnt: Int) extends LexemeHelper with FeatureLocation {
   override def toString = {
@@ -168,6 +170,7 @@ trait KihonkuHelper extends KihonkuAccess {
   }
 }
 
+@deprecated("use protobuf based apis")
 case class KnpTable(info: KnpInfo, lexemes: Array[KnpLexeme], bunsetsu: Array[Bunsetsu], kihonkuData: Array[Kihonku])
   extends KihonkuStorage with LexemeAccess {
 
