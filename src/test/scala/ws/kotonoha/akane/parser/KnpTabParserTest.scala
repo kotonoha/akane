@@ -14,7 +14,7 @@ class KnpTabParserTest extends FreeSpec with Matchers {
     "parses a small tree" in {
       val lines = Resource.fromClasspath("knp.tab.txt").lines()
       val result = parser.parse(lines)
-      result.bunsetsu should have length(5)
+      result.bunsetsuCnt shouldBe 5
       result.bunsetsu(4).lexemes.head.reading should be("み")
     }
   }

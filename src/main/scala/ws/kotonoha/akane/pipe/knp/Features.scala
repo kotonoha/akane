@@ -1,6 +1,6 @@
 package ws.kotonoha.akane.pipe.knp
 
-import ws.kotonoha.akane.parser.FeatureLocation
+import ws.kotonoha.akane.analyzers.knp.FeatureAccess
 
 /**
  * @author eiennohito
@@ -11,7 +11,7 @@ object Features {
 
   val normalizedWriting = "正規化代表表記"
 
-  def normWriting(floc: FeatureLocation) = {
+  def normWriting(floc: FeatureAccess) = {
     floc.findFeature(normalizedWriting)
   }
 }

@@ -1,27 +1,31 @@
 package ws.kotonoha.akane.parser
 
+import ws.kotonoha.akane.analyzers.knp._
 import ws.kotonoha.akane.pipe.knp.{KnpNode, KnpLexeme}
 
 import scala.collection.mutable
 
-
+@deprecated("use protobuf-based apis", "0.3")
 trait LexemeStorage {
   def lexeme(num: Int): KnpLexeme
   def lexemeCnt: Int
-  def lexemes(from: Int, until: Int): IndexedSeq[KnpLexeme]
+  def lexemes(from: Int, until: Int): IndexedSeq[LexemeApi]
 }
 
+@deprecated("use protobuf-based apis", "0.3")
 class ArrayLexemeStorage(data: Array[KnpLexeme]) extends LexemeStorage {
   override def lexeme(num: Int) = data(num)
   override def lexemes(from: Int, until: Int) = data.slice(from, until)
   override def lexemeCnt = data.length
 }
 
+@deprecated("use protobuf-based apis", "0.3")
 trait KihonkuStorage {
   def kihonku(num: Int): Kihonku
   def kihonkuCnt: Int
 }
 
+@deprecated("use protobuf-based apis", "0.3")
 class ArrayKihonkuStorage(data: Array[Kihonku]) extends KihonkuStorage {
   override def kihonku(num: Int) = data(num)
   override def kihonkuCnt = data.length
@@ -36,13 +40,14 @@ class ArrayKihonkuStorage(data: Array[Kihonku]) extends KihonkuStorage {
  * @param features features that are assigned to table entry
  * @param lexs lexeme storage
  */
-@deprecated("use protobuf-based apis")
+@deprecated("use protobuf-based apis", "0.3")
 case class Bunsetsu(lexs: LexemeStorage, kihs: KihonkuStorage,
                     number: Int, depNumber: Int, depType: String, features: Array[String],
                     lexemeStart: Int, lexemeCnt: Int,
-                    kihonkuStart: Int, kihonkuCnt: Int) extends LexemeHelper with KihonkuHelper with FeatureLocation {
+                    kihonkuStart: Int, kihonkuCnt: Int)
+  extends LexemeHelper with KihonkuHelper with FeatureLocation with BunsetsuApi {
 
-  def toNode = KnpNode(number, depType, lexemes.toList, features.toList, Nil)
+  def toNode = KnpNode(number, depType, lexemeIter.map(_.asInstanceOf[KnpLexeme]).toList, features.toList, Nil)
 
   override def toString = {
     s"Bunsetsu($number,$depNumber,$depType,[${lexemes.map(_.surface).mkString}])"
@@ -52,9 +57,10 @@ case class Bunsetsu(lexs: LexemeStorage, kihs: KihonkuStorage,
   override protected def featureSeq = features
 }
 
-@deprecated("use protobuf-based apis")
+@deprecated("use protobuf-based apis", "0.3")
 case class Kihonku(lexs: LexemeStorage, number: Int, depNumber: Int, depType: String, features: Array[String],
-                   lexemeStart: Int, lexemeCnt: Int) extends LexemeHelper with FeatureLocation {
+                   lexemeStart: Int, lexemeCnt: Int)
+  extends LexemeHelper with FeatureLocation with KihonkuApi {
   override def toString = {
     s"Kihonku($number,$depNumber,$depType,[${lexemes.map(_.surface).mkString}])"
   }
@@ -63,7 +69,8 @@ case class Kihonku(lexs: LexemeStorage, number: Int, depNumber: Int, depType: St
   override protected def featureSeq = features
 }
 
-trait FeatureLocation {
+@deprecated("use protobuf-based apis", "0.3")
+trait FeatureLocation extends FeatureAccess {
   //TODO: move to key-value API
   protected def featureSeq: Traversable[String]
 
@@ -86,7 +93,7 @@ trait FeatureLocation {
     None
   }
 
-  def noParamFeatureExists(name: String): Boolean = {
+  def featureExists(name: String): Boolean = {
     val code = name.##
 
     val fiter = featureSeq.toIterator
@@ -98,35 +105,7 @@ trait FeatureLocation {
   }
 }
 
-trait LexemeAccess {
-  def lexeme(idx: Int): KnpLexeme
-  def lexemeStart: Int
-  def lexemeEnd: Int
-  def lexemeCnt: Int
-
-  def lexemeIter: Iterator[KnpLexeme] = new Iterator[KnpLexeme] {
-    private var pos = lexemeStart
-    override def hasNext = pos < lexemeEnd
-    override def next() = {
-      val l = lexeme(pos)
-      pos += 1
-      l
-    }
-  }
-
-  def charLength = {
-    var i = lexemeStart
-    val e = lexemeEnd
-    var len = 0
-    while (i < e) {
-      val l = lexeme(i)
-      len += l.surface.length
-      i += 1
-    }
-    len
-  }
-}
-
+@deprecated("use protobuf-based apis", "0.3")
 trait LexemeHelper extends LexemeAccess {
   def lexs: LexemeStorage
   def lexemeStart: Int
@@ -142,23 +121,8 @@ trait LexemeHelper extends LexemeAccess {
   }
 }
 
-trait KihonkuAccess {
-  def kihonku(idx: Int): Kihonku
-  def kihonkuStart: Int
-  def kihonkuCnt: Int
-  def kihonkuEnd: Int
 
-  def kihonkuIter: Iterator[Kihonku] = new Iterator[Kihonku] {
-    private var pos = kihonkuStart
-    override def hasNext = pos < kihonkuEnd
-    override def next() = {
-      val k = kihonku(pos)
-      pos += 1
-      k
-    }
-  }
-}
-
+@deprecated("use protobuf-based apis", "0.3")
 trait KihonkuHelper extends KihonkuAccess {
   def kihs: KihonkuStorage
   def kihonkuEnd = kihonkuStart + kihonkuCnt
@@ -170,9 +134,9 @@ trait KihonkuHelper extends KihonkuAccess {
   }
 }
 
-@deprecated("use protobuf based apis")
-case class KnpTable(info: KnpInfo, lexemes: Array[KnpLexeme], bunsetsu: Array[Bunsetsu], kihonkuData: Array[Kihonku])
-  extends KihonkuStorage with LexemeAccess {
+@deprecated("use protobuf-based apis", "0.3")
+case class KnpTable(info: KnpInfo, lexemes: Array[KnpLexeme], bunsetsuData: Array[Bunsetsu], kihonkuData: Array[Kihonku])
+  extends KihonkuStorage with LexemeAccess with TableApi {
 
   override def lexeme(idx: Int) = lexemes(idx)
 
@@ -187,9 +151,9 @@ case class KnpTable(info: KnpInfo, lexemes: Array[KnpLexeme], bunsetsu: Array[Bu
   }
 
   def bunsetsuTree: KnpNode = {
-    val root = bunsetsu.find(_.depNumber == -1)
+    val root = bunsetsuData.find(_.depNumber == -1)
       .getOrElse(throw new NullPointerException("There is no root node in tree!"))
-    makeNode(root, bunsetsu)
+    makeNode(root, bunsetsuData)
   }
 
   def toJson: JsonKnpTable = {
@@ -201,84 +165,18 @@ case class KnpTable(info: KnpInfo, lexemes: Array[KnpLexeme], bunsetsu: Array[Bu
       units.map { u => JsonTableUnit(u.number, u.depNumber, u.depType, u.features, u.lexemeCnt, 0)  }
     }
 
-    JsonKnpTable(info, lexemes, jsonizeB(bunsetsu), jsonizeK(kihonkuData))
+    JsonKnpTable(info, lexemes, jsonizeB(bunsetsuData), jsonizeK(kihonkuData))
   }
 
-  def kihonkuIdxForSurface(pos: Int): Int = {
-    var i = 0
-    var cnt = 0
-    val blen = kihonkuCnt
-    while (i < blen) {
-      val b = kihonku(i)
-      var j = b.lexemeStart
-      val jend = b.lexemeEnd
-
-      while (j < jend) {
-        val lex = lexemes(j)
-        cnt += lex.surface.length
-        if (cnt > pos)
-          return i
-        j += 1
-      }
-
-      i += 1
-    }
-    return -1
-  }
-
-  /**
-   * Transforms kihonku scope to bunsetsu scope
-   * @param kihonkuScope sorted array of kihonku indexes
-   * @return array of bunsetsu indices
-   */
-  def bunsetsuScope(kihonkuScope: Array[Int]): Array[Int] = {
-    val indices = new mutable.BitSet()
-
-    var curKih = 0
-
-    var i = 0
-    var cnt = 0
-    val blen = bunsetsu.length
-
-    while (i < blen) {
-      val bnst = bunsetsu(i)
-
-      cnt += bnst.kihonkuCnt
-
-      while (curKih < kihonkuScope.length &&
-             kihonkuScope(curKih) < cnt) {
-        indices += i
-        curKih += 1
-      }
-
-      i += 1
-    }
-
-    indices.toArray
-  }
-
-  def bunsetsuIdxForKihonku(kih: Int): Int = {
-
-    var i = 0
-    var cnt = 0
-    val blen = bunsetsu.length
-
-    while (i < blen) {
-      val bnst = bunsetsu(i)
-
-      cnt += bnst.kihonkuCnt
-
-      if (cnt > kih) return i
-
-      i += 1
-    }
-
-    -1
-  }
+  override def bunsetsu(idx: Int) = bunsetsuData(idx)
+  override def bunsetsuStart = 0
+  override def bunsetsuCnt = bunsetsuData.length
+  override def bunsetsuEnd = bunsetsuData.length
 
   override def kihonku(num: Int) = kihonkuData.apply(num)
-
+  override def kihonkuStart = 0
   override def kihonkuCnt = kihonkuData.length
+  override def kihonkuEnd = kihonkuData.length
 }
 
 

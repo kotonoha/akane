@@ -3,28 +3,19 @@ package ws.kotonoha.akane.pipe.knp
 import org.apache.commons.lang3.StringUtils
 import ws.kotonoha.akane.ParseUtil
 import ws.kotonoha.akane.analyzers.juman.JumanStylePos
+import ws.kotonoha.akane.analyzers.knp.{FeatureAccess, LexemeApi}
 import ws.kotonoha.akane.parser.FeatureLocation
 
 import scala.collection.mutable.ListBuffer
 
 
 
-trait JapaneseLexeme extends FeatureLocation {
-  def surface: String
-  def reading: String
-  def dicForm: String
-  def pos: JumanStylePos
-  def info: String
-  def tags: Seq[String]
-  def canonicForm(): String
 
-  override protected def featureSeq = tags
-}
 
-@deprecated("use protobuf-based api")
+@deprecated("use protobuf-based apis", "0.3")
 case class PosItem(name: String, id: Int)
 
-@deprecated("use protobuf-based api")
+@deprecated("use protobuf-based apis", "0.3")
 case class JumanPosInfo(partOfSpeech: PosItem, subPart: PosItem, conjType: PosItem, conjForm: PosItem) extends JumanStylePos {
   override def pos = partOfSpeech.id
   override def subpos = subPart.id
@@ -33,20 +24,23 @@ case class JumanPosInfo(partOfSpeech: PosItem, subPart: PosItem, conjType: PosIt
 }
 
 //かわったり かわったり かわる 動詞 2 * 0 子音動詞ラ行 10 タ系連用タリ形 15 "代表表記:代わる/かわる 自他動詞:他:代える/かえる
-@deprecated("use protobuf-based apis")
+@deprecated("use protobuf-based apis", "0.3")
 case class KnpLexeme(
                       surface: String,
                       reading: String,
                       dicForm: String,
                       pos: JumanPosInfo,
                       info: String,
-                      tags: List[String]) extends JapaneseLexeme {
+                      tags: List[String]) extends LexemeApi with FeatureLocation {
 
   def canonicForm(): String = findFeature("代表表記").getOrElse(s"$surface/$reading")
+
+  override protected def featureSeq = tags
 }
 
 object KnpLexeme {
   val spaceRe = " ".r
+  @deprecated("use protobuf-based apis", "0.3")
   def fromTabFormat(line: CharSequence): KnpLexeme = {
 
     val end0 = 0
@@ -106,6 +100,7 @@ object KnpLexeme {
     )
   }
 
+  @deprecated("use protobuf-based apis", "0.3")
   def fromTabFormatSlow(line: CharSequence): KnpLexeme = {
     val fields = spaceRe.pattern.split(line, 12)
     val rest = fields(11)
@@ -122,8 +117,11 @@ object KnpLexeme {
   }
 }
 
+@deprecated("use protobuf-based apis", "0.3")
 case class KnpItemRelation(to: Int, tags: List[String])
 
+@deprecated("use protobuf-based apis", "0.3")
 case class KnpItem(num: Int, star: KnpItemRelation, plus: KnpItemRelation, lexems: Seq[KnpLexeme])
 
+@deprecated("use protobuf-based apis", "0.3")
 case class KnpNode(num: Int, kind: String, surface: List[KnpLexeme], features: List[String], children: List[KnpNode] = Nil)

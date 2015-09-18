@@ -2,7 +2,7 @@ package ws.kotonoha.akane.pipe.knp
 
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.commons.lang3.StringUtils
-import ws.kotonoha.akane.parser.Kihonku
+import ws.kotonoha.akane.analyzers.knp.KihonkuApi
 
 /**
  * http://nlp.ist.i.kyoto-u.ac.jp/index.php?KNP%2F%E6%A0%BC%E8%A7%A3%E6%9E%90%E7%B5%90%E6%9E%9C%E6%9B%B8%E5%BC%8F
@@ -25,7 +25,7 @@ object CaseFrameInfo extends StrictLogging {
     }.toIndexedSeq
   }
 
-  def inKihonku(kihonku: Kihonku) = {
+  def inKihonku(kihonku: KihonkuApi) = {
     kihonku.findFeature("格解析結果").flatMap(parsePredarg)
   }
 
