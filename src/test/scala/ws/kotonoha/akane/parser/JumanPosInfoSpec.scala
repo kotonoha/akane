@@ -26,11 +26,11 @@ class JumanPosInfoSpec extends FreeSpec with Matchers {
   def checkPos(set: JumanPosSet, tr: KnpTable): Unit = {
     for (l <- tr.lexemes) {
       val p = l.pos
-      val pos = p.pos
+      val pos = p.partOfSpeech
       val px = set.pos(pos.id)
       pos.name shouldBe px.name
 
-      val sub = p.category
+      val sub = p.subPart
       sub.name shouldBe px.subtypes(sub.id).name
 
       val conjTp = p.conjType

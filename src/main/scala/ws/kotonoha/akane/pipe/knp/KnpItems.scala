@@ -2,19 +2,18 @@ package ws.kotonoha.akane.pipe.knp
 
 import org.apache.commons.lang3.StringUtils
 import ws.kotonoha.akane.ParseUtil
+import ws.kotonoha.akane.analyzers.juman.JumanStylePos
 import ws.kotonoha.akane.parser.FeatureLocation
 
 import scala.collection.mutable.ListBuffer
 
-/**
- * @author eiennohito
- * @since 2013-09-04
- */
+
+
 trait JapaneseLexeme extends FeatureLocation {
   def surface: String
   def reading: String
   def dicForm: String
-  def pos: JumanPosInfo
+  def pos: JumanStylePos
   def info: String
   def tags: Seq[String]
   def canonicForm(): String
@@ -26,7 +25,12 @@ trait JapaneseLexeme extends FeatureLocation {
 case class PosItem(name: String, id: Int)
 
 @deprecated("use protobuf-based api")
-case class JumanPosInfo(pos: PosItem, category: PosItem, conjType: PosItem, conjForm: PosItem)
+case class JumanPosInfo(partOfSpeech: PosItem, subPart: PosItem, conjType: PosItem, conjForm: PosItem) extends JumanStylePos {
+  override def pos = partOfSpeech.id
+  override def subpos = subPart.id
+  override def category = conjType.id
+  override def conjugation = conjForm.id
+}
 
 //かわったり かわったり かわる 動詞 2 * 0 子音動詞ラ行 10 タ系連用タリ形 15 "代表表記:代わる/かわる 自他動詞:他:代える/かえる
 @deprecated("use protobuf-based apis")
