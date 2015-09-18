@@ -11,7 +11,6 @@ trait JapaneseLexeme extends FeatureAccess {
   def reading: String
   def dicForm: String
   def pos: JumanStylePos
-  def info: String
   //def tags: Seq[String]
   def canonicForm(): String
 }

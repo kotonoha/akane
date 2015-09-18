@@ -31,7 +31,7 @@ object KnpSexpParser extends StrictLogging {
           case KAtom(s) => s
           case x => logger.warn("unknown cinfo " + x); ""
         }
-        KnpLexeme(
+        OldAndUglyKnpLexeme(
           surf, read, writ,
           JumanPosInfo(
             PosItem(posStr, posId),

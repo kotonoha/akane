@@ -23,7 +23,7 @@ class JumanPosInfoSpec extends FreeSpec with Matchers {
     }
   }
 
-  def checkPos(set: JumanPosSet, tr: KnpTable): Unit = {
+  def checkPos(set: JumanPosSet, tr: OldAngUglyKnpTable): Unit = {
     for (l <- tr.lexemes) {
       val p = l.pos
       val pos = p.partOfSpeech

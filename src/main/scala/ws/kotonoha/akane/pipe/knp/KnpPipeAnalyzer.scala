@@ -5,7 +5,7 @@ import java.io._
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.StrictLogging
 import ws.kotonoha.akane.config.KnpConfig
-import ws.kotonoha.akane.parser.{KnpTabFormatParser, KnpTable}
+import ws.kotonoha.akane.parser.{KnpTabFormatParser, OldAngUglyKnpTable}
 import ws.kotonoha.akane.pipe.knp.lisp.{KList, LispParser}
 import ws.kotonoha.akane.pipe.{AbstractRetryExecutor, Analyzer, Pipe}
 
@@ -102,7 +102,7 @@ object KnpTreePipeParser {
   }
 }
 
-class KnpTabPipeParser private(factory: () => KnpPipeAnalyzer[KnpTabFormatParser]) extends AbstractRetryExecutor[Option[KnpTable]](factory)
+class KnpTabPipeParser private(factory: () => KnpPipeAnalyzer[KnpTabFormatParser]) extends AbstractRetryExecutor[Option[OldAngUglyKnpTable]](factory)
 object KnpTabPipeParser {
   def apply(config: Config = ConfigFactory.empty()) = {
     val knpConfig = KnpConfig.apply(config)

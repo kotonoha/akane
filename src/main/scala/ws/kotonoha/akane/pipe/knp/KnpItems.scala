@@ -24,8 +24,7 @@ case class JumanPosInfo(partOfSpeech: PosItem, subPart: PosItem, conjType: PosIt
 }
 
 //かわったり かわったり かわる 動詞 2 * 0 子音動詞ラ行 10 タ系連用タリ形 15 "代表表記:代わる/かわる 自他動詞:他:代える/かえる
-@deprecated("use protobuf-based apis", "0.3")
-case class KnpLexeme(
+case class OldAndUglyKnpLexeme (
                       surface: String,
                       reading: String,
                       dicForm: String,
@@ -38,10 +37,9 @@ case class KnpLexeme(
   override protected def featureSeq = tags
 }
 
-object KnpLexeme {
+object OldAndUglyKnpLexeme {
   val spaceRe = " ".r
-  @deprecated("use protobuf-based apis", "0.3")
-  def fromTabFormat(line: CharSequence): KnpLexeme = {
+  def fromTabFormat(line: CharSequence): OldAndUglyKnpLexeme = {
 
     val end0 = 0
     val end1 = StringUtils.indexOf(line, ' ', end0)
@@ -76,7 +74,7 @@ object KnpLexeme {
       } else feStart = -1
     }
 
-    KnpLexeme(
+    OldAndUglyKnpLexeme(
       line.subSequence(end0, end1).toString,
       line.subSequence(end1 + 1, end2).toString,
       line.subSequence(end2 + 1, end3).toString,
@@ -101,13 +99,13 @@ object KnpLexeme {
   }
 
   @deprecated("use protobuf-based apis", "0.3")
-  def fromTabFormatSlow(line: CharSequence): KnpLexeme = {
+  def fromTabFormatSlow(line: CharSequence): OldAndUglyKnpLexeme = {
     val fields = spaceRe.pattern.split(line, 12)
     val rest = fields(11)
     val featuresBegin = rest.indexOf('<')
     val info = StringUtils.strip(rest.substring(0, featuresBegin - 1), " \"")
     val features = rest.substring(featuresBegin).split("><").map(s => StringUtils.strip(s, ">< "))
-    KnpLexeme(fields(0), fields(1), fields(2),
+    OldAndUglyKnpLexeme(fields(0), fields(1), fields(2),
       JumanPosInfo(
         PosItem(fields(3), fields(4).toInt),
         PosItem(fields(5), fields(6).toInt),
@@ -121,7 +119,7 @@ object KnpLexeme {
 case class KnpItemRelation(to: Int, tags: List[String])
 
 @deprecated("use protobuf-based apis", "0.3")
-case class KnpItem(num: Int, star: KnpItemRelation, plus: KnpItemRelation, lexems: Seq[KnpLexeme])
+case class KnpItem(num: Int, star: KnpItemRelation, plus: KnpItemRelation, lexems: Seq[OldAndUglyKnpLexeme])
 
 @deprecated("use protobuf-based apis", "0.3")
-case class KnpNode(num: Int, kind: String, surface: List[KnpLexeme], features: List[String], children: List[KnpNode] = Nil)
+case class KnpNode(num: Int, kind: String, surface: List[OldAndUglyKnpLexeme], features: List[String], children: List[KnpNode] = Nil)
