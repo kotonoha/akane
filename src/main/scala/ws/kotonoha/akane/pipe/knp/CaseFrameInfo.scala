@@ -26,7 +26,7 @@ object CaseFrameInfo extends StrictLogging {
   }
 
   def inKihonku(kihonku: KihonkuApi) = {
-    kihonku.findFeature("格解析結果").flatMap(parsePredarg)
+    kihonku.valueOfFeature("格解析結果").flatMap(parsePredarg)
   }
 
   def parsePredarg(f: String): Option[CaseFrameInfo] = {

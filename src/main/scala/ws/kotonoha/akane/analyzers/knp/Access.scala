@@ -6,7 +6,7 @@ package ws.kotonoha.akane.analyzers.knp
  */
 
 trait FeatureAccess {
-  def findFeature(name: String): Option[String]
+  def valueOfFeature(name: String): Option[String]
   def featureExists(name: String): Boolean
 }
 

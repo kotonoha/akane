@@ -12,6 +12,6 @@ object Features {
   val normalizedWriting = "正規化代表表記"
 
   def normWriting(floc: FeatureAccess) = {
-    floc.findFeature(normalizedWriting)
+    floc.valueOfFeature(normalizedWriting)
   }
 }

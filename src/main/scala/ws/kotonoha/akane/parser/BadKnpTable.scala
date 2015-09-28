@@ -72,7 +72,7 @@ trait FeatureLocation extends FeatureAccess {
   //TODO: move to key-value API
   protected def featureSeq: Traversable[String]
 
-  def findFeature(name: String): Option[String] = {
+  def valueOfFeature(name: String): Option[String] = {
     val fts = featureSeq
 
     val iter = fts.toIterator

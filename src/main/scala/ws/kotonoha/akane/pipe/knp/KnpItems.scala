@@ -32,7 +32,7 @@ case class OldAndUglyKnpLexeme (
                       info: String,
                       tags: List[String]) extends LexemeApi with FeatureLocation {
 
-  def canonicForm(): String = findFeature("代表表記").getOrElse(s"$surface/$reading")
+  def canonicForm(): String = valueOfFeature("代表表記").getOrElse(s"$surface/$reading")
 
   override protected def featureSeq = tags
 }
