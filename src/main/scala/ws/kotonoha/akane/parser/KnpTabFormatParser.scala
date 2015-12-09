@@ -5,7 +5,7 @@ import java.io.BufferedReader
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.commons.lang3.StringUtils
 import ws.kotonoha.akane.pipe.knp.{OldAndUglyKnpLexeme, KnpResultParser}
-import ws.kotonoha.akane.utils.{XDouble, XInt}
+import ws.kotonoha.akane.utils.{DelimetedIterator, XDouble, XInt}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.matching.Regex.Groups
@@ -56,30 +56,16 @@ class KnpTabFormatParser extends KnpResultParser with StrictLogging {
   override type Result = Option[OldAngUglyKnpTable]
 
   override def parse(reader: BufferedReader): Option[OldAngUglyKnpTable] = {
-    val iter = new KnpOutputIterator(reader)
+    val iter = new DelimetedIterator(reader, "EOS")
     Some(this.parse(iter))
   }
-}
-
-class KnpOutputIterator (val reader: BufferedReader) extends BufferedIterator[String] {
-
-  var string: String = reader.readLine()
-
-  override def head = string
-
-  override def next() = {
-    val data = string
-    string = reader.readLine()
-    data
-  }
-
-  override def hasNext = reader.ready() && string != "EOS"
 }
 
 case class KnpInfo(id: Int, version: String, date: String, score: Double)
 
 /**
  * A builder for bunsetsu objects
+ *
  * @param depNumber number of dependency
  * @param depType type of dependency
  * @param features features that are present in bunsetsu
