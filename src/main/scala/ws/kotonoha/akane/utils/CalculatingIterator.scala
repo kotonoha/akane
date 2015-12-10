@@ -24,9 +24,14 @@ package ws.kotonoha.akane.utils
 trait CalculatingIterator[T] extends Iterator[T] with BufferedIterator[T] {
   protected def calculate(): Option[T]
 
-  private var nextval = calculate()
+  private var nextval: Option[T] = null
 
-  def hasNext = !nextval.isEmpty
+  def hasNext = {
+    if (nextval == null) {
+      nextval = calculate()
+    }
+    nextval.isDefined
+  }
 
   def next() = {
     val v = nextval.get
