@@ -1,7 +1,9 @@
 package ws.kotonoha.akane.pipe.knp.lisp
 
+import ws.kotonoha.akane.utils.{XDouble, XInt}
+
+import scala.StringBuilder
 import scala.util.parsing.combinator.RegexParsers
-import ws.kotonoha.akane.utils.XInt
 
 /**
  * @author eiennohito
@@ -13,18 +15,32 @@ class Lisp {
 
 sealed trait KElement
 case class KAtom(content: String) extends KElement
-case class KList(items: List[KElement]) extends KElement
+case class KList(items: List[KElement]) extends KElement {
+  override def toString = {
+    val builder = new StringBuilder
+    LispRenderer.renderList(this, builder)
+    builder.result()
+  }
+}
+
 object KItems {
+  def apply(items: KElement*) = {
+    new KList(items.toList)
+  }
   def unapplySeq(lst: KList) = Some(lst.items)
 }
 
 object KInt {
-  def unapply(x: KAtom) = XInt.unapply(x.content)
+  def unapply(x: KAtom): Option[Int] = XInt.unapply(x.content)
+}
+
+object KDouble {
+  def unapply(x: KAtom): Option[Double] = XDouble.unapply(x.content)
 }
 
 object LispParser extends RegexParsers {
 
-  override val whiteSpace = """((\s+)|([#;][^\n\r]*[\n\r])|(EOS))+""".r
+  override val whiteSpace = """(?:(?:\s+)|(?:[#;][^\n\r]*[\n\r])|(?:EOS))+""".r
 
   def quotedString = "(?:\"(?:[^\"\\\\]|\\\\.)*\")".r ^^ (s => KAtom(s.substring(1, s.length - 1)))
 
@@ -41,6 +57,8 @@ object LispParser extends RegexParsers {
   def nil = literal("NIL") ^^^ KList(Nil)
 
   def expression = list | nil | atom
+
+  def expressionWithComments = opt(rep(whiteSpace)) ~> expression <~ opt(rep(whiteSpace))
 
   def parser = list
 }
@@ -79,5 +97,6 @@ object LispRenderer {
     }
   }
 }
+
 
 
