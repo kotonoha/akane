@@ -65,6 +65,7 @@ class XmlParserTest extends org.scalatest.FunSuite with org.scalatest.matchers.S
 
   test("textOf works") {
     val xml = p("<a>hell</a>")
+    xml.hasNext shouldBe true
     xml.textOf("a") should equal ("hell")
   }
 
