@@ -39,9 +39,17 @@ object UnicodeUtil {
     0x31f0 -> 0x31ff)
 
   def inRange(c: Int, ranges: Array[(Int, Int)]): Boolean = {
-    ranges.foldLeft(false) {
-      case (p, (begin, end)) => if (p) p else begin <= c && c <= end
+    var i = 0
+    val rend = ranges.length
+    while (i < rend) {
+      val rng = ranges(i)
+      val begin = rng._1
+      val end = rng._2
+      if (begin <= c && c <= end) return true
+      i += 1
     }
+
+    false
   }
 
   def isKanji(c: Int) = inRange(c, kanjiRanges)
