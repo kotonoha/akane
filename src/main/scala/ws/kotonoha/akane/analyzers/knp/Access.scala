@@ -8,6 +8,7 @@ package ws.kotonoha.akane.analyzers.knp
 trait FeatureAccess {
   def valueOfFeature(name: String): Option[String]
   def featureExists(name: String): Boolean
+  def featureKeys: Traversable[String]
 }
 
 trait LexemeAccess {

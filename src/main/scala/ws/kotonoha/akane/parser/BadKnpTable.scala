@@ -101,6 +101,17 @@ trait FeatureLocation extends FeatureAccess {
     }
     return false
   }
+
+  override def featureKeys = {
+    featureSeq.map {f =>
+      val pos = f.indexOf(':')
+      if (pos < 0) {
+        f
+      } else {
+        f.substring(0, pos)
+      }
+    }
+  }
 }
 
 @deprecated("use protobuf-based apis", "0.3")
