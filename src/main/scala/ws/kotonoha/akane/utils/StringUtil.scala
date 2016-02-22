@@ -51,6 +51,18 @@ object StringUtil {
     i
   }
 
+  def isHeadOf(needle: CharSequence, haystack: CharSequence, pos: Int): Boolean = {
+    val rest = needle.length() min (haystack.length() - pos)
+    var i = 0
+    while(i < rest) {
+      val c1 = needle.charAt(i)
+      val c2 = haystack.charAt(pos + i)
+      if (c1 != c2) return false
+      i += 1
+    }
+    i == needle.length()
+  }
+
   def indexOfAny(seq: CharSequence, str: String, start: Int = 0): Int = {
     var i = start
     val seql = seq.length()
