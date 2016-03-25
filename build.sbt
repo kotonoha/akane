@@ -4,7 +4,7 @@ organization := "ws.kotonoha"
 
 crossScalaVersions := Seq("2.11.7")
 
-// scalaVersion := "2.11.7"
+scalaVersion := "2.11.8"
 
 name := "Akane"
 
@@ -17,7 +17,7 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.1" % "test"
 resolvers += JavaNet2Repository
 
 libraryDependencies ++= Seq(
-            "net.liftweb" %% "lift-json" % "2.6-RC1",
+            "net.liftweb" %% "lift-json" % "2.6.3",
             "com.jsuereth" %% "scala-arm" % "1.4"
           )
 
