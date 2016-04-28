@@ -2,7 +2,7 @@ import sbt._
 
 organization := "ws.kotonoha"
 
-crossScalaVersions := Seq("2.11.7")
+crossScalaVersions := Seq("2.11.8")
 
 scalaVersion := "2.11.8"
 
