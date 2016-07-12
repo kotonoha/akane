@@ -11,7 +11,7 @@ import ws.kotonoha.akane.utils.ParseUtil
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
-import scala.util.{Success, Try}
+import scala.util.Success
 
 
 trait JumanAnalyzer extends SyncAnalyzer[String, JumanSequence]

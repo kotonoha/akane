@@ -14,7 +14,6 @@ import ws.kotonoha.akane.io.{CloseableIterator, FrameAdapter, StreamClosableIter
  * @since 2015/09/24
  */
 object FSPaths {
-
   import scala.collection.JavaConverters._
 
   def calculateRecursiveSize(path: Path): Long = {
@@ -88,6 +87,11 @@ object FSPaths {
     } else {
       deleteChildren(p)
     }
+    p
+  }
+
+  def ensureParent(p: Path): Path = {
+    p.parent.foreach( x => if (x.notExists) x.mkdirs() )
     p
   }
 
@@ -178,6 +182,7 @@ object FSPaths {
     def copyTo(p2: Path) = Files.copy(p, p2)
     def lines(enc: Charset = utf8): CloseableIterator[String] = wrapStream(Files.lines(p, enc))
     def ensureDirectory() = FSPaths.ensureDir(p)
+    def ensureParent() = FSPaths.ensureParent(p)
     def outputStream(openOption: OpenOption) = Files.newOutputStream(p, openOption).res
     def walk(globPattern: String): CloseableIterator[Path] = FSPaths.recursiveWalk(p, globPattern)
 

@@ -1,6 +1,6 @@
 package ws.kotonoha.akane.pipe.knp
 
-import ws.kotonoha.akane.analyzers.knp.{KihonkuApi, FeatureAccess}
+import ws.kotonoha.akane.analyzers.knp.FeatureAccess
 
 /**
  * @author eiennohito

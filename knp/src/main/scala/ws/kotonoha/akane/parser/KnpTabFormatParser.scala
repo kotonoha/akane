@@ -5,8 +5,7 @@ import java.io.BufferedReader
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.commons.lang3.StringUtils
 import ws.kotonoha.akane.analyzers.knp.raw._
-import ws.kotonoha.akane.pipe.knp.KnpResultParser
-import ws.kotonoha.akane.utils.{DelimetedIterator, XDouble, XInt}
+import ws.kotonoha.akane.utils.{DelimetedIterator, XInt}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.matching.Regex.Groups
@@ -15,17 +14,17 @@ import scala.util.matching.Regex.Groups
  * @author eiennohito
  * @since 2014-04-10
  */
-class KnpTabFormatParser extends KnpResultParser with StrictLogging {
+class KnpTabFormatParser extends StrictLogging {
 
-  val initRe = """(\*|\+) (-?\d+)([A-Z]) (.*)""".r.anchored
+  private val initRe = """(\*|\+) (-?\d+)([A-Z]) (.*)""".r.anchored
 
   def parseFeatures(in: String): Array[String] = {
     in.split("><").map(StringUtils.strip(_, "<>"))
   }
 
-  val startRe = """^(?:;;|\*|\+|\#)""".r
+  private val startRe = """^(?:;;|\*|\+|#)""".r
 
-  val infoRe = """# S-ID:(\d+) KNP:([^ ]+) DATE:([^ ]+) SCORE:([-\d\.]+)""".r
+  private val infoRe = """# S-ID:(\d+) KNP:([^ ]+) DATE:([^ ]+) SCORE:([-\d.]+)""".r
 
   def parse(lines: TraversableOnce[CharSequence]) = {
 
@@ -54,9 +53,7 @@ class KnpTabFormatParser extends KnpResultParser with StrictLogging {
     proc.result
   }
 
-  override type Result = Option[OldAngUglyKnpTable]
-
-  override def parse(reader: BufferedReader): Option[OldAngUglyKnpTable] = {
+  def parse(reader: BufferedReader): Option[OldAngUglyKnpTable] = {
     val iter = new DelimetedIterator(reader, "EOS")
     Some(this.parse(iter))
   }

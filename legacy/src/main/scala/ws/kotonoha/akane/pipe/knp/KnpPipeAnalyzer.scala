@@ -49,6 +49,11 @@ trait KnpResultParser {
   def parse(reader: BufferedReader): Result
 }
 
+class KnpResultParserImpl extends KnpTabFormatParser with KnpResultParser {
+  override type Result = Option[OldAngUglyKnpTable]
+  override def parse(lines: TraversableOnce[CharSequence]) = super.parse(lines)
+}
+
 class KnpPipeAnalyzer[RParser <: KnpResultParser](cont: KnpProcessContainer, enc: String, parser: RParser) extends Analyzer[RParser#Result] with StrictLogging {
 
   def close() {
@@ -103,11 +108,11 @@ object KnpTreePipeParser {
   }
 }
 
-class KnpTabPipeParser private(factory: () => KnpPipeAnalyzer[KnpTabFormatParser]) extends AbstractRetryExecutor[Option[OldAngUglyKnpTable]](factory)
+class KnpTabPipeParser private(factory: () => KnpPipeAnalyzer[KnpResultParserImpl]) extends AbstractRetryExecutor[Option[OldAngUglyKnpTable]](factory)
 object KnpTabPipeParser {
   def apply(config: Config = ConfigFactory.empty()) = {
     val knpConfig = KnpConfig.apply(config)
     val factory = new KnpProcessFactory(knpConfig, KnpOutputType.tab)
-    new KnpTabPipeParser(() => new KnpPipeAnalyzer(factory.launch(), knpConfig.juman.encoding, new KnpTabFormatParser))
+    new KnpTabPipeParser(() => new KnpPipeAnalyzer(factory.launch(), knpConfig.juman.encoding, new KnpResultParserImpl))
   }
 }
