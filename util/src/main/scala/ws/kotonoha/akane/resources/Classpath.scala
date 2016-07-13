@@ -12,7 +12,16 @@ import ws.kotonoha.akane.resources.FSPaths.AutoClosableWrapper
   * @since 2016/07/12
   */
 object Classpath {
-  def resource(name: String): AutoClosableWrapper[InputStream] = {
+  import scala.collection.JavaConverters._
+
+  def lines(name: String, charset: Charset = Charsets.utf8): Seq[String] = {
+    val proc = for (in <- inputStream(name)) yield {
+      IOUtils.readLines(in, charset)
+    }
+    proc.obj.asScala
+  }
+
+  def inputStream(name: String): AutoClosableWrapper[InputStream] = {
     val obj = this.getClass.getClassLoader.getResource(name)
     if (obj != null) {
       new AutoClosableWrapper[InputStream](obj.openStream())
