@@ -47,7 +47,7 @@ def akaneProject(projName: String, basePath: File) = {
 lazy val akaneDeps = Seq(
   //test
 
-  "net.liftweb" %% "lift-json" % "2.6.3",
+  "ws.kotonoha.liftweb" %% "lift-json" % "2.6.3.di",
   "com.jsuereth" %% "scala-arm" % "1.4",
 
   "com.github.scala-incubator.io" %% "scala-io-core" % "0.4.3",
