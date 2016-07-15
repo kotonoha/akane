@@ -87,7 +87,8 @@ lazy val ioc = akaneProject("ioc", file("ioc"))
 
 lazy val legacy = akaneProject("legacy", file("legacy"))
   .settings(Seq(
-    libraryDependencies ++= akaneDeps
+    libraryDependencies ++= akaneDeps,
+    resolvers += "kyouni" at "http://lotus.kuee.kyoto-u.ac.jp/nexus/content/groups/public/"
   ) ++ commonDeps)
   .dependsOn(util, knpAkka)
 
