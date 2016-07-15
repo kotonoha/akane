@@ -199,7 +199,7 @@ object FSPaths {
     def lines(enc: Charset = utf8): CloseableIterator[String] = wrapStream(Files.lines(p, enc))
     def ensureDirectory() = FSPaths.ensureDir(p)
     def ensureParent() = FSPaths.ensureParent(p)
-    def outputStream(openOption: OpenOption) = Files.newOutputStream(p, openOption).res
+    def outputStream(openOption: OpenOption*) = Files.newOutputStream(p, openOption: _*).res
     def walk(globPattern: String): CloseableIterator[Path] = FSPaths.recursiveWalk(p, globPattern)
 
     def mkdirs() = Files.createDirectories(p)
