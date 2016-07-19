@@ -36,13 +36,17 @@ def akaneProject(projName: String, basePath: File) = {
 
   val localSettings = Def.settings(
     name := s"Akane ${projName.capitalize}",
-    moduleName := id
+    moduleName := id,
+    libraryDependencies += "com.google.code.findbugs" % "jsr305" % "3.0.0" % Provided
   )
 
   val allSettings = akaneSettings ++ localSettings ++ commonDeps
 
   Project(id = id, base = basePath, settings = allSettings)
 }
+
+lazy val akka = "com.typesafe.akka" %% "akka-actor" % "2.4.6"
+
 
 lazy val akaneDeps = Seq(
   //test
@@ -56,7 +60,7 @@ lazy val akaneDeps = Seq(
   "com.nativelibs4java" % "bridj" % "0.7.0",
 
   "com.typesafe" % "config" % "1.3.0",
-  "com.typesafe.akka" %% "akka-actor" % "2.4.6"
+  akka
 )
 
 lazy val commonDeps = Def.settings(
@@ -81,7 +85,7 @@ lazy val macroDeps = Def.settings(
 
 lazy val akane = (project in file("."))
   .settings(akaneSettings)
-  .aggregate(ioc, legacy, knp, util, macros, knpAkka)
+  .aggregate(ioc, legacy, knp, util, macros, knpAkka, blobdb)
 
 lazy val ioc = akaneProject("ioc", file("ioc"))
 
@@ -114,3 +118,14 @@ lazy val macros = akaneProject("macros", file("macros"))
 lazy val knpAkka = akaneProject("knp-akka", file("knp-akka"))
   .settings(akkaDeps)
   .dependsOn(knp)
+
+lazy val blobdb = akaneProject("blobdb", file("blobdb"))
+  .dependsOn(util)
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.mapdb" % "mapdb" % "1.0.9",
+      "com.github.ben-manes.caffeine" % "caffeine" % "2.3.1",
+      "net.jpountz.lz4" % "lz4" % "1.3.0",
+      akka
+    )
+  )
