@@ -23,7 +23,7 @@ private[impl] trait DbImplApi[K <: AnyRef] extends BlobDb[K] {
   private[impl] def blockFor(idx: SentenceIndexEntry): DecompressedBuffer
   private[impl] def fillInBlock(gbb: GrowableByteBuffer, entry: SentenceIndexEntry): Unit
 
-  private[impl] def db: DB
+  protected[impl] def db: DB
   private[impl] def index: BTreeMap[K, SentenceIndexEntry]
   private[impl] def invalidateShard(file: Int): Unit
   private[impl] def nextFileNo(): Int
@@ -44,11 +44,12 @@ class BlDbImpl[Key <: AnyRef](cfg: BlobDbConfig, val ops: IdOps[Key], defaultTra
       .build[BufferPointer, DecompressedBuffer]
   }
 
-  private def root = cfg.root
-  private def indexPath = root.resolve("index.db").toFile
+  protected def root = cfg.root
+  protected val indexPath = root.resolve("index.db")
 
-  val db = {
-    val f = DBMaker.newFileDB(indexPath)
+  protected[impl] val db = {
+    import language.existentials
+    val f = DBMaker.newFileDB(indexPath.toFile)
     f.mmapFileEnableIfSupported()
     f.make()
   }
@@ -78,13 +79,13 @@ class BlDbImpl[Key <: AnyRef](cfg: BlobDbConfig, val ops: IdOps[Key], defaultTra
 
   private[this] val treeBuffers = new ConcurrentHashMap[Int, MapBufferWithCache]()
 
-  private[impl] val index = db.createTreeMap("index")
+  protected[impl] val index = db.createTreeMap("index")
     .keySerializer(ops.serializer)
     .valueSerializer(new SentenceIndexEntrySerializer)
     .comparator(ops.comparator)
     .makeOrGet[Key, SentenceIndexEntry]()
 
-  private val fileCount = db.getAtomicInteger("fileCounter")
+  private[this] val fileCount = db.getAtomicInteger("fileCounter")
 
   private[impl] def nextFileNo(): Int = fileCount.getAndIncrement()
 

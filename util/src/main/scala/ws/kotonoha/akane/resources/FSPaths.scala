@@ -133,6 +133,33 @@ object FSPaths {
     }
   }
 
+  def writeStrings(p: Path, strings: TraversableOnce[String], separator: String, enc: Charset): Path = {
+    try {
+      val ret = Files.write(p, new java.lang.Iterable[String] {
+        val iter = strings.toIterator
+        override def iterator = new java.util.Iterator[String] {
+          private var haveSep = false
+          override def hasNext = iter.hasNext || haveSep
+          override def next() = {
+            if (haveSep) {
+              haveSep = false
+              separator
+            } else {
+              haveSep = iter.hasNext
+              iter.next()
+            }
+          }
+        }
+      }, enc)
+      ret
+    } finally {
+      strings match {
+        case l: Closeable => l.close()
+        case _ => //nop
+      }
+    }
+  }
+
 
 
   def find(path: Path, depth: Int = Int.MaxValue)(fn: (Path, BasicFileAttributes) => Boolean): AutoClosableWrapper[CloseableIterator[Path]] = {
@@ -213,6 +240,7 @@ object FSPaths {
     }
 
     def writeLines(lines: TraversableOnce[String], enc: Charset = utf8): Path = FSPaths.writeLines(p, lines, enc)
+    def writeStrings(strings: TraversableOnce[String], separator: String, enc: Charset = utf8): Path = FSPaths.writeStrings(p, strings, separator, enc)
 
     def / (s: String) = p.resolve(s)
     def / (px: Path) = p.resolve(px)
