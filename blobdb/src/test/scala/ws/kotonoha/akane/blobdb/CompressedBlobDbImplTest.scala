@@ -3,7 +3,6 @@ package ws.kotonoha.akane.blobdb
 import java.lang.{Long => JLong}
 import java.nio.ByteBuffer
 import java.nio.file.{Files, Path}
-import java.util.Comparator
 import java.util.concurrent.atomic.AtomicInteger
 
 import akka.actor.ActorSystem

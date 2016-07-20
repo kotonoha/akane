@@ -12,7 +12,7 @@ import scala.concurrent.Promise
   */
 private[impl] class DbWriterActor(dbi: DbImplApi[_]) extends Actor with ActorLogging {
   @inline
-  def transaction[T](p: Promise[TrOk])(f: => T): Unit = {
+  final def transaction[T](p: Promise[TrOk])(f: => T): Unit = {
     try {
       f
       dbi.db.commit()

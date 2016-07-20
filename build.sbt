@@ -27,7 +27,28 @@ lazy val akaneSettings = Seq(
   name := "Akane",
   version := "0.2-SNAPSHOT",
 
-  javacOptions ++= Seq("-encoding", "utf8")
+  javacOptions ++= Seq("-encoding", "utf8"),
+
+  scalacOptions ++= Seq(
+    "-Ybackend:GenBCode",
+    "-Yopt:l:classpath",
+    "-Yopt-warnings",
+    "-target:jvm-1.8",
+    "-feature",
+    "-deprecation"
+  ),
+  scalacOptions in Compile ++= (if (scalaVersion.value.startsWith("2.11.8")) {
+    Seq("-Ydelambdafy:method")
+  } else {
+    Seq.empty
+  }),
+  scalacOptions in Test ++= (if (scalaVersion.value.startsWith("2.11.8")) {
+    Seq("-Ydelambdafy:inline")
+  } else {
+    Seq.empty
+  }),
+  libraryDependencies ++= Seq("org.scala-lang.modules" % "scala-java8-compat_2.11" % "0.7.0")
+
 )
 
 
@@ -63,11 +84,14 @@ lazy val akaneDeps = Seq(
   akka
 )
 
+lazy val scalatest = "org.scalatest" %% "scalatest" % "2.2.6"
+lazy val scalacheck = "org.scalacheck" %% "scalacheck" % "1.12.5"
+lazy val scalamock = "org.scalamock" %% "scalamock-scalatest-support" % "3.2.2"
+
 lazy val commonDeps = Def.settings(
   libraryDependencies ++= Seq(
     "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
-
-    "org.scalatest" %% "scalatest" % "2.2.6" % Test,
+    scalatest % Test,
     "ch.qos.logback" % "logback-classic" % "1.1.7" % Test
   )
 )
@@ -104,20 +128,20 @@ lazy val knp = akaneProject("knp", file("knp"))
   .dependsOn(util, macros % Provided)
 
 lazy val util = akaneProject("util", file("util"))
-    .settings(
-      libraryDependencies ++= Seq(
-        "org.apache.commons" % "commons-lang3" % "3.3.2",
-        "commons-io" % "commons-io" % "2.4",
-        "com.typesafe" % "config" % "1.3.0"
-      )
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.apache.commons" % "commons-lang3" % "3.3.2",
+      "commons-io" % "commons-io" % "2.4",
+      "com.typesafe" % "config" % "1.3.0"
     )
+  )
 
 lazy val macros = akaneProject("macros", file("macros"))
   .settings(macroDeps)
 
 lazy val knpAkka = akaneProject("knp-akka", file("knp-akka"))
   .settings(akkaDeps)
-  .dependsOn(knp)
+  .dependsOn(knp, testkit % Test)
 
 lazy val blobdb = akaneProject("blobdb", file("blobdb"))
   .dependsOn(util)
@@ -128,4 +152,10 @@ lazy val blobdb = akaneProject("blobdb", file("blobdb"))
       "net.jpountz.lz4" % "lz4" % "1.3.0",
       akka
     )
+  )
+
+lazy val testkit = akaneProject("testkit", file("testkit"))
+  .dependsOn(knp)
+  .settings(
+    libraryDependencies ++= Seq(scalatest, scalamock, scalacheck)
   )
