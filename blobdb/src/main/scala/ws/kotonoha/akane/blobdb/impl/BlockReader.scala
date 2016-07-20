@@ -1,4 +1,4 @@
-package ws.eiennohito.persistence.treedb
+package ws.kotonoha.akane.blobdb.impl
 
 import java.nio.ByteBuffer
 import java.util.function.Supplier

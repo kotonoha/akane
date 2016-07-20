@@ -5,7 +5,7 @@ import java.nio.ByteBuffer
 import java.util.Comparator
 
 import org.mapdb.BTreeKeySerializer
-import ws.eiennohito.persistence.treedb.{ResultCreator, SentenceIndexEntry}
+import ws.kotonoha.akane.blobdb.impl.SentenceIndexEntry
 
 import scala.concurrent.Future
 
@@ -24,11 +24,15 @@ trait BlobDb[Key <: AnyRef] {
   def writer(): BlobDbWriter[Key]
 }
 
+trait ResultCreator[T] {
+  def result(buf: ByteBuffer): Option[T]
+}
+
 trait IdOps[K <: AnyRef] {
   def generate(prefix: Int): K
   def checkPrefix(o: K, prefix: Int): Boolean
   def comparator: Comparator[K]
-  def serializer: BTreeKeySerializer[K] with Serializable
+  def serializer: BTreeKeySerializer[K]
 }
 
 trait ItemSearch[Key <: AnyRef, +Value] { self =>

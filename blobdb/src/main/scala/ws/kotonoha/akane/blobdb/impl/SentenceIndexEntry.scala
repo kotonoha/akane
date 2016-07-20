@@ -1,6 +1,4 @@
-package ws.eiennohito.persistence.treedb
-
-import java.nio.ByteBuffer
+package ws.kotonoha.akane.blobdb.impl
 
 import ws.kotonoha.akane.blobdb.impl.bgz.BlockCompressedFilePointerUtil
 
@@ -15,10 +13,6 @@ case class SentenceIndexEntry(file: Int, ptr: Long, len: Int) {
     val remBytes = blockSize - posInBlock
     remBytes >= len
   }
-}
-
-trait ResultCreator[T] {
-  def result(buf: ByteBuffer): Option[T]
 }
 
 class TreeDatabaseException(msg: String) extends RuntimeException(msg)

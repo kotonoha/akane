@@ -5,7 +5,6 @@ import java.nio.ByteBuffer
 import java.util.concurrent.ConcurrentLinkedQueue
 
 import com.typesafe.scalalogging.StrictLogging
-import ws.eiennohito.persistence.treedb.SentenceIndexEntry
 import ws.kotonoha.akane.blobdb.api._
 
 import scala.concurrent.{Future, Promise}
@@ -75,7 +74,7 @@ class BlDbWriterImpl[K <: AnyRef](impl: BlDbImpl[K], cfg: BlobDbConfig, ops: IdO
 
     logger.trace(s"creating writer #$fileNo")
     val name = cfg.pathFile(fileNo)
-    val wr0 = cfg.compr.writer(name)
+    val wr0 = cfg.codec.writer(name)
     new CompressedShardWriter { self =>
       override def file = fileNo
       override def position = wr0.position
@@ -139,10 +138,10 @@ class BlDbWriterImpl[K <: AnyRef](impl: BlDbImpl[K], cfg: BlobDbConfig, ops: IdO
   def optimize(): Unit = impl.db.compact()
 
   override def close() = {
-    val data = streamCache
+    val cache = streamCache
     streamCache = null
     cfg.forCommit.stop(actor)
-    val it = streamCache.iterator()
+    val it = cache.iterator()
     while (it.hasNext) {
       it.next().stream.close()
     }

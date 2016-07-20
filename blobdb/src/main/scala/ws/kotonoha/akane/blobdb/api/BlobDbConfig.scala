@@ -6,7 +6,7 @@ import java.nio.file.{Files, Path, StandardOpenOption}
 import akka.actor.ActorRefFactory
 import net.jpountz.lz4.{LZ4BlockOutputStream2, LZ4Factory}
 import net.jpountz.xxhash.XXHashFactory
-import ws.eiennohito.persistence.treedb.{BlockReader, LZ4BlockReader, TreeDatabaseException, ZlibBlockReader}
+import ws.kotonoha.akane.blobdb.impl.{BlockReader, LZ4BlockReader, TreeDatabaseException, ZlibBlockReader}
 import ws.kotonoha.akane.resources.FSPaths
 
 import scala.concurrent.ExecutionContextExecutor
@@ -21,13 +21,13 @@ case class BlobDbConfig(
   cacheEc: ExecutionContextExecutor,
   name: String = "blob",
   idPrefix: Int = 0,
-  shardMaxSize: Int = 50 * 1024 * 1024,
-  diskCachedBytes: Long = 50 * 1024 * 1024,
-  compr: BlobDbCompression = BlobDbCompression.lz4
+  shardMaxSize: Int = 500 * 1024 * 1024,
+  decompressedCache: Long = 50 * 1024 * 1024,
+  codec: BlobDbCodec = BlobDbCodec.lz4
 ) {
 
   def guessFileForNum(num: Int): Path = {
-    val pattern = f"$num%08d.$name.b."
+    val pattern = f"$num%08d.$name."
 
     val stream = FSPaths.find(root, 1) {
       (p, a) =>
@@ -47,15 +47,9 @@ case class BlobDbConfig(
   }
 
   def pathFile(num: Int) = {
-    val fname = f"$num%08d.$name.b.${compr.extension}"
+    val fname = f"$num%08d.$name.${codec.extension}"
     root.resolve(fname)
   }
-}
-
-trait BlobDbCompression {
-  def extension: String
-  def reader(): BlockReader
-  def writer(file: Path): BlockWriter
 }
 
 trait BlockWriter {
@@ -64,9 +58,15 @@ trait BlockWriter {
   def blockAddress: Long
 }
 
-object BlobDbCompression {
+trait BlobDbCodec {
+  def extension: String
+  def reader(): BlockReader
+  def writer(file: Path): BlockWriter
+}
 
-  object lz4 extends BlobDbCompression {
+object BlobDbCodec {
+
+  object lz4 extends BlobDbCodec {
     override def extension = "lz4"
     override def reader() = new LZ4BlockReader
     override def writer(file: Path) = new BlockWriter {
@@ -86,16 +86,16 @@ object BlobDbCompression {
     }
   }
 
-  object gzip extends BlobDbCompression {
+  object gzip extends BlobDbCodec {
     override def extension = "gz"
     override def reader() = new ZlibBlockReader
     override def writer(file: Path) = ???
   }
 
-  def guess(ext: String, cfg: BlobDbConfig): BlobDbCompression = {
-    val specified = cfg.compr.extension
-    if (ext == specified) {
-      cfg.compr
+  def guess(ext: String, cfg: BlobDbConfig): BlobDbCodec = {
+    val codec = cfg.codec
+    if (ext == codec.extension) {
+      codec
     } else {
       ext match {
         case "lz4" => lz4

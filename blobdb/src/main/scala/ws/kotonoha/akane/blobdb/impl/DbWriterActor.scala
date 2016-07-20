@@ -2,7 +2,6 @@ package ws.kotonoha.akane.blobdb.impl
 
 import akka.actor.{Actor, ActorLogging, Props}
 import org.mapdb.BTreeMap
-import ws.eiennohito.persistence.treedb.SentenceIndexEntry
 import ws.kotonoha.akane.blobdb.api.{DataRef, TrOk}
 
 import scala.concurrent.Promise
@@ -43,6 +42,5 @@ private[impl] object DbWriterActor {
 
   case class Delete(ids: Seq[AnyRef], p: Promise[TrOk])
   case class Commit(data: Seq[DataRef[_]], p: Promise[TrOk])
-
 }
 

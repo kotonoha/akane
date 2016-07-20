@@ -7,7 +7,6 @@ import java.util.concurrent.{ConcurrentHashMap, TimeUnit}
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.typesafe.scalalogging.StrictLogging
 import org.mapdb.{BTreeMap, DB, DBMaker}
-import ws.eiennohito.persistence.treedb._
 import ws.kotonoha.akane.blobdb.api._
 import ws.kotonoha.akane.blobdb.impl.bgz.BlockCompressedFilePointerUtil
 import ws.kotonoha.akane.blobdb.util.StringResultCreator
@@ -36,7 +35,7 @@ class BlDbImpl[Key <: AnyRef](cfg: BlobDbConfig, val ops: IdOps[Key], defaultTra
   private final val blockSize = 64 * 1024
 
   private val bufferCache = {
-    val size = cfg.diskCachedBytes / blockSize
+    val size = cfg.decompressedCache / blockSize
     logger.trace(s"storing up to $size blocks of 64k")
     val bldr = Caffeine.newBuilder()
     bldr.maximumSize(size)
@@ -68,15 +67,13 @@ class BlDbImpl[Key <: AnyRef](cfg: BlobDbConfig, val ops: IdOps[Key], defaultTra
     val wr = cachedWriter
     if (wr != null) {
       cachedWriter = null
-      cachedWriter.close()
+      wr.close()
     }
 
     val iter = treeBuffers.values().iterator()
     while (iter.hasNext) {
       iter.next().close()
     }
-
-
   }
 
   private[this] val treeBuffers = new ConcurrentHashMap[Int, MapBufferWithCache]()
@@ -97,7 +94,7 @@ class BlDbImpl[Key <: AnyRef](cfg: BlobDbConfig, val ops: IdOps[Key], defaultTra
       val created = {
         val path = cfg.guessFileForNum(fileNo)
         val raf = new RandomAccessFile(path.toFile, "r")
-        val kind = BlobDbCompression.guess(FSPaths.extension(path), cfg)
+        val kind = BlobDbCodec.guess(FSPaths.extension(path), cfg)
         new MapBufferWithCache(fileNo, raf, kind.reader(), bufferCache)
       }
       val res = treeBuffers.put(fileNo, created)

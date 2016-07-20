@@ -2,7 +2,7 @@ package ws.kotonoha.akane.blobdb.util
 
 import java.nio.ByteBuffer
 
-import ws.eiennohito.persistence.treedb.ResultCreator
+import ws.kotonoha.akane.blobdb.api.ResultCreator
 
 import scala.util.control.NonFatal
 

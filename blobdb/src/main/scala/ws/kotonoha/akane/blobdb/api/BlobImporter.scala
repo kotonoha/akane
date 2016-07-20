@@ -1,6 +1,6 @@
 package ws.kotonoha.akane.blobdb.api
 
-import ws.eiennohito.persistence.treedb.SentenceIndexEntry
+import ws.kotonoha.akane.blobdb.impl.SentenceIndexEntry
 
 /**
   * @author eiennohito
