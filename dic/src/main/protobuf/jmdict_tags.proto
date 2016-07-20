@@ -1,0 +1,345 @@
+
+syntax = "proto2";
+package jmdict;
+option java_package = "ws.kotonoha.akane.dic.jmdict";
+
+
+enum JmdictTag {
+  //MA : martial arts term
+  MA = 0;
+
+  //X : rude or X-rated term (not displayed in educational software)
+  X = 1;
+
+  //abbr : abbreviation
+  abbr = 2;
+
+  //adj-i : adjective (keiyoushi)
+  adjI = 3;
+
+  //adj-na : adjectival nouns or quasi-adjectives (keiyodoshi)
+  adjNa = 4;
+
+  //adj-no : nouns which may take the genitive case particle `no'
+  adjNo = 5;
+
+  //adj-pn : pre-noun adjectival (rentaishi)
+  adjPn = 6;
+
+  //adj-t : `taru' adjective
+  adjT = 7;
+
+  //adj-f : noun or verb acting prenominally
+  adjF = 8;
+
+  //adj : former adjective classification (being removed)
+  adj = 9;
+
+  //adv : adverb (fukushi)
+  adv = 10;
+
+  //adv-to : adverb taking the `to' particle
+  advTo = 11;
+
+  //arch : archaism
+  arch = 12;
+
+  //ateji : ateji (phonetic) reading
+  ateji = 13;
+
+  //aux : auxiliary
+  aux = 14;
+
+  //aux-v : auxiliary verb
+  auxV = 15;
+
+  //aux-adj : auxiliary adjective
+  auxAdj = 16;
+
+  //Buddh : Buddhist term
+  Buddh = 17;
+
+  //chem : chemistry term
+  chem = 18;
+
+  //chn : children's language
+  chn = 19;
+
+  //col : colloquialism
+  col = 20;
+
+  //comp : computer terminology
+  comp = 21;
+
+  //conj : conjunction
+  conj = 22;
+
+  //ctr : counter
+  ctr = 23;
+
+  //derog : derogatory
+  derog = 24;
+
+  //eK : exclusively kanji
+  exclKanj = 25;
+
+  //ek : exclusively kana
+  exclKana = 26;
+
+  //exp : Expressions (phrases, clauses, etc.)
+  exp = 27;
+
+  //fam : familiar language
+  fam = 28;
+
+  //fem : female term or language
+  fem = 29;
+
+  //food : food term
+  food = 30;
+
+  //geom : geometry term
+  geom = 31;
+
+  //gikun : gikun (meaning as reading)  or jukujikun (special kanji reading)
+  gikun = 32;
+
+  //hon : honorific or respectful (sonkeigo) language
+  hon = 33;
+
+  //hum : humble (kenjougo) language
+  hum = 34;
+
+  //iK : word containing irregular kanji usage
+  irrKanji = 35;
+
+  //id : idiomatic expression
+  id = 36;
+
+  //ik : word containing irregular kana usage
+  irrKana = 37;
+
+  //int : interjection (kandoushi)
+  interj = 38;
+
+  //io : irregular okurigana usage
+  io = 39;
+
+  //iv : irregular verb
+  iv = 40;
+
+  //ling : linguistics terminology
+  ling = 41;
+
+  //m-sl : manga slang
+  mSl = 42;
+
+  //male : male term or language
+  male = 43;
+
+  //male-sl : male slang
+  maleSl = 44;
+
+  //math : mathematics
+  math = 45;
+
+  //mil : military
+  mil = 46;
+
+  //n : noun (common) (futsuumeishi)
+  n = 47;
+
+  //n-adv : adverbial noun (fukushitekimeishi)
+  nAdv = 48;
+
+  //n-suf : noun, used as a suffix
+  nSuf = 49;
+
+  //n-pref : noun, used as a prefix
+  nPref = 50;
+
+  //n-t : noun (temporal) (jisoumeishi)
+  nT = 51;
+
+  //num : numeric
+  num = 52;
+
+  //oK : word containing out-dated kanji
+  outKanji = 53;
+
+  //obs : obsolete term
+  obs = 54;
+
+  //obsc : obscure term
+  obsc = 55;
+
+  //ok : out-dated or obsolete kana usage
+  outKana = 56;
+
+  //on-mim : onomatopoeic or mimetic word
+  onMim = 57;
+
+  //pn : pronoun
+  pn = 58;
+
+  //poet : poetical term
+  poet = 59;
+
+  //pol : polite (teineigo) language
+  pol = 60;
+
+  //pref : prefix
+  pref = 61;
+
+  //proverb : proverb
+  proverb = 62;
+
+  //prt : particle
+  prt = 63;
+
+  //physics : physics terminology
+  physics = 64;
+
+  //rare : rare
+  rare = 65;
+
+  //sens : sensitive
+  sens = 66;
+
+  //sl : slang
+  sl = 67;
+
+  //suf : suffix
+  suf = 68;
+
+  //uK : word usually written using kanji alone
+  useKanji = 69;
+
+  //uk : word usually written using kana alone
+  useKana = 70;
+
+  //v1 : Ichidan verb
+  v1 = 71;
+
+  //v2a-s : Nidan verb with 'u' ending (archaic)
+  v2aS = 72;
+
+  //v4h : Yondan verb with `hu/fu' ending (archaic)
+  v4h = 73;
+
+  //v4r : Yondan verb with `ru' ending (archaic)
+  v4r = 74;
+
+  //v5 : Godan verb (not completely classified)
+  v5 = 75;
+
+  //v5aru : Godan verb - -aru special class
+  v5aru = 76;
+
+  //v5b : Godan verb with `bu' ending
+  v5b = 77;
+
+  //v5g : Godan verb with `gu' ending
+  v5g = 78;
+
+  //v5k : Godan verb with `ku' ending
+  v5k = 79;
+
+  //v5k-s : Godan verb - Iku/Yuku special class
+  v5kS = 80;
+
+  //v5m : Godan verb with `mu' ending
+  v5m = 81;
+
+  //v5n : Godan verb with `nu' ending
+  v5n = 82;
+
+  //v5r : Godan verb with `ru' ending
+  v5r = 83;
+
+  //v5r-i : Godan verb with `ru' ending (irregular verb)
+  v5rI = 84;
+
+  //v5s : Godan verb with `su' ending
+  v5s = 85;
+
+  //v5t : Godan verb with `tsu' ending
+  v5t = 86;
+
+  //v5u : Godan verb with `u' ending
+  v5u = 87;
+
+  //v5u-s : Godan verb with `u' ending (special class)
+  v5uS = 88;
+
+  //v5uru : Godan verb - Uru old class verb (old form of Eru)
+  v5uru = 89;
+
+  //v5z : Godan verb with `zu' ending
+  v5z = 90;
+
+  //vz : Ichidan verb - zuru verb (alternative form of -jiru verbs)
+  vz = 91;
+
+  //vi : intransitive verb
+  vi = 92;
+
+  //vk : Kuru verb - special class
+  vk = 93;
+
+  //vn : irregular nu verb
+  vn = 94;
+
+  //vr : irregular ru verb, plain form ends with -ri
+  vr = 95;
+
+  //vs : noun or participle which takes the aux. verb suru
+  vs = 96;
+
+  //vs-c : su verb - precursor to the modern suru
+  vsC = 97;
+
+  //vs-s : suru verb - special class
+  vsS = 98;
+
+  //vs-i : suru verb - irregular
+  vsI = 99;
+
+  //kyb : Kyoto-ben
+  kyb = 100;
+
+  //osb : Osaka-ben
+  osb = 101;
+
+  //ksb : Kansai-ben
+  ksb = 102;
+
+  //ktb : Kantou-ben
+  ktb = 103;
+
+  //tsb : Tosa-ben
+  tsb = 104;
+
+  //thb : Touhoku-ben
+  thb = 105;
+
+  //tsug : Tsugaru-ben
+  tsug = 106;
+
+  //kyu : Kyuushuu-ben
+  kyu = 107;
+
+  //rkb : Ryuukyuu-ben
+  rkb = 108;
+
+  //nab : Nagano-ben
+  nab = 109;
+
+  //vt : transitive verb
+  vt = 110;
+
+  //vulg : vulgar expression or word
+  vulg = 111;
+
+}
+

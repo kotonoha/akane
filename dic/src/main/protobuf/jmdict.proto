@@ -1,0 +1,10 @@
+syntax = "proto2";
+
+package jmdict;
+
+option java_package = "ws.kotonoha.akane.dic.jmdict";
+
+message JmdictEntry {
+    required uint64 id = 1;
+
+}

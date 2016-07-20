@@ -159,3 +159,7 @@ lazy val testkit = akaneProject("testkit", file("testkit"))
   .settings(
     libraryDependencies ++= Seq(scalatest, scalamock, scalacheck)
   )
+
+lazy val dic = akaneProject("dic", file("dic"))
+  .settings(pbScala())
+  .dependsOn(util)
