@@ -21,6 +21,7 @@ message SourceInfo {
   optional string content = 1;
   required bool wasei = 2;
   required bool full = 3;
+  required string lang = 4;
 }
 
 message MeaningInfo {
@@ -32,6 +33,7 @@ message MeaningInfo {
   repeated CrossReference xref = 6;
   repeated CrossReference antonym = 7;
   repeated SourceInfo source = 8;
+  repeated string remark = 9;
 }
 
 message KanjiInfo {
@@ -56,7 +58,7 @@ message EntryInfo {}
 message JmdictEntry {
   required uint64 id = 1;
   repeated ReadingInfo readings = 2;
-  repeated KanjiInfo wrtitings = 3;
+  repeated KanjiInfo writings = 3;
   repeated MeaningInfo meanings = 4;
   optional EntryInfo info = 5;
 }

@@ -45,9 +45,9 @@ case class XmlText(data: String) extends XmlData
 case class XmlERef(data: String) extends XmlData
 
 case class XmlEl(data: String) extends XmlData {
-  var attrs = Map[String, String]()
+  var attrs: collection.Map[String, String] = Map.empty
 
-  def this(data: String, attrmap: Map[String, String]) = {
+  def this(data: String, attrmap: collection.Map[String, String]) = {
     this(data)
     attrs = attrmap
   }
@@ -88,14 +88,20 @@ class XmlIterator(in: XMLEventReader) extends CalculatingIterator[XmlData] {
     throw new XmlParserException(msg, inner)
   }
 
-  private def extractAttributeMap(st: StartElement): Map[String, String] = {
-    import scala.collection.JavaConversions._
+  private def extractAttributeMap(st: StartElement): collection.Map[String, String] = {
+
     val iter = st.getAttributes
     if (!iter.hasNext) {
       return Map.empty
     }
-    iter.map(_.asInstanceOf[Attribute])
-      .foldLeft(Map[String, String]())((m, a) => m.updated(a.getName.getLocalPart, a.getValue))
+    val bldr = new mutable.HashMap[String, String]
+
+    while (iter.hasNext) {
+      val i = iter.next().asInstanceOf[Attribute]
+      bldr.put(i.getName.getLocalPart, i.getValue)
+    }
+
+    bldr
   }
 
   private def transform(next: XMLEvent): Option[XmlData] = {
@@ -104,7 +110,7 @@ class XmlIterator(in: XMLEventReader) extends CalculatingIterator[XmlData] {
         val map = extractAttributeMap(st)
         val name = st.getName.getLocalPart
         state.push(name)
-        Some(new XmlEl(name, map) at (state.top))
+        Some(new XmlEl(name, map).at(state.top))
       }
       case en: EndElement => {
         val name = en.getName.getLocalPart
@@ -117,9 +123,9 @@ class XmlIterator(in: XMLEventReader) extends CalculatingIterator[XmlData] {
           case t: Characters => its = t.getData :: its; in.nextEvent(); true
           case _ => false
         }) {}
-        Some(XmlText(its.reverse.mkString) at (state.top))
+        Some(XmlText(its.reverse.mkString).at(state.top))
       }
-      case er: EntityReference => Some(XmlERef(er.getName) at (state.top))
+      case er: EntityReference => Some(XmlERef(er.getName).at(state.top))
       case _ => None
     }
   }
@@ -150,7 +156,8 @@ class XmlParseTransformer(in: CalculatingIterator[XmlData]) {
 
   def next() = in.next()
 
-  def selector[T](pf: PartialFunction[XmlData, T]) = {
+  @inline
+  final def selector[T](pf: PartialFunction[XmlData, T]) = {
     while (in.hasNext) {
       val n = in.head
       if (pf.isDefinedAt(n)) {
@@ -228,13 +235,15 @@ class XmlParseTransformer(in: CalculatingIterator[XmlData]) {
     }
   }
 
-  def trans[T](name: String)(body: XmlParseTransformer => T): T = {
+  @inline
+  final def trans[T](name: String)(body: XmlParseTransformer => T): T = {
     transformFromTag(name) {
       (_, inp) => body(inp)
     }
   }
 
-  def transformFromTag[T](name: String)(body: (XmlEl, XmlParseTransformer) => T): T = {
+  @inline
+  final def transformFromTag[T](name: String)(body: (XmlEl, XmlParseTransformer) => T): T = {
     val work = true
     while (work && in.hasNext) {
       val n = in.next()
@@ -308,7 +317,7 @@ class XmlParseTransformer(in: CalculatingIterator[XmlData]) {
     }
   }
 
-  def textAndAttrs(name: String): (String, Map[String, String]) = {
+  def textAndAttrs(name: String): (String, collection.Map[String, String]) = {
     in.head match {
       case e @ XmlEl(`name`) => (textOf(name), e.attrs)
       case _ => throw new XmlParseException(s"first element is not an opening tag $name, but ${in.head}")
