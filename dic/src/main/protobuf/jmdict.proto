@@ -4,7 +4,70 @@ package jmdict;
 
 option java_package = "ws.kotonoha.akane.dic.jmdict";
 
-message JmdictEntry {
-    required uint64 id = 1;
+import "jmdict_tags.proto";
 
+message LocalizedString {
+  required string lang = 1;
+  required string str = 2;
+}
+
+message CrossReference {
+  required string writing = 1;
+  optional string reading = 2;
+  optional int32 sense = 3;
+}
+
+message SourceInfo {
+  optional string content = 1;
+  required bool wasei = 2;
+  required bool full = 3;
+}
+
+message MeaningInfo {
+  repeated JmdictTag pos = 1 [packed = true];
+  repeated JmdictTag info = 2 [packed = true];
+  repeated LocalizedString content = 3;
+  repeated int32 kanjiRestriction = 4 [packed = true];
+  repeated int32 readingRestriction = 5 [packed = true];
+  repeated CrossReference xref = 6;
+  repeated CrossReference antonym = 7;
+  repeated SourceInfo source = 8;
+}
+
+message KanjiInfo {
+  required string content = 1;
+  repeated JmdictTag info = 2 [packed = true];
+  repeated Priority priority = 3 [packed = true];
+  optional int32 freq = 4;
+}
+
+message ReadingInfo {
+  required string content = 1;
+  required bool nokanji = 2;
+  repeated int32 restr = 3 [packed = true];
+  repeated JmdictTag info = 4 [packed = true];
+  repeated Priority priority = 5 [packed = true];
+  optional int32 freq = 6;
+}
+
+//jmdict does not contain info field at all
+message EntryInfo {}
+
+message JmdictEntry {
+  required uint64 id = 1;
+  repeated ReadingInfo readings = 2;
+  repeated KanjiInfo wrtitings = 3;
+  repeated MeaningInfo meanings = 4;
+  optional EntryInfo info = 5;
+}
+
+enum Priority {
+  news1 = 1;
+  news2 = 2;
+  ichi1 = 3;
+  ichi2 = 4;
+  spec1 = 5;
+  spec2 = 6;
+  gai1 = 7;
+  gai2 = 8;
 }
