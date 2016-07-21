@@ -89,6 +89,9 @@ object ClassGenerator {
       """
         |package ws.kotonoha.akane.dic.jmdict
         |
+        |case class JmdictTagInfo(tag: JmdictTag, repr: String, explanation: String) {
+        |   def number: Int = tag.value
+        |}
         |
         |object JmdictTagMap {
         |  val tagMap = Map[String, JmdictTag](
@@ -103,6 +106,23 @@ object ClassGenerator {
       camelCase(tf, buffer)
 
       buffer.append(",\n")
+    }
+
+    buffer.replace(buffer.length() - 2, buffer.length(), "\n")
+
+    buffer.append("  )\n")
+
+    buffer.append("  val tagInfo: Array[JmdictTagInfo] = Array(\n")
+    for (e <- entities) {
+      val tf = nameOverrides.getOrElse(e.name, e.name)
+
+      buffer.append("    JmdictTagInfo(")
+        .append("JmdictTag.")
+      camelCase(tf, buffer)
+
+      buffer.append(", ").append('"').append(e.name).append("\", ")
+      buffer.append("\"\"\"").append(e.comment).append("\"\"\"),\n")
+
     }
 
     buffer.replace(buffer.length() - 2, buffer.length(), "\n")
