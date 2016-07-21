@@ -66,5 +66,21 @@ class JmdictParserSpec extends FreeSpec with Matchers with LoneElement {
       val parsed = data.trans("entry")(parser.parseEntry)
       parsed.writings should have length 2
     }
+
+    "restrictions in sense work" in {
+      val data = xml("jmdict/restr_sense.xml")
+      val parsed = data.trans("entry")(parser.parseEntry)
+      parsed.writings should have length 2
+      parsed.meanings should have length 3
+      parsed.meanings(1).readingRestriction shouldBe Seq(0, 1)
+    }
+
+    "restrictions in reading work" in {
+      val data = xml("jmdict/restr_reading.xml")
+      val parsed = data.trans("entry")(parser.parseEntry)
+      parsed.writings should have length 3
+      parsed.meanings should have length 1
+      parsed.readings.head.restr shouldBe Seq(0, 1)
+    }
   }
 }

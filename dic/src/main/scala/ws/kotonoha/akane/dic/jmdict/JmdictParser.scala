@@ -97,6 +97,8 @@ class JmdictParser {
   def parseXref(it: XmlParseTransformer): CrossReference = {
     val data = it.content()
     StringUtils.split(data, '・') match {
+      case Array(s) =>
+        CrossReference(s)
       case Array(wr, smt) =>
         XInt.unapply(smt) match {
           case Some(i) => CrossReference(wr, None, Some(i))

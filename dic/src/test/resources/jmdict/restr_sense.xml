@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entry>
+  <ent_seq>1000320</ent_seq>
+  <k_ele>
+    <keb>彼処</keb>
+    <ke_pri>ichi1</ke_pri>
+  </k_ele>
+  <k_ele>
+    <keb>彼所</keb>
+  </k_ele>
+  <r_ele>
+    <reb>あそこ</reb>
+    <re_pri>ichi1</re_pri>
+  </r_ele>
+  <r_ele>
+    <reb>あすこ</reb>
+  </r_ele>
+  <r_ele>
+    <reb>かしこ</reb>
+  </r_ele>
+  <r_ele>
+    <reb>あしこ</reb>
+    <re_inf>&ok;</re_inf>
+  </r_ele>
+  <r_ele>
+    <reb>あこ</reb>
+    <re_inf>&ok;</re_inf>
+  </r_ele>
+  <sense>
+    <pos>&pn;</pos>
+    <pos>&adj-no;</pos>
+    <xref>何処</xref>
+    <xref>此処</xref>
+    <xref>其処</xref>
+    <misc>&uk;</misc>
+    <gloss>there (place physically distant from both speaker and listener)</gloss>
+    <gloss>over there</gloss>
+    <gloss>that place</gloss>
+    <gloss>yonder</gloss>
+    <gloss xml:lang="dut">(1) ginds</gloss>
+    <gloss xml:lang="dut">daar</gloss>
+    <gloss xml:lang="dut">daarginds</gloss>
+    <gloss xml:lang="dut">ginder</gloss>
+    <gloss xml:lang="dut">daarginder</gloss>
+    <gloss xml:lang="dut">(2) zodanig</gloss>
+    <gloss xml:lang="dut">dermate</gloss>
+    <gloss xml:lang="dut">zó</gloss>
+    <gloss xml:lang="dut">zó zeer</gloss>
+    <gloss xml:lang="dut">in zoverre</gloss>
+    <gloss xml:lang="dut">(3) {arch.} hij</gloss>
+    <gloss xml:lang="dut">die</gloss>
+    <gloss xml:lang="dut">daar</gloss>
+    <gloss xml:lang="dut">ginds</gloss>
+    <gloss xml:lang="dut">ginder</gloss>
+    <gloss xml:lang="dut">daarginds</gloss>
+    <gloss xml:lang="dut">daarginder</gloss>
+    <gloss xml:lang="dut">{volkst.} daaro</gloss>
+    <gloss xml:lang="fre">cet endroit-là</gloss>
+    <gloss xml:lang="fre">là</gloss>
+    <gloss xml:lang="fre">là-bas</gloss>
+    <gloss xml:lang="ger">daselbst</gloss>
+    <gloss xml:lang="ger">dort</gloss>
+    <gloss xml:lang="ger">dort drüben</gloss>
+    <gloss xml:lang="ger">dahinten</gloss>
+    <gloss xml:lang="ger">(1) dort</gloss>
+    <gloss xml:lang="ger">dort drüben</gloss>
+    <gloss xml:lang="ger">dahinten</gloss>
+    <gloss xml:lang="ger">(2) männliche und weibliche Geschlechtsorgane</gloss>
+    <gloss xml:lang="hun">ugyan, ugyan!</gloss>
+    <gloss xml:lang="hun">ottani</gloss>
+    <gloss xml:lang="ita">là, lì (luogo distante fisicamente sia da chi parla che da chi ascolta)</gloss>
+    <gloss xml:lang="ita">laggiù</gloss>
+    <gloss xml:lang="ita">quel luogo</gloss>
+    <gloss xml:lang="ita">di là</gloss>
+    <gloss xml:lang="ita">genitali</gloss>
+    <gloss xml:lang="ita">così lontano, fino a quel punto (qualcosa distante in senso figurato sia da chi parla che da chi ascolta)</gloss>
+    <gloss xml:lang="ita">così lontano, fino a quel punto (qualcosa distante in senso figurato sia da chi parla che da chi ascolta</gloss>
+    <gloss xml:lang="rus">там (место удалённое от всех участников беседы)</gloss>
+    <gloss xml:lang="spa">(1) allá</gloss>
+    <gloss xml:lang="spa">allí</gloss>
+    <gloss xml:lang="spa">aquel lugar</gloss>
+    <gloss xml:lang="spa">(2) genitales</gloss>
+  </sense>
+  <sense>
+    <stagr>あそこ</stagr>
+    <stagr>あすこ</stagr>
+    <pos>&n;</pos>
+    <misc>&col;</misc>
+    <gloss>genitals</gloss>
+    <gloss xml:lang="fre">organes génitaux</gloss>
+  </sense>
+  <sense>
+    <xref>あれほど</xref>
+    <gloss>that far (something psychologically distant from both speaker and listener)</gloss>
+    <gloss>that much</gloss>
+    <gloss>that point</gloss>
+  </sense>
+</entry>

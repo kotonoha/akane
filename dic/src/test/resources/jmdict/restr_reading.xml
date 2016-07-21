@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2016 eiennohito (Tolmachev Arseny)
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<entry>
+  <ent_seq>1001510</ent_seq>
+  <k_ele>
+    <keb>御襁褓気触れ</keb>
+  </k_ele>
+  <k_ele>
+    <keb>お襁褓気触れ</keb>
+  </k_ele>
+  <k_ele>
+    <keb>オムツ気触れ</keb>
+  </k_ele>
+  <r_ele>
+    <reb>おむつかぶれ</reb>
+    <re_restr>御襁褓気触れ</re_restr>
+    <re_restr>お襁褓気触れ</re_restr>
+  </r_ele>
+  <r_ele>
+    <reb>オムツかぶれ</reb>
+    <re_restr>オムツ気触れ</re_restr>
+  </r_ele>
+  <sense>
+    <pos>&n;</pos>
+    <misc>&uk;</misc>
+    <gloss>diaper rash</gloss>
+    <gloss>nappy rash</gloss>
+    <gloss xml:lang="ita">mutande copripannolino</gloss>
+    <gloss xml:lang="ita">eritema da pannolino</gloss>
+  </sense>
+</entry>
