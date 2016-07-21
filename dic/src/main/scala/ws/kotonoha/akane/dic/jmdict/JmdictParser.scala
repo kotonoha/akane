@@ -20,6 +20,7 @@ import java.io.InputStream
 import javax.xml.stream.XMLInputFactory
 
 import org.apache.commons.lang3.StringUtils
+import ws.kotonoha.akane.unicode.UnicodeUtil
 import ws.kotonoha.akane.utils.XInt
 import ws.kotonoha.akane.xml._
 
@@ -102,10 +103,17 @@ class JmdictParser {
       case Array(wr, smt) =>
         XInt.unapply(smt) match {
           case Some(i) => CrossReference(wr, None, Some(i))
-          case _ => CrossReference(wr, Some(smt))
+          case _ =>
+            if (UnicodeUtil.isHiragana(smt)) {
+              CrossReference(wr, Some(smt))
+            } else CrossReference(data)
         }
       case Array(wr, rd, id) =>
-        CrossReference(wr, Some(rd), Some(id.toInt))
+        if (UnicodeUtil.isKatakana(wr) && UnicodeUtil.isKatakana(rd)) {
+          CrossReference(data)
+        } else {
+          CrossReference(wr, Some(rd), Some(id.toInt))
+        }
     }
   }
 

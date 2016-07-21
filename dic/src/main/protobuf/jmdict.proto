@@ -5,6 +5,7 @@ package jmdict;
 option java_package = "ws.kotonoha.akane.dic.jmdict";
 
 import "jmdict_tags.proto";
+import "scalapb/scalapb.proto";
 
 message LocalizedString {
   required string lang = 1;
@@ -37,6 +38,8 @@ message MeaningInfo {
 }
 
 message KanjiInfo {
+  option (scalapb.message).extends = "ws.kotonoha.akane.dic.jmdict.CommonInfo";
+
   required string content = 1;
   repeated JmdictTag info = 2 [packed = true];
   repeated Priority priority = 3 [packed = true];
@@ -44,6 +47,8 @@ message KanjiInfo {
 }
 
 message ReadingInfo {
+  option (scalapb.message).extends = "ws.kotonoha.akane.dic.jmdict.CommonInfo";
+
   required string content = 1;
   required bool nokanji = 2;
   repeated int32 restr = 3 [packed = true];

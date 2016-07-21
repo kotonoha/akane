@@ -120,7 +120,7 @@ object Kanjidic2Parser {
     it.transOpt("dic_number")(_.traverse("dic_ref") {
       it =>
         it.head match {
-          case e@XmlEl("dic_ref") => DicRef(e("dr_type"), it.textOf("dic_ref"), e.attrs - "dr_type")
+          case e@XmlEl("dic_ref") => DicRef(e("dr_type"), it.textOf("dic_ref"), e.attrs.toMap - "dr_type")
           case _ => throw new IllegalStateException()
         }
     } toList) getOrElse (Nil)
