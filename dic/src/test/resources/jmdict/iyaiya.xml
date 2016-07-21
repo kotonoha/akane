@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2016 eiennohito (Tolmachev Arseny)
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<entry>
+  <ent_seq>1000620</ent_seq>
+  <k_ele>
+    <keb>否々</keb>
+    <ke_pri>ichi1</ke_pri>
+  </k_ele>
+  <k_ele>
+    <keb>否否</keb>
+  </k_ele>
+  <r_ele>
+    <reb>いやいや</reb>
+    <re_pri>ichi1</re_pri>
+  </r_ele>
+  <r_ele>
+    <reb>いえいえ</reb>
+  </r_ele>
+  <sense>
+    <pos>&int;</pos>
+    <xref>嫌々・いやいや・3</xref>
+    <misc>&uk;</misc>
+    <gloss>no!</gloss>
+    <gloss>no no!</gloss>
+    <gloss>no, not at all</gloss>
+    <gloss xml:lang="fre">pas du tout</gloss>
+    <gloss xml:lang="ger">nein, nein</gloss>
+    <gloss xml:lang="hun">kelletlenül</gloss>
+    <gloss xml:lang="hun">vonakodva</gloss>
+    <gloss xml:lang="hun">húzódozva</gloss>
+    <gloss xml:lang="hun">nem akaródzva</gloss>
+    <gloss xml:lang="hun">nem akarva</gloss>
+    <gloss xml:lang="ita">malvolentieri, controvoglia, con riluttanza</gloss>
+    <gloss xml:lang="ita">fare segno di no con la testa</gloss>
+    <gloss xml:lang="rus">никоим образом</gloss>
+    <gloss xml:lang="rus">ни в коем случае</gloss>
+    <gloss xml:lang="slv">nerade volje</gloss>
+    <gloss xml:lang="slv">proti volji</gloss>
+    <gloss xml:lang="slv">neprostovoljno</gloss>
+    <gloss xml:lang="slv">z nejevoljo</gloss>
+    <gloss xml:lang="slv">nerad</gloss>
+    <gloss xml:lang="spa">a regañadientes</gloss>
+    <gloss xml:lang="spa">de ninguna manera</gloss>
+    <gloss xml:lang="spa">de mala gana</gloss>
+  </sense>
+</entry>

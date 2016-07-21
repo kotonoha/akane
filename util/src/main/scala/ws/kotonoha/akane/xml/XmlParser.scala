@@ -16,11 +16,16 @@
 
 package ws.kotonoha.akane.xml
 
-import javax.xml.stream.XMLEventReader
+import java.io.{InputStream, InputStreamReader, Reader}
+import java.nio.charset.Charset
+import javax.xml.stream.{XMLEventReader, XMLInputFactory}
 import javax.xml.stream.events._
 
+import com.typesafe.scalalogging.StrictLogging
+import ws.kotonoha.akane.io.Charsets
 import ws.kotonoha.akane.utils.CalculatingIterator
 
+import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.language.implicitConversions
 
@@ -144,7 +149,8 @@ class XmlIterator(in: XMLEventReader) extends CalculatingIterator[XmlData] {
   }
 }
 
-class XmlParseTransformer(in: CalculatingIterator[XmlData]) {
+class XmlParseTransformer(in: CalculatingIterator[XmlData], debug: Boolean = false) extends StrictLogging {
+
   def head = in.head
 
   def self = this
@@ -156,12 +162,14 @@ class XmlParseTransformer(in: CalculatingIterator[XmlData]) {
 
   def next() = in.next()
 
-  @inline
   final def selector[T](pf: PartialFunction[XmlData, T]) = {
     while (in.hasNext) {
       val n = in.head
       if (pf.isDefinedAt(n)) {
         pf.apply(n)
+        if (debug && in.chead.isDefined && (in.chead.get eq n)) {
+          throw new XmlParseException(s"iterator should move forward, current element was ${n}")
+        }
       } else {
         in.next()
       }
@@ -174,6 +182,29 @@ class XmlParseTransformer(in: CalculatingIterator[XmlData]) {
     pf(item)
   }
 
+  def skipTag() = {
+    @tailrec
+    def rec(it: CalculatingIterator[XmlData], target: String, levels: Int): Unit = {
+      val local = it.next()
+      local match {
+        case x: XmlElEnd if x.data == target =>
+          if (levels > 0) rec(it, target, levels - 1)
+        case x: XmlEl if x.data == target =>
+          rec(it, target, levels + 1)
+        case _ =>
+          rec(it, target, levels)
+      }
+    }
+
+    in.next() match {
+      case tag: XmlEl =>
+        rec(in, tag.data, 0)
+      case x =>
+        throw new XmlParseException(s"head element $x was not a tag")
+    }
+
+  }
+
   def skipTo(tag: String) = {
     while (in.hasNext && in.head.data != tag) {
       val n = in.next()
@@ -182,7 +213,7 @@ class XmlParseTransformer(in: CalculatingIterator[XmlData]) {
   }
 
   def transSeq[T](name: String)(processor: XmlParseTransformer => T): Iterator[T] = {
-     transformSeqFromTag(name)((_, it) => processor(it))
+    transformSeqFromTag(name)((_, it) => processor(it))
   }
 
   def transformSeqFromTag[T](name: String)(body: (XmlEl, XmlParseTransformer) => T): Iterator[T] = new CalculatingIterator[T] {
@@ -191,7 +222,7 @@ class XmlParseTransformer(in: CalculatingIterator[XmlData]) {
       while (work && in.hasNext) {
         val n = in.next()
         n match {
-          case x @ XmlEl(`name`) => {
+          case x@XmlEl(`name`) => {
             return Some(body(x, untilEndTag(name)))
           }
           case _ => //do nothing
@@ -225,7 +256,7 @@ class XmlParseTransformer(in: CalculatingIterator[XmlData]) {
       while (work && in.hasNext) {
         val n = in.next()
         n match {
-          case x @ XmlEl(nm) if nm == name && (!noattr || x.attrs.isEmpty) => {
+          case x@XmlEl(nm) if nm == name && (!noattr || x.attrs.isEmpty) => {
             return Some(processor(untilEndTag(name)))
           }
           case _ => //do nothing
@@ -235,20 +266,18 @@ class XmlParseTransformer(in: CalculatingIterator[XmlData]) {
     }
   }
 
-  @inline
   final def trans[T](name: String)(body: XmlParseTransformer => T): T = {
     transformFromTag(name) {
       (_, inp) => body(inp)
     }
   }
 
-  @inline
   final def transformFromTag[T](name: String)(body: (XmlEl, XmlParseTransformer) => T): T = {
     val work = true
     while (work && in.hasNext) {
       val n = in.next()
       n match {
-        case el @ XmlEl(`name`) => {
+        case el@XmlEl(`name`) =>
           val inp = untilEndTag(name)
           val data = body(el, inp)
           head match {
@@ -256,7 +285,6 @@ class XmlParseTransformer(in: CalculatingIterator[XmlData]) {
             case _ => //
           }
           return data
-        }
         case _ => //do nothing
       }
     }
@@ -281,7 +309,7 @@ class XmlParseTransformer(in: CalculatingIterator[XmlData]) {
   def skipAll() {
     while (in.hasNext) {
       val n = in.next()
-      println(s"warning: skipped $n")
+      logger.warn(s"skipped $n")
     }
   }
 
@@ -292,6 +320,17 @@ class XmlParseTransformer(in: CalculatingIterator[XmlData]) {
     }
   }
 
+  def content(): String = {
+    val tag = in.head
+    textOf(tag.data)
+  }
+
+  @inline
+  final def contAttrs(): (String, collection.Map[String, String]) = {
+    val tag = in.head
+    textAndAttrs(tag.data)
+  }
+
   def textOf(name: String) = {
     val first = in.next()
 
@@ -299,14 +338,14 @@ class XmlParseTransformer(in: CalculatingIterator[XmlData]) {
       case XmlEl(`name`) =>
         val sec = in.next()
         val cont = sec match {
-          case XmlText(t) => Some(t)
-          case XmlERef(t) => Some(t)
-          case XmlElEnd(`name`) => None
+          case XmlText(t) => t
+          case XmlERef(t) => t
+          case XmlElEnd(`name`) => null
           case _ => throw new XmlParseException(s"error when parsing xml: invalid sequence $first, $sec")
         }
         cont match {
-          case None => ""
-          case Some(x) =>
+          case null => ""
+          case x =>
             val third = in.next()
             third match {
               case XmlElEnd(`name`) => x
@@ -317,9 +356,10 @@ class XmlParseTransformer(in: CalculatingIterator[XmlData]) {
     }
   }
 
-  def textAndAttrs(name: String): (String, collection.Map[String, String]) = {
+  @inline
+  final def textAndAttrs(name: String): (String, collection.Map[String, String]) = {
     in.head match {
-      case e @ XmlEl(`name`) => (textOf(name), e.attrs)
+      case e@XmlEl(`name`) => (textOf(name), e.attrs)
       case _ => throw new XmlParseException(s"first element is not an opening tag $name, but ${in.head}")
     }
   }
@@ -339,14 +379,33 @@ class XmlParseTransformer(in: CalculatingIterator[XmlData]) {
         case Some(XmlElEnd(`name`)) => false
         case _ => true
       }
-    })
+    }, this.debug)
   }
 }
 
 object XmlParser {
-  implicit def iterator2parsetransformer(in: CalculatingIterator[XmlData]): XmlParseTransformer = new XmlParseTransformer(in)
+  implicit def iterator2parsetransformer(in: CalculatingIterator[XmlData]): XmlParseTransformer =
+    new XmlParseTransformer(in, debug = false)
 
   def parse(in: XMLEventReader) = new XmlIterator(in)
+
+  def create(in: InputStream, cs: Charset = Charsets.utf8): XmlIterator = {
+    val rdr = new InputStreamReader(in, cs)
+    create(rdr)
+  }
+
+  def create(in: Reader): XmlIterator = {
+    val fact = XMLInputFactory.newInstance()
+    fact.setProperty(XMLInputFactory.IS_VALIDATING, false)
+    fact.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false)
+
+    val reader = fact.createFilteredReader(
+      fact.createXMLEventReader(in),
+      WhitespaceFilter
+    )
+
+    XmlParser.parse(reader)
+  }
 }
 
 class XmlParseException(msg: String) extends Exception(msg)

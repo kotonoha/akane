@@ -21,14 +21,17 @@ package ws.kotonoha.akane.dict.jmdict
  * @since 14.11.12 
  */
 
+@deprecated
 case class LocString(str: String, loc: String)
 
+@deprecated
 case class Meaning(info: List[String], vals: List[LocString])
-
+@deprecated
 case class Priority(value: String)
 
+@deprecated
 case class JMString(priority: List[Priority], info: List[String], value: String)
-
+@deprecated
 case class JMRecord(id: Long, reading: List[JMString], writing: List[JMString], meaning: List[Meaning])
 
 import ws.kotonoha.akane.xml._
@@ -36,7 +39,7 @@ import java.io.InputStream
 import javax.xml.stream.XMLInputFactory
 import collection.mutable.ListBuffer
 
-
+@deprecated
 object JMDictParser {
 
   import XmlParser._
