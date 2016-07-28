@@ -194,7 +194,7 @@ object FSPaths {
       }
     }
 
-    @inline
+    //@inline
     def map[R](f: T => R): EmptyWrapper[R] = {
       try {
         new EmptyWrapper[R](f(obj))
@@ -223,6 +223,7 @@ object FSPaths {
     def extension = FSPaths.extension(p)
     def deleteIfExists() = Files.deleteIfExists(p)
     def copyTo(p2: Path) = Files.copy(p, p2)
+    def moveTo(p2: Path) = Files.move(p, p2)
     def lines(enc: Charset = utf8): CloseableIterator[String] = wrapStream(Files.lines(p, enc))
     def ensureDirectory() = FSPaths.ensureDir(p)
     def ensureParent() = FSPaths.ensureParent(p)

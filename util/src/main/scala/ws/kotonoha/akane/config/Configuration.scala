@@ -26,6 +26,9 @@ import com.typesafe.scalalogging.StrictLogging
  * @since 2013-09-02
  */
 object Configuration extends StrictLogging {
+
+  private val theOverrides = ConfigFactory.defaultOverrides()
+
   def withHostname(name: String): List[String] = {
     val localhost = InetAddress.getLocalHost.getHostName
     val dots: List[String] = localhost.split("\\.").toList
@@ -38,7 +41,8 @@ object Configuration extends StrictLogging {
   }
 
   def withUsername(name: String, config: Config = ConfigFactory.defaultOverrides()): List[String] = {
-    val uname = config.getString("user.name")
+    val cfg = config.withFallback(theOverrides)
+    val uname = cfg.getString("user.name")
     s"$uname.$name" :: Nil
   }
 
@@ -50,7 +54,7 @@ object Configuration extends StrictLogging {
   def makeConfigFor(name: String, defaults: Config = ConfigFactory.defaultOverrides()) = {
     val names = possibleNamesFor(name, defaults)
     logger.debug(s"For config {$name} trying [${names.mkString(", ")}]")
-    names.foldLeft(defaults) {
+    val cfg = names.foldLeft(defaults) {
       case (c, cname) =>
         val config = ConfigFactory.parseResources(cname)
         if (!config.isEmpty) {
@@ -58,5 +62,6 @@ object Configuration extends StrictLogging {
           config.withFallback(c)
         } else c
     }
+    cfg.resolve()
   }
 }
