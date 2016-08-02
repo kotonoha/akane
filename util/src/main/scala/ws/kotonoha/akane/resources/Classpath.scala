@@ -37,15 +37,22 @@ object Classpath {
     proc.obj.asScala
   }
 
+  private def resourceUri(name: String) = {
+    val fromClass = getClass.getResource(name)
+    if (fromClass == null) {
+      getClass.getClassLoader.getResource(name)
+    } else fromClass
+  }
+
   def inputStream(name: String): AutoClosableWrapper[InputStream] = {
-    val obj = this.getClass.getClassLoader.getResource(name)
+    val obj = resourceUri(name)
     if (obj != null) {
       new AutoClosableWrapper[InputStream](obj.openStream())
     } else throw new Exception(s"resource $name was not found")
   }
 
   def fileAsString(name: String, charset: Charset = Charsets.utf8): String = {
-    val url = this.getClass.getClassLoader.getResource(name)
+    val url = resourceUri(name)
     if (url == null) {
       throw new Exception(s"resource $name was not found")
     }
