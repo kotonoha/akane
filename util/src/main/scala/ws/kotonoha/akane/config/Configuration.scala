@@ -22,9 +22,9 @@ import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.StrictLogging
 
 /**
- * @author eiennohito
- * @since 2013-09-02
- */
+  * @author eiennohito
+  * @since 2013-09-02
+  */
 object Configuration extends StrictLogging {
 
   private val theOverrides = ConfigFactory.defaultOverrides()
@@ -51,7 +51,7 @@ object Configuration extends StrictLogging {
     c1.map(_ + ".conf").distinct
   }
 
-  def makeConfigFor(name: String, defaults: Config = ConfigFactory.defaultOverrides()) = {
+  def rawConfigFor(name: String, defaults: Config = ConfigFactory.defaultOverrides()): Config = {
     val names = possibleNamesFor(name, defaults)
     logger.debug(s"For config {$name} trying [${names.mkString(", ")}]")
     val cfg = names.foldLeft(defaults) {
@@ -62,6 +62,10 @@ object Configuration extends StrictLogging {
           config.withFallback(c)
         } else c
     }
-    cfg.resolve()
+    cfg
+  }
+
+  def makeConfigFor(name: String, defaults: Config = ConfigFactory.defaultOverrides()) = {
+    rawConfigFor(name, defaults).resolve()
   }
 }
