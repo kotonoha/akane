@@ -16,6 +16,7 @@
 
 package ws.kotonoha.akane.parser
 
+import ws.kotonoha.akane.analyzers.juman.JumanPos
 import ws.kotonoha.akane.helpers.lisp._
 import ws.kotonoha.akane.resources.Classpath
 
@@ -37,7 +38,36 @@ case class JumanConjForm(num: Int, name: String, writing: String, reading: Strin
 class JumanPosSet(
   val pos: Array[JumanPosType],
   val conjugatons: Array[JumanConjType]
-)
+) {
+
+  def explain(posInfo: JumanPos): String = {
+    val bldr = new StringBuilder
+
+    val pobj = pos(posInfo.pos)
+    bldr.append(pobj.name)
+
+    if (posInfo.subpos != 0) {
+      bldr.append("-")
+      val spos = pobj.subtypes(posInfo.subpos)
+      bldr.append(spos.name)
+    }
+
+    if (posInfo.category != 0) {
+      bldr.append("-")
+      val cobj = conjugatons(posInfo.category)
+      bldr.append(cobj.name)
+
+      if (posInfo.conjugation != 0) {
+        bldr.append("-")
+        val cat = cobj.conjugations(posInfo.conjugation)
+        bldr.append(cat.name)
+      }
+    }
+
+    bldr.result()
+  }
+
+}
 
 object JumanPosSet {
   lazy val default = JumanPosReader.fromClasspath()
