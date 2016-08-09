@@ -72,7 +72,7 @@ lazy val akka = "com.typesafe.akka" %% "akka-actor" % "2.4.6"
 lazy val akaneDeps = Seq(
   //test
 
-  "ws.kotonoha.liftweb" %% "lift-json" % "2.6.3.di",
+  "net.liftweb" %% "lift-json" % "3.0-RC3",
   "com.jsuereth" %% "scala-arm" % "1.4",
 
   "com.github.scala-incubator.io" %% "scala-io-core" % "0.4.3",
