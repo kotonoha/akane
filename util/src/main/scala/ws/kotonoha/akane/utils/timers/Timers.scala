@@ -8,6 +8,7 @@ final class Millitimer {
 
 final case class Millis(millis: Long) extends AnyVal {
   @inline def seconds = millis * 1e-3
+  override def toString: String = millis.toString
 }
 
 object Millitimer {
