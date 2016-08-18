@@ -1,6 +1,6 @@
 package ws.kotonoha.akane.blobdb.api
 
-import ws.kotonoha.akane.blobdb.impl.SentenceIndexEntry
+import ws.kotonoha.akane.blobdb.impl.BlobIndexEntry
 
 /**
   * @author eiennohito
@@ -9,7 +9,7 @@ import ws.kotonoha.akane.blobdb.impl.SentenceIndexEntry
 
 
 
-case class DataRef[Key <: AnyRef](id: Key, ptr: SentenceIndexEntry, writtenBytes: Long)
+case class DataRef[Key <: AnyRef](id: Key, ptr: BlobIndexEntry, writtenBytes: Long)
 
 final class IdRef[Key <: AnyRef](f: IdOps[Key], val prefix: Int) {
   private[this] var inst: Key = _

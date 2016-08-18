@@ -20,11 +20,11 @@ import ws.kotonoha.akane.resources.FSPaths
 
 private[impl] trait DbImplApi[K <: AnyRef] extends BlobDb[K] {
   //Low-level API for reading blocks
-  private[impl] def blockFor(idx: SentenceIndexEntry): DecompressedBuffer
-  private[impl] def fillInBlock(gbb: GrowableByteBuffer, entry: SentenceIndexEntry): Unit
+  private[impl] def blockFor(idx: BlobIndexEntry): DecompressedBuffer
+  private[impl] def fillInBlock(gbb: GrowableByteBuffer, entry: BlobIndexEntry): Unit
 
   protected[impl] def db: DB
-  private[impl] def index: BTreeMap[K, SentenceIndexEntry]
+  private[impl] def index: BTreeMap[K, BlobIndexEntry]
   private[impl] def invalidateShard(file: Int): Unit
   private[impl] def nextFileNo(): Int
 }
@@ -83,7 +83,7 @@ class BlDbImpl[Key <: AnyRef](cfg: BlobDbConfig, val ops: IdOps[Key], defaultTra
     .keySerializer(ops.serializer)
     .valueSerializer(new SentenceIndexEntrySerializer)
     .comparator(ops.comparator)
-    .makeOrGet[Key, SentenceIndexEntry]()
+    .makeOrGet[Key, BlobIndexEntry]()
 
   private[this] val fileCount = db.getAtomicInteger("fileCounter")
 
@@ -106,7 +106,7 @@ class BlDbImpl[Key <: AnyRef](cfg: BlobDbConfig, val ops: IdOps[Key], defaultTra
     } else info
   }
 
-  private[impl] override def fillInBlock(gbb: GrowableByteBuffer, entry: SentenceIndexEntry): Unit = {
+  private[impl] override def fillInBlock(gbb: GrowableByteBuffer, entry: BlobIndexEntry): Unit = {
     var remaining = entry.len
     gbb.ensureSize(remaining)
     val buf = buffer(entry.file)
@@ -124,7 +124,7 @@ class BlDbImpl[Key <: AnyRef](cfg: BlobDbConfig, val ops: IdOps[Key], defaultTra
     }
   }
 
-  private[impl] override def blockFor(entry: SentenceIndexEntry): DecompressedBuffer = {
+  private[impl] override def blockFor(entry: BlobIndexEntry): DecompressedBuffer = {
     val buf = buffer(entry.file)
     val addr = BlockCompressedFilePointerUtil.getBlockAddress(entry.ptr)
     buf.block(addr, buf.reader)
@@ -162,7 +162,7 @@ private[impl] final class DefaultSearchImpl[Key <: AnyRef, T](dbi: DbImplApi[Key
     } else None
   }
 
-  private def tryRead(id: Key, ptr: SentenceIndexEntry): Option[T] = {
+  private def tryRead(id: Key, ptr: BlobIndexEntry): Option[T] = {
     try {
       val res = doRead(ptr)
       if (res.isEmpty) {
@@ -176,7 +176,7 @@ private[impl] final class DefaultSearchImpl[Key <: AnyRef, T](dbi: DbImplApi[Key
     }
   }
 
-  private def doRead(ptr: SentenceIndexEntry): Option[T] = {
+  private def doRead(ptr: BlobIndexEntry): Option[T] = {
     if (ptr.fullyInBlock) {
       useBufferDirectly(ptr)
     } else {
@@ -184,14 +184,14 @@ private[impl] final class DefaultSearchImpl[Key <: AnyRef, T](dbi: DbImplApi[Key
     }
   }
 
-  private def useBufferDirectly(ptr: SentenceIndexEntry): Option[T] = {
+  private def useBufferDirectly(ptr: BlobIndexEntry): Option[T] = {
     val block = dbi.blockFor(ptr)
     val pos = BlockCompressedFilePointerUtil.getBlockOffset(ptr.ptr)
     val buffer = ByteBuffer.wrap(block.data, pos, ptr.len)
     rc.result(buffer)
   }
 
-  private def readSeveralParts(ptr: SentenceIndexEntry): Option[T] = {
+  private def readSeveralParts(ptr: BlobIndexEntry): Option[T] = {
     val buf = growBuffer
     buf.reset()
     dbi.fillInBlock(buf, ptr)

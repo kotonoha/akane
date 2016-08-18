@@ -96,8 +96,8 @@ class CompressedFileBlockReader(mapper: LargeFileMemoryMapper) extends Closeable
 }
 
 
-class SentenceIndexEntrySerializer extends Serializer[SentenceIndexEntry] with Serializable {
-  override def serialize(out: DataOutput, value: SentenceIndexEntry) = {
+class SentenceIndexEntrySerializer extends Serializer[BlobIndexEntry] with Serializable {
+  override def serialize(out: DataOutput, value: BlobIndexEntry) = {
     out.writeInt(value.file)
     out.writeLong(value.ptr)
     out.writeInt(value.len)
@@ -109,7 +109,7 @@ class SentenceIndexEntrySerializer extends Serializer[SentenceIndexEntry] with S
     val file = in.readInt()
     val ptr = in.readLong()
     val sz = in.readInt()
-    SentenceIndexEntry(file, ptr, sz)
+    BlobIndexEntry(file, ptr, sz)
   }
 }
 

@@ -40,7 +40,7 @@ class BlobImporterImpl[K <: AnyRef](
       None
     } else {
       saveCnt += 1
-      val idxEntry = SentenceIndexEntry(writer.file, pos, len)
+      val idxEntry = BlobIndexEntry(writer.file, pos, len)
       val lastOne = lastAddr
       lastAddr = writer.blockAddress
       Some(DataRef(idref.get(), idxEntry, lastAddr - lastOne))

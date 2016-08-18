@@ -25,7 +25,7 @@ private[impl] class DbWriterActor(dbi: DbImplApi[_]) extends Actor with ActorLog
     }
   }
 
-  private val idx = dbi.index.asInstanceOf[BTreeMap[AnyRef, SentenceIndexEntry]]
+  private val idx = dbi.index.asInstanceOf[BTreeMap[AnyRef, BlobIndexEntry]]
 
   override def receive = {
     case DbWriterActor.Delete(ids, p) => transaction(p) {

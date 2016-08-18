@@ -5,7 +5,7 @@ import java.nio.ByteBuffer
 import java.util.Comparator
 
 import org.mapdb.BTreeKeySerializer
-import ws.kotonoha.akane.blobdb.impl.SentenceIndexEntry
+import ws.kotonoha.akane.blobdb.impl.BlobIndexEntry
 
 import scala.concurrent.Future
 
@@ -16,7 +16,7 @@ import scala.concurrent.Future
 trait BlobDb[Key <: AnyRef] {
   def ops: IdOps[Key]
 
-  def infoFor(id: Key): Option[SentenceIndexEntry]
+  def infoFor(id: Key): Option[BlobIndexEntry]
   def valueGetter[Val](rc: ResultCreator[Val]): ItemSearch[Key, Val]
   def get(id: Key): Option[String]
   def idCount: Long
