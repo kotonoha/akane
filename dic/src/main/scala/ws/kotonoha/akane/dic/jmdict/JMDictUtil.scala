@@ -79,12 +79,65 @@ object JMDictUtil {
   }
 
   object priorityOrder extends Ordering[JmdictEntry] {
-
-
     override def compare(x: JmdictEntry, y: JmdictEntry) = {
       val xp = calculatePriority(x.readings) max calculatePriority(x.writings)
       val yp = calculatePriority(y.readings) max calculatePriority(y.writings)
       xp.compareTo(yp)
     }
   }
+
+  def cleanLanguages(e: JmdictEntry, langs: Set[String]): JmdictEntry = {
+    val ms = e.meanings.map { mi =>
+      val content = mi.content.filter(l => langs.contains(l.lang))
+      mi.copy(content = content)
+    }
+    e.copy(meanings = ms)
+  }
+
+  def cleanLanguages(es: Seq[JmdictEntry], langs: Set[String]): Seq[JmdictEntry] = es.map(cleanLanguages(_, langs))
+
+  val verbTags = Set(
+    JmdictTag.v1,
+    JmdictTag.v2aS,
+    JmdictTag.v4h,
+    JmdictTag.v4r,
+    JmdictTag.v5,
+    JmdictTag.v5aru,
+    JmdictTag.v5b,
+    JmdictTag.v5g,
+    JmdictTag.v5k,
+    JmdictTag.v5kS,
+    JmdictTag.v5m,
+    JmdictTag.v5n,
+    JmdictTag.v5r,
+    JmdictTag.v5rI,
+    JmdictTag.v5s,
+    JmdictTag.v5t,
+    JmdictTag.v5u,
+    JmdictTag.v5uS,
+    JmdictTag.v5uru,
+    JmdictTag.v5z,
+    JmdictTag.v5z,
+    JmdictTag.vk,
+    JmdictTag.vn,
+    JmdictTag.vr,
+    JmdictTag.vs,
+    JmdictTag.vsS,
+    JmdictTag.vsI
+  )
+
+  val adjTags = Set(
+    JmdictTag.adj,
+    JmdictTag.adjI,
+    JmdictTag.adjNa,
+    JmdictTag.adjNo,
+    JmdictTag.adjF,
+    JmdictTag.adjT,
+    JmdictTag.adjPn
+  )
+
+  val advTags = Set(
+    JmdictTag.adv,
+    JmdictTag.advTo
+  )
 }
