@@ -66,7 +66,7 @@ def akaneProject(projName: String, basePath: File) = {
   Project(id = id, base = basePath, settings = allSettings)
 }
 
-lazy val akka = "com.typesafe.akka" %% "akka-actor" % "2.4.6"
+lazy val akkaDep = "com.typesafe.akka" %% "akka-actor" % "2.4.9"
 
 
 lazy val akaneDeps = Seq(
@@ -81,7 +81,7 @@ lazy val akaneDeps = Seq(
   "com.nativelibs4java" % "bridj" % "0.7.0",
 
   "com.typesafe" % "config" % "1.3.0",
-  akka
+  akkaDep
 )
 
 lazy val scalatest = "org.scalatest" %% "scalatest" % "2.2.6"
@@ -97,7 +97,7 @@ lazy val commonDeps = Def.settings(
 )
 
 lazy val akkaDeps = Def.settings(
-  libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.4.6"
+  libraryDependencies += akkaDep
 )
 
 lazy val macroDeps = Def.settings(
@@ -109,7 +109,7 @@ lazy val macroDeps = Def.settings(
 
 lazy val akane = (project in file("."))
   .settings(akaneSettings)
-  .aggregate(ioc, legacy, knp, util, macros, knpAkka, blobdb)
+  .aggregate(ioc, legacy, knp, util, macros, knpAkka, blobdb, akka)
 
 lazy val ioc = akaneProject("ioc", file("ioc"))
 
@@ -148,9 +148,9 @@ lazy val blobdb = akaneProject("blobdb", file("blobdb"))
   .settings(
     libraryDependencies ++= Seq(
       "org.mapdb" % "mapdb" % "1.0.9",
-      "com.github.ben-manes.caffeine" % "caffeine" % "2.3.1",
+      "com.github.ben-manes.caffeine" % "caffeine" % "2.3.2",
       "net.jpountz.lz4" % "lz4" % "1.3.0",
-      akka
+      akkaDep
     )
   )
 
@@ -163,3 +163,7 @@ lazy val testkit = akaneProject("testkit", file("testkit"))
 lazy val dic = akaneProject("dic", file("dic"))
   .settings(pbScala())
   .dependsOn(util)
+
+lazy val akka = akaneProject("akka", file("akka"))
+    .dependsOn(util)
+    .settings(akkaDeps)
