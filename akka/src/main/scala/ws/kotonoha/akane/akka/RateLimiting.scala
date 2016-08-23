@@ -100,8 +100,8 @@ object MaxAtOnceActor {
 
   private[akka] case object Timeout
 
-  case class QueueInfo(sender: ActorRef, tag: Any)
-  case class InFlightInfo(sender: ActorRef, tag: Any, start: Long)
+  private[akka] case class QueueInfo(sender: ActorRef, tag: Any)
+  private[akka] case class InFlightInfo(sender: ActorRef, tag: Any, start: Long)
 
   def props(cfg: RateLimitCfg): Props = Props(new MaxAtOnceActor(cfg))
 }
