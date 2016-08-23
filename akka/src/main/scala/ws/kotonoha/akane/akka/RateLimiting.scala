@@ -69,7 +69,11 @@ class MaxAtOnceActor(cfg: RateLimitCfg) extends Actor with ActorLogging {
   override def receive = {
     case Request(tag) =>
       if (inFlight.length > cfg.concurrency) {
-        queue += QueueInfo(sender(), tag)
+        val sndr = sender()
+        queue += QueueInfo(sndr, tag)
+        if (cfg.tracing != null) {
+          cfg.tracing.enqueue(sndr, tag)
+        }
       } else {
         allow(sender(), tag)
       }
@@ -107,9 +111,10 @@ object MaxAtOnceActor {
 }
 
 trait RateLimitTracing {
-  def start(ref: ActorRef, tag: Any, time: Long): Unit
-  def finish(ref: ActorRef, tag: Any, start: Long): Unit
-  def timeout(ref: ActorRef, tag: Any, start: Long): Unit
+  def enqueue(ref: ActorRef, tag: Any): Unit = {}
+  def start(ref: ActorRef, tag: Any, time: Long): Unit = {}
+  def finish(ref: ActorRef, tag: Any, start: Long): Unit = {}
+  def timeout(ref: ActorRef, tag: Any, start: Long): Unit = {}
 }
 
 case class RateLimitCfg (
