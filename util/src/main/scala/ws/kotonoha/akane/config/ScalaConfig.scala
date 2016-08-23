@@ -42,9 +42,13 @@ object ScalaConfig {
       } else None
     }
 
-    def optDuration(name: String) = optName(name, cfg => {
-      val millis = cfg.getDuration(name, TimeUnit.MILLISECONDS)
+    def finiteDuration(name: String) = {
+      val millis = conf.getDuration(name, TimeUnit.MILLISECONDS)
       FiniteDuration(millis, TimeUnit.MILLISECONDS)
+    }
+
+    def optDuration(name: String) = optName(name, cfg => {
+      finiteDuration(name)
     })
   }
 }
