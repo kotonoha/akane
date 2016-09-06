@@ -109,7 +109,7 @@ lazy val macroDeps = Def.settings(
 
 lazy val akane = (project in file("."))
   .settings(akaneSettings)
-  .aggregate(ioc, legacy, knp, util, macros, knpAkka, blobdb, akka)
+  .aggregate(ioc, legacy, knp, util, macros, knpAkka, blobdb, akka, dic, kytea)
 
 lazy val ioc = akaneProject("ioc", file("ioc"))
 
@@ -167,3 +167,6 @@ lazy val dic = akaneProject("dic", file("dic"))
 lazy val akka = akaneProject("akka", file("akka"))
     .dependsOn(util)
     .settings(akkaDeps)
+
+lazy val kytea = akaneProject("kytea", file("kytea"))
+  .dependsOn(util)
