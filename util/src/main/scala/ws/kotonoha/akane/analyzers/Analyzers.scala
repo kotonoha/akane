@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2016 eiennohito (Tolmachev Arseny)
+ * Copyright 2016 eiennohito (Tolmachev Arseny)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,8 @@
 
 package ws.kotonoha.akane.analyzers
 
-import java.io.{Closeable, InputStream, OutputStream}
+import java.io.{InputStream, OutputStream}
 
-import com.typesafe.scalalogging.StrictLogging
-import org.apache.commons.io.IOUtils
-
-import scala.annotation.tailrec
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
