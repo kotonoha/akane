@@ -27,19 +27,19 @@ public class ParseUtil {
     return parseInt(cs, offset, strLen);
   }
 
-  public static int parseInt(CharSequence cs, int offset, int strLen) {
+  public static int parseInt(CharSequence cs, int idxStart, int idxEnd) {
     char c;
     boolean positive = true;
-    if ((c = cs.charAt(offset)) == '-') {
+    if ((c = cs.charAt(idxStart)) == '-') {
       positive = false;
-      offset++;
+      idxStart++;
     } else if (c == '+') {
-      offset++;
+      idxStart++;
     }
 
     int value = 0;
-    while (offset < strLen) {
-      c = cs.charAt(offset++);
+    while (idxStart < idxEnd) {
+      c = cs.charAt(idxStart++);
       if (c >= '0' && c <= '9') {
         value = value * 10 + (c - '0');
       } else {
