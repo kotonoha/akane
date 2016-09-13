@@ -80,6 +80,11 @@ object BLinesReader {
       recommended = true
     }
 
+    val barIdx = StringUtils.indexOf(data, '|', senseEnd)
+    if (barIdx > 0 && barIdx < hwEnd) {
+      hwEnd = barIdx
+    }
+
     val reading = if (rdStart < 0) None else {
       val rd = data.subSequence(rdStart + 1, rdEnd).toString
       Some(rd)
@@ -114,5 +119,16 @@ object BLinesReader {
       units += readUnit(data.subSequence(from, spaceIdx))
       parseUnitsImpl(units, data, spaceIdx + 1, to)
     }
+  }
+
+  def parseTabbedLine(data: CharSequence): BLine = {
+    val tab1 = StringUtils.indexOf(data, '\t', 0)
+    if (tab1 < 0) throw new RuntimeException(s"a line $data should contain at least one tab")
+    val tab2 = StringUtils.indexOf(data, '\t', tab1 + 1)
+    if (tab1 < 0) throw new RuntimeException(s"a line $data should contain at least two tabs")
+    val p1 = data.subSequence(0, tab1).toString.toLong
+    val p2 = data.subSequence(tab1 + 1, tab2).toString.toLong
+    val p3 = parseUnits(data, tab2 + 1, data.length())
+    BLine(p1, p2, p3)
   }
 }

@@ -16,7 +16,7 @@
 
 package ws.kotonoha.akane.resources
 
-import java.io.{Closeable, IOException}
+import java.io.{BufferedReader, Closeable, IOException, InputStreamReader}
 import java.nio.charset.Charset
 import java.nio.file._
 import java.nio.file.attribute.{BasicFileAttributes, FileTime}
@@ -235,6 +235,12 @@ object FSPaths {
 
     def inputStream = Files.newInputStream(p).res
     def framedBy(sep: Array[Byte]): FrameAdapter = FrameAdapter.apply(p.inputStream.obj, sep)
+    def bufferedReader(cs: Charset = utf8) = {
+      val stream = Files.newInputStream(p)
+      val rdr = new InputStreamReader(stream, cs)
+      val brdr = new BufferedReader(rdr)
+      brdr.res
+    }
 
     def write(s: CharSequence, enc: Charset = utf8): Path = {
       Files.write(p, Collections.singleton(s), enc)

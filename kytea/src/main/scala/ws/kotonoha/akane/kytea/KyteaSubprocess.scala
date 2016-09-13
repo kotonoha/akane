@@ -31,4 +31,3 @@ case class KyteaMorpheme(parts: Seq[String])
 object KyteaSubprocess {
 
 }
-

@@ -49,7 +49,7 @@ object KyteaConfig {
     KyteaConfig(model)
   }
 
-  val wordBound = "\u0001"
-  val tagBound = "\u0002"
-  val elemBound = "\u0003"
+  val wordBound = "˥"
+  val tagBound = "˦"
+  val elemBound = "˧"
 }
