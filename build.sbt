@@ -66,7 +66,10 @@ def akaneProject(projName: String, basePath: File) = {
   Project(id = id, base = basePath, settings = allSettings)
 }
 
-lazy val akkaDep = "com.typesafe.akka" %% "akka-actor" % "2.4.9"
+val luceneVersion = "6.2.0"
+
+
+lazy val akkaDep = "com.typesafe.akka" %% "akka-actor" % "2.4.10"
 
 
 lazy val akaneDeps = Seq(
@@ -107,9 +110,16 @@ lazy val macroDeps = Def.settings(
   )
 )
 
+lazy val luceneDeps = Def.settings(
+  libraryDependencies ++= Seq(
+    "org.apache.lucene" % "lucene-core" % luceneVersion,
+    "org.apache.lucene" % "lucene-analyzers-common" % luceneVersion
+  )
+)
+
 lazy val akane = (project in file("."))
   .settings(akaneSettings)
-  .aggregate(ioc, legacy, knp, util, macros, knpAkka, blobdb, akka, dic, kytea, misc)
+  .aggregate(ioc, legacy, knp, util, macros, knpAkka, blobdb, akka, dic, kytea, misc, `jmdict-lucene`)
 
 lazy val ioc = akaneProject("ioc", file("ioc"))
 
@@ -173,3 +183,15 @@ lazy val kytea = akaneProject("kytea", file("kytea"))
 
 lazy val misc = akaneProject("misc", file("misc"))
   .dependsOn(util)
+
+lazy val `jmdict-lucene` = akaneProject("jmdict-lucene", file("dic/jmdict-lucene"))
+  .dependsOn(dic)
+  .settings(luceneDeps,
+    libraryDependencies ++= Seq(
+      "com.github.ben-manes.caffeine" % "caffeine" % "2.3.1",
+      "joda-time" % "joda-time" % "2.9.4",
+      "org.joda" % "joda-convert" % "1.8.1" % Optional
+    )
+  )
+
+
