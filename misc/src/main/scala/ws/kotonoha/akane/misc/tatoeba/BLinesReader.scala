@@ -80,7 +80,7 @@ object BLinesReader {
       recommended = true
     }
 
-    val barIdx = StringUtils.indexOf(data, '|', senseEnd)
+    val barIdx = StringUtils.indexOf(data, '|', 0)
     if (barIdx > 0 && barIdx < hwEnd) {
       hwEnd = barIdx
     }

@@ -60,6 +60,15 @@ class BLinesSpec extends FreeSpec with Matchers {
       unit.surface shouldBe None
     }
 
+    "reads unit は|1[01]" in {
+      val string = "は|1[01]"
+      val unit = BLinesReader.readUnit(string)
+      unit.reading shouldBe None
+      unit.headword shouldBe "は"
+      unit.sense shouldBe 1
+      unit.surface shouldBe None
+    }
+
     "b-line surface can be restored to original sentence" in {
       val bline = "其の[01]{その} 家(いえ)[01] は 可也{かなり} ぼろ屋[01]~ になる[01]{になっている}"
       val original = "その家はかなりぼろ屋になっている"
