@@ -14,26 +14,12 @@
  * limitations under the License.
  */
 
-package ws.kotonoha.dict.jmdict
-
-import org.apache.lucene.util.BytesRefBuilder
-import org.scalatest.{FreeSpec, Matchers}
-import org.scalatest.prop.PropertyChecks
+package ws.kotonoha.akane.dic.lucene.jmdict
 
 /**
   * @author eiennohito
-  * @since 2016/07/29
+  * @since 2016/07/28
   */
-class ValueConverterTest extends FreeSpec with PropertyChecks with Matchers {
-  "value converter" - {
-    "works" in {
-      forAll { (inp: Long) =>
-        val bb = new BytesRefBuilder
-        DataConversion.writeSignedVLong(inp, bb)
-        val lng = DataConversion.readSignedVLong(bb.toBytesRef)
-        lng shouldBe inp
-      }
-    }
-  }
+case class JmdictIdQuery(parts: Seq[IdQueryPart])
 
-}
+case class IdQueryPart(wrs: Seq[String], rds: Seq[String])

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ws.kotonoha.dict.jmdict
+package ws.kotonoha.akane.dic.lucene.jmdict
 
 import java.io.ByteArrayInputStream
 import java.util.concurrent.TimeUnit
@@ -25,12 +25,12 @@ import org.apache.lucene.document.LongPoint
 import org.apache.lucene.index.{IndexReader, Term}
 import org.apache.lucene.search.BooleanClause.Occur
 import org.apache.lucene.search._
+import org.apache.lucene.util.automaton.TooComplexToDeterminizeException
+import org.joda.time.{DateTime, LocalDate}
 import ws.kotonoha.akane.dic.jmdict.JmdictEntry
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionContextExecutor
-import org.apache.lucene.util.automaton.TooComplexToDeterminizeException
-import org.joda.time.{DateTime, LocalDate}
 
 /**
   * @author eiennohito

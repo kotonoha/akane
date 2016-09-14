@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ws.kotonoha.dict.jmdict
+package ws.kotonoha.akane.dic.lucene.jmdict
 
 import java.io.StringReader
 import java.util
