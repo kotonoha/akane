@@ -40,6 +40,30 @@ object KanaUtil {
     }
     buf.toString
   }
+
+  private val binding = {
+    val half = "0123456789" +
+      "abcdefghijklmnopqrstuvwxyz" +
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    val full = "０１２３４５６７８９" +
+      "ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ" +
+      "ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ"
+    UnicodeUtil.stream(half).zip(UnicodeUtil.stream(full)).toMap[Int, Int]
+  }
+
+  def halfToFull(input: String): String = {
+    val bldr = new java.lang.StringBuilder
+    val iter = UnicodeUtil.stream(input)
+    while (iter.hasNext) {
+      val c = iter.next()
+      val cr = binding.get(c) match {
+        case Some(cv) => cv
+        case None => c
+      }
+      bldr.appendCodePoint(cr)
+    }
+    bldr.toString
+  }
 }
 
 

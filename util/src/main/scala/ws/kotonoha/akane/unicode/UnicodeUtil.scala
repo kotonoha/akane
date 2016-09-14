@@ -67,7 +67,8 @@ object UnicodeUtil {
 
   def isKana(s: String): Boolean = stream(s).forall(isKana)
 
-  def hasKanji(s: String) = stream(s).exists(isKanji)
+  def hasKanji(s: String): Boolean = stream(s).exists(isKanji)
+  def hasKanji(s: String, start: Int, end: Int): Boolean = stream(s, start, end).exists(isKanji)
 
   def hasKana(s: String) = stream(s).exists(isKana)
 
@@ -77,24 +78,54 @@ object UnicodeUtil {
 
   def kanji(s: String) = stream(s).filter(isKanji).map(cp => new String(Character.toChars(cp))).toList
 
-  def stream(s: String): Stream[Int] = stream(new StringReader(s))
+  def stream(s: CharSequence): SeqCodepointIterator = stream(s, 0, s.length)
+  def stream(s: CharSequence, start: Int, end: Int): SeqCodepointIterator = new SeqCodepointIterator(s, start, end)
 
-  def stream(r: Reader): Stream[Int] = {
-    def rec(r: Reader): Stream[Int] = {
-      val read = r.read()
-      if (read == -1) {
-        return Stream.Empty
-      }
-      val c = read.toChar
-      if (Character.isHighSurrogate(c)) {
-        Stream.cons(Character.toCodePoint(c, r.read().toChar), rec(r))
-      } else {
-        Stream.cons(read, rec(r))
-      }
-    }
-    rec(r)
+  def stream(r: Reader): CodepointIterator = new ReaderCodepointIterator(r)
+
+  def klen(s: String): Int = stream(s).count(isKanji)
+
+}
+
+trait CodepointIterator extends Iterator[Int]
+
+final class ReaderCodepointIterator(input: Reader) extends CodepointIterator {
+
+  private[this] def computeNext(): Int = {
+    val c1 = input.read()
+    if (c1 == -1) return -1
+    if (Character.isLowSurrogate(c1.toChar)) {
+      val c2 = input.read()
+      if (c2 == -1) return -1
+      Character.toCodePoint(c1.toChar, c2.toChar)
+    } else c1
   }
 
-  def klen(s: String) = stream(s).count(isKanji(_))
+  private[this] var nextCp = computeNext()
+  override def hasNext: Boolean = nextCp == -1
+  override def next(): Int = {
+    val c = nextCp
+    nextCp = computeNext()
+    c
+  }
+}
 
+final class SeqCodepointIterator(input: CharSequence, from: Int, to: Int) extends CodepointIterator {
+  private[this] var position = {
+    if (from >= input.length()) {
+      to
+    } else if (Character.isLowSurrogate(input.charAt(from))) {
+      from + 1
+    } else { from }
+  }
+
+  override def hasNext: Boolean = {
+    position < to
+  }
+
+  override def next(): Int = {
+    val cp = Character.codePointAt(input, position)
+    position += (if (Character.isBmpCodePoint(cp)) 1 else 2)
+    cp
+  }
 }
