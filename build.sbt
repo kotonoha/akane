@@ -94,7 +94,7 @@ lazy val scalamock = "org.scalamock" %% "scalamock-scalatest-support" % "3.2.2"
 lazy val commonDeps = Def.settings(
   libraryDependencies ++= Seq(
     "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
-    scalatest % Test,
+    scalatest % Test, scalamock % Test, scalacheck % Test,
     "ch.qos.logback" % "logback-classic" % "1.1.7" % Test
   )
 )
