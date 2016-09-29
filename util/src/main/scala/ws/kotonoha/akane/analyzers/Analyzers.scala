@@ -40,11 +40,6 @@ trait ToStream[T] {
 }
 
 trait FromStream[T] {
-  /**
-   * Should not wrap IOExceptions into try
-   * @param s
-   * @return
-   */
   def readFrom(s: InputStream): Try[T]
 }
 
