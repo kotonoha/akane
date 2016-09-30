@@ -1,7 +1,6 @@
 package ws.kotonoha.akane.analyzers.jumanpp
 
 import akka.actor.Actor
-import com.typesafe.config.Config
 import ws.kotonoha.akane.analyzers.jumanpp.wire.Lattice
 
 import scala.util.{Failure, Success}
@@ -10,10 +9,10 @@ import scala.util.{Failure, Success}
   * @author eiennohito
   * @since 2016/09/28
   */
-class JumanppActor(conf: Config) extends Actor {
+class JumanppActor(conf: JumanppConfig) extends Actor {
   import JumanppActor._
 
-  lazy val process = JumanppSubprocess.create(JumanppConfig(conf))
+  lazy val process = JumanppSubprocess.create(conf)
 
   override def receive = {
     case AnalyzeRequest(ref, data) =>
