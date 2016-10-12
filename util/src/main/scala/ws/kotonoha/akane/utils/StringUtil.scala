@@ -16,12 +16,28 @@
 
 package ws.kotonoha.akane.utils
 
+import java.nio.ByteBuffer
+import java.nio.charset.Charset
+
 /**
  * @author eiennohito
  * @since 30.10.12 
  */
 
 object StringUtil {
+  def fromByteBuffer(v1: ByteBuffer, cs: Charset): String = {
+    if (v1.hasArray) {
+      val array = v1.array()
+      new String(array, v1.arrayOffset() + v1.position(), v1.remaining(), cs)
+    } else {
+      val arr = new Array[Byte](v1.remaining())
+      val pos = v1.position()
+      v1.get(arr)
+      v1.position(pos)
+      new String(arr, cs)
+    }
+  }
+
   def commonTail(s1: String, s2: String): Int = {
     var l1 = s1.length - 1
     var l2 = s2.length - 1
