@@ -17,6 +17,7 @@
 package ws.kotonoha.akane.kytea
 
 import com.typesafe.config.Config
+import ws.kotonoha.akane.config.AkaneConfig
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -25,7 +26,13 @@ import scala.collection.mutable.ArrayBuffer
   * @since 2016/09/06
   */
 
-case class KyteaConfig(model: Option[String]) {
+case class KyteaConfig(
+  model: Option[String] = None,
+  executable: String = "kytea",
+  wordBound: String = KyteaConfig.wordBound,
+  tagBound: String = KyteaConfig.tagBound,
+  elemBound: String = KyteaConfig.elemBound
+) {
   def cmdline: Seq[String] = {
     val result = new ArrayBuffer[String]()
     model.foreach { mf =>
@@ -41,15 +48,21 @@ case class KyteaConfig(model: Option[String]) {
 }
 
 object KyteaConfig {
+  lazy val default: KyteaConfig = apply(AkaneConfig.default)
+
   import ws.kotonoha.akane.config.ScalaConfig._
   def apply(cfg: Config): KyteaConfig = {
     val subconf = cfg.getConfig("akane.kytea")
 
+    val exec = cfg.strOr("executable", "kytea")
     val model = cfg.optStr("model")
-    KyteaConfig(model)
+    val word = cfg.strOr("word-bound", wordBound)
+    val tag = cfg.strOr("tag-bound", tagBound)
+    val elem = cfg.strOr("elem-bound", elemBound)
+    KyteaConfig(model, exec, word, tag, elem)
   }
 
-  val wordBound = "˥"
-  val tagBound = "˦"
-  val elemBound = "˧"
+  private val wordBound = "˥"
+  private val tagBound = "˦"
+  private val elemBound = "˧"
 }

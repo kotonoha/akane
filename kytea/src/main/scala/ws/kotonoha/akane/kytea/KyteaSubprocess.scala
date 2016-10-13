@@ -16,18 +16,44 @@
 
 package ws.kotonoha.akane.kytea
 
-import ws.kotonoha.akane.analyzers.SyncAnalyzer
+import java.io._
+
+import ws.kotonoha.akane.analyzers.{FromStream, SyncAnalyzer, ToStream}
+import ws.kotonoha.akane.io.Charsets
+import ws.kotonoha.akane.kytea.wire.KyteaSentence
+
+import scala.util.{Failure, Success, Try}
 
 /**
   * @author eiennohito
   * @since 2016/09/06
   */
 
-trait KyteaRaw extends SyncAnalyzer[String, KyteaResult]
-
-case class KyteaResult(morphemes: Seq[KyteaMorpheme])
-case class KyteaMorpheme(parts: Seq[String])
+trait KyteaRaw extends SyncAnalyzer[String, KyteaSentence]
 
 object KyteaSubprocess {
+  def reader(cfg: KyteaConfig): FromStream[KyteaSentence] = new FromStream[KyteaSentence] {
+    private val format = new KyteaFormat(cfg)
+    override def readFrom(s: InputStream): Try[KyteaSentence] = {
+      val rdr = new BufferedReader(new InputStreamReader(s, Charsets.utf8))
+      try {
+        Success(format.parse(rdr.readLine()))
+      } catch {
+        case e: IOException => throw e
+        case e: Exception => Failure(e)
+      }
+    }
+  }
 
+  def writer(): ToStream[String] = new ToStream[String] {
+    override def writeTo(s: OutputStream, obj: String): Unit = {
+      s.write(obj.getBytes(Charsets.utf8))
+      s.write('\n')
+      s.flush()
+    }
+  }
+
+  def process(cfg: KyteaConfig) = {
+    val cmdline = cfg.cmdline
+  }
 }

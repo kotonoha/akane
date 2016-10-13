@@ -128,7 +128,7 @@ lazy val legacy = akaneProject("legacy", file("legacy"))
     libraryDependencies ++= akaneDeps,
     resolvers += "kyouni" at "http://lotus.kuee.kyoto-u.ac.jp/nexus/content/groups/public/"
   ) ++ commonDeps)
-  .dependsOn(util, knpAkka)
+  .dependsOn(util, knpAkka, kytea)
 
 lazy val knp = akaneProject("knp", file("knp"))
   .settings(pbScala())
@@ -179,6 +179,7 @@ lazy val akka = akaneProject("akka", file("akka"))
     .settings(akkaDeps)
 
 lazy val kytea = akaneProject("kytea", file("kytea"))
+  .settings(pbScala())
   .dependsOn(util)
 
 lazy val misc = akaneProject("misc", file("misc"))

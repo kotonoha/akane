@@ -25,29 +25,36 @@ object ScalaConfig {
       case e: ConfigException.Missing => x
     }
 
-    def optDouble(name: String) = opt(conf.getDouble(name))
-    def optStr(name: String) = opt(conf.getString(name))
-    def doubleOr(name: String, default: Double) = optElse(conf.getDouble(name), default)
-    def intOr(name: String, default: Int) = optElse(conf.getInt(name), default)
-    def optBool(name: String): Option[Boolean] = {
-      optName(name, _.getBoolean(name))
+    @inline
+    private[this] def optElse[T](name: String, extract: Config => T, other: => T): T = {
+      if (conf.hasPath(name)) {
+        extract(conf)
+      } else other
     }
 
-    def optInt(name: String): Option[Int] = optName(name, _.getInt(name))
-
     @inline
-    def optName[T](name: String, f: Config => T): Option[T] = {
+    private[this] def optName[T](name: String, f: Config => T): Option[T] = {
       if (conf.hasPath(name)) {
         Some(f(conf))
       } else None
     }
 
-    def finiteDuration(name: String) = {
+    def optDouble(name: String): Option[Double]  = opt(conf.getDouble(name))
+    def optStr(name: String): Option[String] = opt(conf.getString(name))
+    def doubleOr(name: String, default: Double): Double = optElse(conf.getDouble(name), default)
+    def intOr(name: String, default: Int): Int = optElse(conf.getInt(name), default)
+    def strOr(name: String, default: String): String = optElse(name, _.getString(name), default)
+    def optBool(name: String): Option[Boolean] = {
+      optName(name, _.getBoolean(name))
+    }
+
+    def optInt(name: String): Option[Int] = optName(name, _.getInt(name))
+    def finiteDuration(name: String): FiniteDuration = {
       val millis = conf.getDuration(name, TimeUnit.MILLISECONDS)
       FiniteDuration(millis, TimeUnit.MILLISECONDS)
     }
 
-    def optDuration(name: String) = optName(name, cfg => {
+    def optDuration(name: String): Option[FiniteDuration] = optName(name, cfg => {
       finiteDuration(name)
     })
   }

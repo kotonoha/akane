@@ -1,33 +1,35 @@
 package ws.kotonoha.akane.kytea
 
+import ws.kotonoha.akane.kytea.wire.{KyteaSentence, KyteaUnit}
+
 /**
   * @author eiennohito
   * @since 2016/09/12
   */
-object KyteaRenderer {
-  def renderMorhpeme(bldr: Appendable, m: KyteaMorpheme): Unit = {
-    val iter = m.parts.iterator
+class KyteaRenderer(cfg: KyteaConfig) {
+  def renderMorhpeme(bldr: Appendable, m: KyteaUnit): Unit = {
+    val iter = m.fields.iterator
     while (iter.hasNext) {
       val o = iter.next()
       bldr.append(o)
       if (iter.hasNext) {
-        bldr.append(KyteaConfig.tagBound)
+        bldr.append(cfg.tagBound)
       }
     }
   }
 
-  def renderResult(bldr: Appendable, m: KyteaResult): Unit = {
-    val iter = m.morphemes.iterator
+  def renderResult(bldr: Appendable, m: KyteaSentence): Unit = {
+    val iter = m.units.iterator
     while (iter.hasNext) {
       val o = iter.next()
       renderMorhpeme(bldr, o)
       if (iter.hasNext) {
-        bldr.append(KyteaConfig.wordBound)
+        bldr.append(cfg.wordBound)
       }
     }
   }
 
-  def renderResult(m: KyteaResult): String = {
+  def renderResult(m: KyteaSentence): String = {
     val bldr = new java.lang.StringBuilder()
     renderResult(bldr, m)
     bldr.toString

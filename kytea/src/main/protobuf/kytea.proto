@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+option java_package = "ws.kotonoha.akane.kytea.wire";
+
+message KyteaUnit {
+  repeated string fields = 1;
+}
+
+message KyteaSentence {
+  repeated KyteaUnit units = 1;
+}

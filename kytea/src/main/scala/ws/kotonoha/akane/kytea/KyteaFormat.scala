@@ -16,9 +16,8 @@
 
 package ws.kotonoha.akane.kytea
 
-import java.util.regex.Pattern
-
 import org.apache.commons.lang3.StringUtils
+import ws.kotonoha.akane.kytea.wire.{KyteaSentence, KyteaUnit}
 
 import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer
@@ -27,29 +26,40 @@ import scala.collection.mutable.ArrayBuffer
   * @author eiennohito
   * @since 2016/09/06
   */
-object KyteaFormat {
+class KyteaFormat(cfg: KyteaConfig) {
 
-  private val morphemeSplit = Pattern.compile(Pattern.quote(KyteaConfig.tagBound))
+  @tailrec
+  private def parseMorphmemeImpl(buffer: ArrayBuffer[String], line: CharSequence, start: Int): Unit = {
+    val endOfLexeme = StringUtils.indexOf(line, cfg.tagBound, start)
+    if (endOfLexeme == -1) {
+      buffer += line.subSequence(start, line.length()).toString
+    } else {
+      buffer += line.subSequence(start, endOfLexeme).toString
+      parseMorphmemeImpl(buffer, line, endOfLexeme + 1)
+    }
+  }
 
-  private def parseMorpheme(sequence: CharSequence): KyteaMorpheme = {
-    val splitted = morphemeSplit.split(sequence)
-    KyteaMorpheme(splitted)
+
+  def parseMorpheme(sequence: CharSequence): KyteaUnit = {
+    val parts = new ArrayBuffer[String](4)
+    parseMorphmemeImpl(parts, sequence, 0)
+    KyteaUnit(parts)
   }
 
   @tailrec
-  private def parseImpl(buffer: ArrayBuffer[KyteaMorpheme], line: CharSequence, start: Int): Unit = {
-    val endOfLexeme = StringUtils.indexOf(line, KyteaConfig.wordBound, start)
+  private def parseSentenceImpl(buffer: ArrayBuffer[KyteaUnit], line: CharSequence, start: Int): Unit = {
+    val endOfLexeme = StringUtils.indexOf(line, cfg.wordBound, start)
     if (endOfLexeme == -1) {
       buffer += parseMorpheme(line.subSequence(start, line.length()))
     } else {
       buffer += parseMorpheme(line.subSequence(start, endOfLexeme))
-      parseImpl(buffer, line, endOfLexeme)
+      parseSentenceImpl(buffer, line, endOfLexeme + 1)
     }
   }
 
-  def parse(line: CharSequence): Seq[KyteaMorpheme] = {
-    val buffer = new ArrayBuffer[KyteaMorpheme](32)
-    parseImpl(buffer, line, 0)
-    buffer
+  def parse(line: CharSequence): KyteaSentence = {
+    val buffer = new ArrayBuffer[KyteaUnit](32)
+    parseSentenceImpl(buffer, line, 0)
+    KyteaSentence(buffer)
   }
 }
