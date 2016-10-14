@@ -41,7 +41,7 @@ trait AsyncJumanAnalyzer extends AsyncAnalyzer[String, JumanSequence]
  */
 object JumanSubprocess extends StrictLogging {
 
-  def process(config: JumanConfig) = {
+  def process(config: JumanConfig): Process = {
     val lst = new util.ArrayList[String]()
     logger.debug(s"trying to start subprocess juman as: ${config.executable}")
     lst.add(config.executable)
@@ -56,9 +56,9 @@ object JumanSubprocess extends StrictLogging {
     new Impl(config)
   }
 
-  def reader(cfg: JumanConfig) = JumanText.reader(cfg.encoding)
+  def reader(cfg: JumanConfig): FromStream[JumanSequence] = JumanText.reader(cfg.encoding)
 
-  def writer(cfg: JumanConfig) = new ToStream[String] {
+  def writer(cfg: JumanConfig): ToStream[String] = new ToStream[String] {
     val eol = 0x0A //End of line
     val cs = Charset.forName(cfg.encoding)
 

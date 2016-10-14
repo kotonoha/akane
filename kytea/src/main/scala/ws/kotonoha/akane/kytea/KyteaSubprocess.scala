@@ -18,10 +18,12 @@ package ws.kotonoha.akane.kytea
 
 import java.io._
 
+import com.typesafe.scalalogging.StrictLogging
 import ws.kotonoha.akane.analyzers.{FromStream, SyncAnalyzer, ToStream}
 import ws.kotonoha.akane.io.Charsets
 import ws.kotonoha.akane.kytea.wire.KyteaSentence
 
+import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
 /**
@@ -31,7 +33,7 @@ import scala.util.{Failure, Success, Try}
 
 trait KyteaRaw extends SyncAnalyzer[String, KyteaSentence]
 
-object KyteaSubprocess {
+object KyteaSubprocess extends StrictLogging {
   def reader(cfg: KyteaConfig): FromStream[KyteaSentence] = new FromStream[KyteaSentence] {
     private val format = new KyteaFormat(cfg)
     override def readFrom(s: InputStream): Try[KyteaSentence] = {
@@ -53,7 +55,12 @@ object KyteaSubprocess {
     }
   }
 
-  def process(cfg: KyteaConfig) = {
+  def process(cfg: KyteaConfig): Process = {
     val cmdline = cfg.cmdline
+    logger.debug(s"starting kytea from: ${cfg.executable}, model: ${cfg.model}")
+    val pb = new ProcessBuilder(cmdline.asJava)
+    val proc = pb.start()
+    logger.debug(s"started kytea: ${proc.isAlive}")
+    proc
   }
 }

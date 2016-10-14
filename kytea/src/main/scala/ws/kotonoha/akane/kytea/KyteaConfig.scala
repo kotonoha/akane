@@ -35,6 +35,8 @@ case class KyteaConfig(
 ) {
   def cmdline: Seq[String] = {
     val result = new ArrayBuffer[String]()
+    result.append(executable)
+
     model.foreach { mf =>
       result.append("-model", mf)
     }
