@@ -32,6 +32,7 @@ import scala.util.{Failure, Success, Try}
   */
 
 trait KyteaRaw extends SyncAnalyzer[String, KyteaSentence]
+trait KyteaAsync extends AsyncAnalyzer[String, KyteaSentence]
 
 object KyteaSubprocess extends StrictLogging {
   def reader(cfg: KyteaConfig): FromStream[KyteaSentence] = new FromStream[KyteaSentence] {
