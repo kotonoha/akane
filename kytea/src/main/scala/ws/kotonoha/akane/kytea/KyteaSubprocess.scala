@@ -19,7 +19,7 @@ package ws.kotonoha.akane.kytea
 import java.io._
 
 import com.typesafe.scalalogging.StrictLogging
-import ws.kotonoha.akane.analyzers.{FromStream, SyncAnalyzer, ToStream}
+import ws.kotonoha.akane.analyzers._
 import ws.kotonoha.akane.io.Charsets
 import ws.kotonoha.akane.kytea.wire.KyteaSentence
 
@@ -63,4 +63,9 @@ object KyteaSubprocess extends StrictLogging {
     logger.debug(s"started kytea: ${proc.isAlive}")
     proc
   }
+
+  private final class Impl(cfg: KyteaConfig) extends
+    SpawnedProcessAnalyzer[String, KyteaSentence](process(cfg))(writer(), reader(cfg)) with KyteaRaw
+
+  def create(cfg: KyteaConfig): KyteaRaw with SubprocessControls = new Impl(cfg)
 }
