@@ -111,12 +111,21 @@ final class ReaderCodepointIterator(input: Reader) extends CodepointIterator {
 }
 
 final class SeqCodepointIterator(input: CharSequence, from: Int, to: Int) extends CodepointIterator {
-  private[this] var position = {
+  private[this] var position = init()
+
+  private def init() = {
     if (from >= input.length()) {
       to
     } else if (Character.isLowSurrogate(input.charAt(from))) {
       from + 1
-    } else { from }
+    } else {
+      from
+    }
+  }
+
+  def reset(): SeqCodepointIterator = {
+    position = init()
+    this
   }
 
   override def hasNext: Boolean = {
@@ -125,7 +134,7 @@ final class SeqCodepointIterator(input: CharSequence, from: Int, to: Int) extend
 
   override def next(): Int = {
     val cp = Character.codePointAt(input, position)
-    position += (if (Character.isBmpCodePoint(cp)) 1 else 2)
+    position += Character.charCount(cp)
     cp
   }
 }
