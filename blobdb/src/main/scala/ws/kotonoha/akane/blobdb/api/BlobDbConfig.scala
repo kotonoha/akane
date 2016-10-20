@@ -56,6 +56,7 @@ trait BlockWriter {
   def stream: OutputStream
   def position: Long
   def blockAddress: Long
+  def flush(): Unit
 }
 
 trait BlobDbCodec {
@@ -83,6 +84,7 @@ object BlobDbCodec {
       }
       override def position = stream.getFilePointer
       override def blockAddress = stream.getBlockAddress
+      override def flush(): Unit = stream.flush()
     }
   }
 

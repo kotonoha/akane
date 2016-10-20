@@ -82,6 +82,7 @@ class BlDbWriterImpl[K <: AnyRef](impl: BlDbImpl[K], cfg: BlobDbConfig, ops: IdO
       override def stream = wr0.stream
       override def goToDaddy() = returnWriter(self)
       override def commit(refs: Seq[DataRef[_]]) = {
+        wr0.flush()
         val p = Promise[TrOk]
         actor ! DbWriterActor.Commit(refs, p)
         p.future
