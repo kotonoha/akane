@@ -33,6 +33,7 @@ trait IdOps[K <: AnyRef] {
   def checkPrefix(o: K, prefix: Int): Boolean
   def comparator: Comparator[K]
   def serializer: BTreeKeySerializer[K]
+  def debug(x: K): String = x.toString
 }
 
 trait ItemSearch[Key <: AnyRef, +Value] { self =>

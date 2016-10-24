@@ -1,8 +1,9 @@
 package ws.kotonoha.akane.blobdb.impl
 
-import akka.actor.{Actor, ActorLogging, Props}
+import akka.actor.{Actor, Props}
+import com.typesafe.scalalogging.StrictLogging
 import org.mapdb.BTreeMap
-import ws.kotonoha.akane.blobdb.api.{DataRef, TrOk}
+import ws.kotonoha.akane.blobdb.api.{DataRef, IdOps, TrOk}
 
 import scala.concurrent.Promise
 
@@ -10,7 +11,7 @@ import scala.concurrent.Promise
   * @author eiennohito
   * @since 2016/07/19
   */
-private[impl] class DbWriterActor(dbi: DbImplApi[_]) extends Actor with ActorLogging {
+private[impl] class DbWriterActor[K <: AnyRef](dbi: DbImplApi[K], ops: IdOps[K]) extends Actor with StrictLogging {
   @inline
   final def transaction[T](p: Promise[TrOk])(f: => T): Unit = {
     try {
@@ -19,7 +20,7 @@ private[impl] class DbWriterActor(dbi: DbImplApi[_]) extends Actor with ActorLog
       p.success(TrOk)
     } catch {
       case e: Exception =>
-        log.error(e, "can't execute transaction")
+        logger.error("can't execute transaction", e)
         dbi.db.rollback()
         p.failure(e)
     }
@@ -32,13 +33,16 @@ private[impl] class DbWriterActor(dbi: DbImplApi[_]) extends Actor with ActorLog
       ids.foreach(id => idx.remove(id))
     }
     case DbWriterActor.Commit(items, p) => transaction(p) {
-      items.foreach(d => idx.put(d.id.asInstanceOf[AnyRef], d.ptr))
+      items.foreach { d =>
+        //logger.debug(s"insert id=${ops.debug(d.id.asInstanceOf[K])}")
+        idx.put(d.id.asInstanceOf[AnyRef], d.ptr)
+      }
     }
   }
 }
 
 private[impl] object DbWriterActor {
-  def props(impl: DbImplApi[_]): Props = Props(new DbWriterActor(impl))
+  def props[K <: AnyRef](impl: DbImplApi[K]): Props = Props(new DbWriterActor[K](impl, impl.ops))
 
   case class Delete(ids: Seq[AnyRef], p: Promise[TrOk])
   case class Commit(data: Seq[DataRef[_]], p: Promise[TrOk])

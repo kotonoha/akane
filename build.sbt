@@ -157,7 +157,7 @@ lazy val blobdb = akaneProject("blobdb", file("blobdb"))
   .dependsOn(util)
   .settings(
     libraryDependencies ++= Seq(
-      "org.mapdb" % "mapdb" % "1.0.8",
+      "org.mapdb" % "mapdb" % "1.0.9",
       "com.github.ben-manes.caffeine" % "caffeine" % "2.3.2",
       "net.jpountz.lz4" % "lz4" % "1.3.0",
       akkaDep
