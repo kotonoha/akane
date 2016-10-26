@@ -69,7 +69,7 @@ def akaneProject(projName: String, basePath: File) = {
 val luceneVersion = "6.2.0"
 
 
-lazy val akkaDep = "com.typesafe.akka" %% "akka-actor" % "2.4.10"
+lazy val akkaDep = "com.typesafe.akka" %% "akka-actor" % "2.4.11"
 
 
 lazy val akaneDeps = Seq(
