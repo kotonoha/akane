@@ -1,21 +1,14 @@
-import com.trueaccord.scalapb.{ScalaPbPlugin => PB}
-
-val scalaPbVersion = "0.5.32"
+lazy val scalaPbVersion = "0.5.43"
 
 def pbScala(): Seq[Setting[_]] = {
-  val config = PB.protobufSettings ++ Seq(
-    PB.flatPackage in PB.protobufConfig := true,
-    PB.javaConversions in PB.protobufConfig := true,
-    PB.scalapbVersion := scalaPbVersion,
-    PB.runProtoc in PB.protobufConfig := (args =>
-      com.github.os72.protocjar.Protoc.runProtoc("-v300" +: args.toArray))
-  )
-
-  val runtimeDep =
-    libraryDependencies += "com.trueaccord.scalapb" %% "scalapb-runtime" % scalaPbVersion % PB.protobufConfig
-
-  config ++ Seq(
-    runtimeDep
+  Def.settings(
+    PB.targets in Compile := Seq(
+      scalapb.gen(flatPackage = true, javaConversions = true, grpc = true) -> (sourceManaged in Compile).value,
+      PB.gens.java -> (sourceManaged in Compile).value
+    ),
+    libraryDependencies ++= Seq(
+      "com.trueaccord.scalapb" %% "scalapb-runtime" % scalaPbVersion % "protobuf"
+    )
   )
 }
 
@@ -87,8 +80,8 @@ lazy val akaneDeps = Seq(
   akkaDep
 )
 
-lazy val scalatest = "org.scalatest" %% "scalatest" % "2.2.6"
-lazy val scalacheck = "org.scalacheck" %% "scalacheck" % "1.12.5"
+lazy val scalatest = "org.scalatest" %% "scalatest" % "3.0.0"
+lazy val scalacheck = "org.scalacheck" %% "scalacheck" % "1.13.4"
 lazy val scalamock = "org.scalamock" %% "scalamock-scalatest-support" % "3.2.2"
 
 lazy val commonDeps = Def.settings(
