@@ -16,15 +16,14 @@
 
 package ws.kotonoha.akane.juman
 
-import org.scalatest.FreeSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{FreeSpec, Matchers}
 
 /**
  * @author eiennohito
  * @since 16.08.12
  */
 
-class JumanPipeExecutorTest extends FreeSpec with ShouldMatchers{
+class JumanPipeExecutorTest extends FreeSpec with Matchers {
  "juman" - {
    "runs and parses" in {
      val ex = JumanPipeExecutor() // should be in path

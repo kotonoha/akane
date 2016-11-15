@@ -16,15 +16,14 @@
 
 package ws.kotonoha.akane.unicode
 
-import org.scalatest.FreeSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{FreeSpec, Matchers}
 
 /**
  * @author eiennohito
  * @since 22.10.12 
  */
 
-class KanaUtilTest extends FreeSpec with ShouldMatchers {
+class KanaUtilTest extends FreeSpec with Matchers {
   "KanaUtil" - {
     "converts katakana string to hiragana" in {
       val ks = "アメリカ"

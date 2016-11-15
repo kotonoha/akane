@@ -22,7 +22,7 @@ import ws.kotonoha.akane.xml.{WhitespaceFilter, XmlParser, XmlParseTransformer}
 import scalax.file.Path
 
 
-class JMDictParserTest extends org.scalatest.FunSuite with org.scalatest.matchers.ShouldMatchers {
+class JMDictParserTest extends org.scalatest.FunSuite with org.scalatest.Matchers {
   import XmlParser._
 
   def p(s: String): XmlParseTransformer = {

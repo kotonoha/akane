@@ -16,9 +16,10 @@
 
 package ws.kotonoha.akane.ruby
 
-import ws.kotonoha.akane.ast.{RubyNode, ListNode, StringNode}
+import org.scalatest.{FunSuite, Matchers}
+import ws.kotonoha.akane.ast.{ListNode, RubyNode, StringNode}
 
-class AfterLexicalTest extends org.scalatest.FunSuite with org.scalatest.matchers.ShouldMatchers {
+class AfterLexicalTest extends FunSuite with Matchers {
   test("makes kana node from kana soruce") {
     AfterLexical.makeNode("ばか", "ばか") should equal (StringNode("ばか"))
   }

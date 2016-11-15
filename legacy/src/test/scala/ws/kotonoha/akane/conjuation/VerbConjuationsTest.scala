@@ -16,15 +16,14 @@
 
 package ws.kotonoha.akane.conjuation
 
-import org.scalatest.FreeSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{FreeSpec, Matchers}
 
 /**
  * @author eiennohito
  * @since 13.11.12 
  */
 
-class VerbConjuationsTest extends FreeSpec with ShouldMatchers {
+class VerbConjuationsTest extends FreeSpec with Matchers {
 
   "conjuator" - {
     val taberu = Verb.ichidan("食べる")

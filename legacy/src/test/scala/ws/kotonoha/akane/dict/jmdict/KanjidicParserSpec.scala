@@ -16,8 +16,7 @@
 
 package ws.kotonoha.akane.dict.jmdict
 
-import org.scalatest.FreeSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{FreeSpec, Matchers}
 import ws.kotonoha.akane.dict.kanjidic2.Kanjidic2Parser
 
 /**
@@ -25,7 +24,7 @@ import ws.kotonoha.akane.dict.kanjidic2.Kanjidic2Parser
  * @since 17.01.13 
  */
 
-class KanjidicParserSpec extends FreeSpec with ShouldMatchers {
+class KanjidicParserSpec extends FreeSpec with Matchers {
 
   "kradfile parser" - {
     "parses something" in {

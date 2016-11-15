@@ -19,7 +19,9 @@ package ws.kotonoha.akane.xml
 import javax.xml.stream.XMLInputFactory
 import java.io.ByteArrayInputStream
 
-class XmlParserTest extends org.scalatest.FunSuite with org.scalatest.matchers.ShouldMatchers {
+import org.scalatest.{FunSuite, Matchers}
+
+class XmlParserTest extends FunSuite with Matchers {
   def p(s: String) = {
     val fact = XMLInputFactory.newInstance()
     fact.setProperty(XMLInputFactory.IS_VALIDATING, false)
@@ -34,7 +36,7 @@ class XmlParserTest extends org.scalatest.FunSuite with org.scalatest.matchers.S
     s.push("test")
     s.top should equal (List("test"))
     s.pop()
-    evaluating { s.top } should produce[NoSuchElementException]
+    an[NoSuchElementException] should be thrownBy { s.top }
   }
 
   test("xmlparser matches successfully") {

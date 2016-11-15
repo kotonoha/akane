@@ -17,7 +17,6 @@
 package ws.kotonoha.akane.parser
 
 import org.scalatest.{Matchers, FreeSpec}
-import org.scalatest.matchers.ShouldMatchers
 import scalax.io.{Codec, Resource}
 
 /**

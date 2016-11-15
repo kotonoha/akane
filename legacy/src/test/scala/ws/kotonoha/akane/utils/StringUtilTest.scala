@@ -16,15 +16,14 @@
 
 package ws.kotonoha.akane.utils
 
-import org.scalatest.FreeSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{FreeSpec, Matchers}
 
 /**
  * @author eiennohito
  * @since 30.10.12 
  */
 
-class StringUtilTest extends FreeSpec with ShouldMatchers {
+class StringUtilTest extends FreeSpec with Matchers {
   "common tail" - {
     "returns 3 on mayhem and anhem" in {
       StringUtil.commonTail("mayhem", "anhem") should equal (3)

@@ -16,8 +16,7 @@
 
 package ws.kotonoha.akane.pipe.knp.lisp
 
-import org.scalatest.FreeSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{FreeSpec, Matchers}
 
 import scala.util.parsing.input.{CharSequenceReader, Reader, StreamReader}
 import java.io.InputStreamReader
@@ -28,7 +27,7 @@ import ws.kotonoha.akane.helpers.lisp.{KAtom, KItems, LispParser}
  * @author eiennohito
  * @since 2013-09-04
  */
-class LispParserTest extends FreeSpec with ShouldMatchers {
+class LispParserTest extends FreeSpec with Matchers {
 
   implicit def input(s: String): Reader[Char] = {
     new CharSequenceReader(s, 0)

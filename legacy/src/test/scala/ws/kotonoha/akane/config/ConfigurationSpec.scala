@@ -16,12 +16,11 @@
 
 package ws.kotonoha.akane.config
 
-import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.FreeSpec
+import org.scalatest.{FreeSpec, Matchers}
 import com.typesafe.config.ConfigFactory
 
 
-class ConfigurationSpec extends FreeSpec with ShouldMatchers {
+class ConfigurationSpec extends FreeSpec with Matchers {
   "config" - {
     "make candidates with hostname" in {
       val name = "addr"

@@ -16,8 +16,7 @@
 
 package ws.kotonoha.akane.transform
 
-import org.scalatest.FreeSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{FreeSpec, Matchers}
 import ws.kotonoha.akane.parser.{AozoraParser, AozoraStringInput}
 import ws.kotonoha.akane.juman.JumanPipeExecutor
 import ws.kotonoha.akane.ast.Sentence
@@ -27,7 +26,7 @@ import ws.kotonoha.akane.ast.Sentence
  * @since 17.08.12
  */
 
-class JumanTransformerTest extends FreeSpec with ShouldMatchers{
+class JumanTransformerTest extends FreeSpec with Matchers {
   "juman transformer" - {
     "parses something" in {
       val pe = JumanPipeExecutor()

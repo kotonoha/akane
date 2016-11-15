@@ -17,7 +17,6 @@
 package ws.kotonoha.akane.pipe.knp
 
 import org.scalatest.{FreeSpec, Matchers}
-import org.scalatest.matchers.ShouldMatchers
 import ws.kotonoha.akane.pipe.knp.lisp._
 
 import scala.util.parsing.input.{CharSequenceReader, Reader}
