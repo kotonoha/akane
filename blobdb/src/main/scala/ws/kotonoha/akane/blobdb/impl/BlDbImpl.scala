@@ -2,6 +2,7 @@ package ws.kotonoha.akane.blobdb.impl
 
 import java.io.{Closeable, RandomAccessFile}
 import java.nio.ByteBuffer
+import java.nio.file.Path
 import java.util.concurrent.{ConcurrentHashMap, TimeUnit}
 
 import com.github.benmanes.caffeine.cache.Caffeine
@@ -44,10 +45,10 @@ class BlDbImpl[Key <: AnyRef](cfg: BlobDbConfig, val ops: IdOps[Key], defaultTra
       .build[BufferPointer, DecompressedBuffer]
   }
 
-  protected def root = cfg.root
-  protected val indexPath = root.resolve("index.db")
+  protected def root: Path = cfg.root
+  protected val indexPath: Path = root.resolve("index.db")
 
-  protected[impl] val db = {
+  protected[impl] val db: DB = {
     import language.existentials
     val f = DBMaker.newFileDB(indexPath.toFile)
     f.mmapFileEnableIfSupported()
@@ -79,7 +80,7 @@ class BlDbImpl[Key <: AnyRef](cfg: BlobDbConfig, val ops: IdOps[Key], defaultTra
 
   private[this] val treeBuffers = new ConcurrentHashMap[Int, MapBufferWithCache]()
 
-  protected[impl] val index = db.createTreeMap("index")
+  protected[impl] val index: BTreeMap[Key, BlobIndexEntry] = db.createTreeMap("index")
     .keySerializer(ops.serializer)
     .valueSerializer(new SentenceIndexEntrySerializer)
     .comparator(ops.comparator)
@@ -166,12 +167,12 @@ private[impl] final class DefaultSearchImpl[Key <: AnyRef, T](dbi: DbImplApi[Key
     try {
       val res = doRead(ptr)
       if (res.isEmpty) {
-        logger.warn(s"$rc could not read data id=$id")
+        logger.warn(s"$rc could not read data id=${dbi.ops.debug(id)}")
       }
       res
     } catch {
       case e: Exception =>
-        logger.error(s"couldn't deserialize data id=$id", e)
+        logger.error(s"couldn't deserialize data id=${dbi.ops.debug(id)}", e)
         None
     }
   }

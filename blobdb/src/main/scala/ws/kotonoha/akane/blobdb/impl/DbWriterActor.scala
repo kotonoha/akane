@@ -32,11 +32,12 @@ private[impl] class DbWriterActor[K <: AnyRef](dbi: DbImplApi[K], ops: IdOps[K])
     case DbWriterActor.Delete(ids, p) => transaction(p) {
       ids.foreach(id => idx.remove(id))
     }
-    case DbWriterActor.Commit(items, p) => transaction(p) {
+    case DbWriterActor.Commit(items, p, fileNo) => transaction(p) {
       items.foreach { d =>
         //logger.debug(s"insert id=${ops.debug(d.id.asInstanceOf[K])}")
         idx.put(d.id.asInstanceOf[AnyRef], d.ptr)
       }
+      dbi.invalidateShard(fileNo)
     }
   }
 }
@@ -45,6 +46,6 @@ private[impl] object DbWriterActor {
   def props[K <: AnyRef](impl: DbImplApi[K]): Props = Props(new DbWriterActor[K](impl, impl.ops))
 
   case class Delete(ids: Seq[AnyRef], p: Promise[TrOk])
-  case class Commit(data: Seq[DataRef[_]], p: Promise[TrOk])
+  case class Commit(data: Seq[DataRef[_]], p: Promise[TrOk], fileNo: Int)
 }
 

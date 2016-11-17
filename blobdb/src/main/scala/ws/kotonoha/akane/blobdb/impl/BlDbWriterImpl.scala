@@ -84,7 +84,7 @@ class BlDbWriterImpl[K <: AnyRef](impl: BlDbImpl[K], cfg: BlobDbConfig, ops: IdO
       override def commit(refs: Seq[DataRef[_]]) = {
         wr0.flush()
         val p = Promise[TrOk]
-        actor ! DbWriterActor.Commit(refs, p)
+        actor ! DbWriterActor.Commit(refs, p, fileNo)
         p.future
       }
     }

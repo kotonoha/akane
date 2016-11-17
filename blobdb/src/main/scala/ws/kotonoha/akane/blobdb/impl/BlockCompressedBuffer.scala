@@ -23,13 +23,13 @@ final class LargeFileMemoryMapper(raf: RandomAccessFile, file: FileChannel, mode
     file.close()
   }
 
-  val pageSize = 1 << pageOffset
-  val mapSize = pageSize + overlap
+  private val pageSize = 1 << pageOffset
+  private val mapSize = pageSize + overlap
 
 
   type Buffers = Array[BufferDescription]
 
-  val buffers = new AtomicReference[Buffers](createBuffers)
+  private val buffers = new AtomicReference[Buffers](createBuffers)
 
   private def createBuffers: Buffers = {
     val sz = file.size()
@@ -67,9 +67,9 @@ final class LargeFileMemoryMapper(raf: RandomAccessFile, file: FileChannel, mode
 
   private val mask: Long = pageSize - 1
 
-  private var mySize = raf.length()
+  @volatile private var mySize = raf.length()
 
-  def invalidate() = {
+  def invalidate(): Unit = {
     val len = raf.length()
     if (len != mySize) synchronized {
       buffers.set(null)
@@ -88,11 +88,11 @@ final class LargeFileMemoryMapper(raf: RandomAccessFile, file: FileChannel, mode
 class CompressedFileBlockReader(mapper: LargeFileMemoryMapper) extends Closeable {
   override def close() = mapper.close()
 
-  def read(ptr: Long, reader: BlockReader) = {
+  def read(ptr: Long, reader: BlockReader): DecompressedBuffer = {
     mapper.withBuffer(ptr)(reader.readBlock)
   }
 
-  def invalidate() = mapper.invalidate()
+  def invalidate(): Unit = mapper.invalidate()
 }
 
 
@@ -116,8 +116,8 @@ class SentenceIndexEntrySerializer extends Serializer[BlobIndexEntry] with Seria
 case class DecompressedBuffer(compressedSize: Int, data: Array[Byte])
 
 class MapBufferWithCache(fileNo: Int, raf: RandomAccessFile, val reader: BlockReader, cache: Cache[BufferPointer, DecompressedBuffer]) extends Closeable {
-  val chan = raf.getChannel
-  val rdr = new CompressedFileBlockReader(new LargeFileMemoryMapper(raf, chan, MapMode.READ_ONLY, 29, 128 * 1024))
+  private val chan = raf.getChannel
+  private val rdr = new CompressedFileBlockReader(new LargeFileMemoryMapper(raf, chan, MapMode.READ_ONLY, 29, 128 * 1024))
 
 
   def block(ptr: Long, reader: BlockReader): DecompressedBuffer = {
@@ -129,7 +129,7 @@ class MapBufferWithCache(fileNo: Int, raf: RandomAccessFile, val reader: BlockRe
     })
   }
 
-  def invalidate() = {
+  def invalidate(): Unit = {
     rdr.invalidate()
   }
 
