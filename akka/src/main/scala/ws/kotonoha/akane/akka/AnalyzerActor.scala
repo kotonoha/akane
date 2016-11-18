@@ -43,6 +43,10 @@ class AnalyzerActor[I: ClassTag, O](factory: => SyncAnalyzer[I, O] with Subproce
 }
 
 object AnalyzerActor {
+  def props[I: ClassTag, O](factory: => SyncAnalyzer[I, O] with SubprocessControls): Props = {
+    Props(new AnalyzerActor(factory))
+  }
+
   case class Request[I](ref: AnyRef, data: I)
   case class Reply[O](ref: AnyRef, data: O)
   case class Failure(ref: AnyRef, ex: Throwable)
@@ -53,7 +57,7 @@ object AnalyzerActor {
 class ActorBackedAsyncAnalyzer[I: ClassTag, O](arf: ActorRefFactory, factory: => SyncAnalyzer[I, O] with SubprocessControls, concurrency: Int) extends AsyncAnalyzer[I, O] {
 
   val actor: ActorRef = {
-    val props = Props(new AnalyzerActor[I, O](factory))
+    val props = AnalyzerActor.props(factory)
     val realProps = if (concurrency == 1) {
       props
     } else {
@@ -71,5 +75,11 @@ class ActorBackedAsyncAnalyzer[I: ClassTag, O](arf: ActorRefFactory, factory: =>
       case AnalyzerActor.Reply(_, d) => d.asInstanceOf[O]
       case AnalyzerActor.Failure(_, t) => throw t
     }
+  }
+}
+
+object ActorBackedAsyncAnalyzer {
+  def create[I: ClassTag, O](arf: ActorRefFactory, factory: SyncAnalyzer[I, O] with SubprocessControls, concurrrency: Int): AsyncAnalyzer[I, O] = {
+    new ActorBackedAsyncAnalyzer[I, O](arf, factory, concurrrency)
   }
 }

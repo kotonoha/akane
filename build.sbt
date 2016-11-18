@@ -144,7 +144,7 @@ lazy val macros = akaneProject("macros", file("macros"))
 
 lazy val knpAkka = akaneProject("knp-akka", file("knp-akka"))
   .settings(akkaDeps)
-  .dependsOn(knp, testkit % Test)
+  .dependsOn(knp, akka, testkit % Test)
 
 lazy val blobdb = akaneProject("blobdb", file("blobdb"))
   .dependsOn(util)

@@ -10,7 +10,7 @@ trait PosCheck extends Serializable {
   def check(lex: PosAccess): Boolean
   def check(pos: JumanStylePos): Boolean
 
-  def unapply(lex: LexemeApi): Option[LexemeApi] = {
+  def unapply[T <: LexemeApi](lex: T): Option[T] = {
     if (check(lex)) {
       Some(lex)
     } else None

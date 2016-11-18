@@ -54,7 +54,7 @@ object KyteaConfig {
 
   import ws.kotonoha.akane.config.ScalaConfig._
   def apply(cfg: Config): KyteaConfig = {
-    val subconf = cfg.getConfig("akane.kytea")
+    val subconf = cfg.withFallback(AkaneConfig.default).getConfig("akane.kytea")
 
     val exec = cfg.strOr("executable", "kytea")
     val model = cfg.optStr("model")

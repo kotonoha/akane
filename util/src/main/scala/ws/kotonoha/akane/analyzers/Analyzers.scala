@@ -25,11 +25,17 @@ import scala.util.Try
  * @author eiennohito
  * @since 2015/09/10
  */
-trait SyncAnalyzer[I, O] {
+trait AnalyzerCore[I, O] {
+  type Input = I
+  type Output = O
+}
+
+
+trait SyncAnalyzer[I, O] extends AnalyzerCore[I, O] {
   def analyzeSync(input: I): Try[O]
 }
 
-trait AsyncAnalyzer[I, O] {
+trait AsyncAnalyzer[I, O] extends AnalyzerCore[I, O] {
   def analyze(input: I)(implicit ec: ExecutionContext): Future[O]
 }
 
