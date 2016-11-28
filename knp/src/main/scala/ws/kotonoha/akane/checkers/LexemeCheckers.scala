@@ -32,6 +32,10 @@ final class PosAndLexemeChecker(pc: PosCheck, other: LexemeChecker) extends Lexe
   }
 }
 
+final class CanonicalFormChecker(form: String) extends LexemeChecker {
+  override def check(lex: LexemeApi): Boolean = lex.canonicForm().equals(form)
+}
+
 object LexemeCheckers {
   implicit def posChecker2LexemeChecher(pc: PosCheck): LexemeChecker = new PosLexemeChecker(pc)
 
