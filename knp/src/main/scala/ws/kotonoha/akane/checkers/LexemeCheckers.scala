@@ -10,7 +10,7 @@ import scala.languageFeature.implicitConversions
   * @since 2016/01/15
   */
 
-trait LexemeChecker extends Serializable{
+trait LexemeChecker extends Serializable {
   def check(lex: LexemeApi): Boolean
 }
 
