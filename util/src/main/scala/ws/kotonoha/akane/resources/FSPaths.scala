@@ -16,7 +16,7 @@
 
 package ws.kotonoha.akane.resources
 
-import java.io.{BufferedReader, Closeable, IOException, InputStreamReader}
+import java.io.{BufferedReader, Closeable, IOException, InputStream, InputStreamReader, OutputStream}
 import java.nio.charset.Charset
 import java.nio.file._
 import java.nio.file.attribute.{BasicFileAttributes, FileTime}
@@ -65,7 +65,7 @@ object FSPaths {
     }
   }
 
-  def recursiveDelete(path: Path) = {
+  def recursiveDelete(path: Path): Path = {
     Files.walkFileTree(path, new SimpleFileVisitor[Path] {
       override def visitFile(file: Path, attrs: BasicFileAttributes) = {
         Files.delete(file)
@@ -83,7 +83,7 @@ object FSPaths {
     })
   }
 
-  def deleteChildren(path: Path) = {
+  def deleteChildren(path: Path): Unit = {
     val stream = Files.newDirectoryStream(path)
 
     for (s <- stream.res) {
@@ -136,7 +136,7 @@ object FSPaths {
   def writeStrings(p: Path, strings: TraversableOnce[String], separator: String, enc: Charset): Path = {
     try {
       val ret = Files.write(p, new java.lang.Iterable[String] {
-        val iter = strings.toIterator
+        val iter: Iterator[String] = strings.toIterator
         override def iterator = new java.util.Iterator[String] {
           private var haveSep = false
           override def hasNext = iter.hasNext || haveSep
@@ -213,29 +213,29 @@ object FSPaths {
   }
 
   implicit class RichPath(val p: Path) extends AnyVal {
-    def modTime = Files.getLastModifiedTime(p)
-    def fileSize = Files.size(p)
-    def exists = Files.exists(p)
-    def notExists = Files.notExists(p)
-    def delete() = Files.delete(p)
+    def modTime: FileTime = Files.getLastModifiedTime(p)
+    def fileSize: Long = Files.size(p)
+    def exists: Boolean = Files.exists(p)
+    def notExists: Boolean = Files.notExists(p)
+    def delete(): Unit = Files.delete(p)
     def parent: Option[Path] = Option(p.getParent)
     def name: String = p.getFileName.toString
-    def extension = FSPaths.extension(p)
-    def deleteIfExists() = Files.deleteIfExists(p)
-    def copyTo(p2: Path) = Files.copy(p, p2)
-    def moveTo(p2: Path) = Files.move(p, p2)
+    def extension: String = FSPaths.extension(p)
+    def deleteIfExists(): Boolean = Files.deleteIfExists(p)
+    def copyTo(p2: Path): Path = Files.copy(p, p2)
+    def moveTo(p2: Path): Path = Files.move(p, p2)
     def lines(enc: Charset = utf8): CloseableIterator[String] = wrapStream(Files.lines(p, enc))
-    def ensureDirectory() = FSPaths.ensureDir(p)
-    def ensureParent() = FSPaths.ensureParent(p)
-    def outputStream(openOption: OpenOption*) = Files.newOutputStream(p, openOption: _*).res
+    def ensureDirectory(): Path = FSPaths.ensureDir(p)
+    def ensureParent(): Path = FSPaths.ensureParent(p)
+    def outputStream(openOption: OpenOption*): AutoClosableWrapper[OutputStream] = Files.newOutputStream(p, openOption: _*).res
     def walk(globPattern: String): CloseableIterator[Path] = FSPaths.recursiveWalk(p, globPattern)
 
-    def mkdirs() = Files.createDirectories(p)
+    def mkdirs(): Path = Files.createDirectories(p)
 
 
-    def inputStream = Files.newInputStream(p).res
+    def inputStream: AutoClosableWrapper[InputStream] = Files.newInputStream(p).res
     def framedBy(sep: Array[Byte]): FrameAdapter = FrameAdapter.apply(p.inputStream.obj, sep)
-    def bufferedReader(cs: Charset = utf8) = {
+    def bufferedReader(cs: Charset = utf8): AutoClosableWrapper[BufferedReader] = {
       val stream = Files.newInputStream(p)
       val rdr = new InputStreamReader(stream, cs)
       val brdr = new BufferedReader(rdr)
@@ -249,16 +249,16 @@ object FSPaths {
     def writeLines(lines: TraversableOnce[String], enc: Charset = utf8): Path = FSPaths.writeLines(p, lines, enc)
     def writeStrings(strings: TraversableOnce[String], separator: String, enc: Charset = utf8): Path = FSPaths.writeStrings(p, strings, separator, enc)
 
-    def / (s: String) = p.resolve(s)
-    def / (px: Path) = p.resolve(px)
+    def / (s: String): Path = p.resolve(s)
+    def / (px: Path): Path = p.resolve(px)
   }
 
   implicit class RichFileTime(val t: FileTime) extends AnyVal {
-    def < (o: FileTime) = t.compareTo(o) < 0
-    def > (o: FileTime) = t.compareTo(o) > 0
+    def < (o: FileTime): Boolean = t.compareTo(o) < 0
+    def > (o: FileTime): Boolean = t.compareTo(o) > 0
   }
 
-  val utf8 = Charset.forName("utf-8")
+  val utf8: Charset = Charset.forName("utf-8")
 
   private def wrapStream[T](str: java.util.stream.Stream[T]): CloseableIterator[T] = new StreamClosableIterator(str)
 }
