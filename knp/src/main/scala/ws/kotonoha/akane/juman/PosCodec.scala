@@ -44,7 +44,7 @@ object PosCodec {
   private val posset = JumanPosSet.default
 
   def parsePosEntry(line: String, start: Int, end: Int): JumanPos = {
-    val parts = line.split("-")
+    val parts = line.substring(start, end).split("-")
     if (parts.length != 4) {
       throw new Exception(s"$line was invalid pos tag")
     }
