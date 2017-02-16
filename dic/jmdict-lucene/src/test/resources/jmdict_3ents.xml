@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<JMdict>
+  <entry>
+    <ent_seq>1000885</ent_seq>
+    <k_ele>
+      <keb>嘶く</keb>
+    </k_ele>
+    <r_ele>
+      <reb>いななく</reb>
+    </r_ele>
+    <sense>
+      <pos>&v5k;</pos>
+      <pos>&vi;</pos>
+      <gloss>to neigh</gloss>
+      <gloss xml:lang="dut">{馬が} hinniken</gloss>
+      <gloss xml:lang="dut">{驢馬が} balken</gloss>
+      <gloss xml:lang="dut">iaën</gloss>
+      <gloss xml:lang="ger">wiehern</gloss>
+      <gloss xml:lang="ger">iahen</gloss>
+      <gloss xml:lang="hun">nyerít</gloss>
+      <gloss xml:lang="rus">ржать</gloss>
+    </sense>
+  </entry>
+  <entry>
+    <ent_seq>1000890</ent_seq>
+    <k_ele>
+      <keb>嘶き</keb>
+    </k_ele>
+    <r_ele>
+      <reb>いななき</reb>
+    </r_ele>
+    <sense>
+      <pos>&n;</pos>
+      <misc>&uk;</misc>
+      <gloss>neigh</gloss>
+      <gloss>whinny</gloss>
+      <gloss>bray</gloss>
+      <gloss xml:lang="ger">(n) Wiehern</gloss>
+      <gloss xml:lang="ger">(n) Gewieher</gloss>
+      <gloss xml:lang="rus">ржание</gloss>
+    </sense>
+  </entry>
+  <entry>
+    <ent_seq>1000900</ent_seq>
+    <r_ele>
+      <reb>いびる</reb>
+    </r_ele>
+    <sense>
+      <pos>&v5r;</pos>
+      <pos>&vt;</pos>
+      <gloss>to pick on</gloss>
+      <gloss>to tease</gloss>
+      <gloss xml:lang="ger">ärgern</gloss>
+      <gloss xml:lang="ger">mobben</gloss>
+      <gloss xml:lang="ger">misshandeln</gloss>
+      <gloss xml:lang="ger">belästigen</gloss>
+      <gloss xml:lang="ger">quälen</gloss>
+      <gloss xml:lang="ger">drangsalieren</gloss>
+      <gloss xml:lang="ger">martern</gloss>
+      <gloss xml:lang="ger">übel mitspielen</gloss>
+      <gloss xml:lang="ger">schinden</gloss>
+      <gloss xml:lang="ger">plagen</gloss>
+      <gloss xml:lang="hun">kiszúr</gloss>
+      <gloss xml:lang="hun">pikkel vkire</gloss>
+      <gloss xml:lang="hun">utazik vkire</gloss>
+      <gloss xml:lang="hun">kötekedik</gloss>
+      <gloss xml:lang="ita">prendersela con qualcuno</gloss>
+      <gloss xml:lang="ita">canzonare, tormentare, maltrattare</gloss>
+      <gloss xml:lang="rus">(を) (прост.) мучить (кого-л.); издеваться (над кем-л.)</gloss>
+    </sense>
+  </entry>
+  <entry>
+    <ent_seq>1000920</ent_seq>
+    <r_ele>
+      <reb>いらっしゃい</reb>
+      <re_pri>spec1</re_pri>
+    </r_ele>
+    <r_ele>
+      <reb>いらしゃい</reb>
+      <re_inf>&ik;</re_inf>
+    </r_ele>
+    <sense>
+      <pos>&int;</pos>
+      <pos>&n;</pos>
+      <xref>いらっしゃる・1</xref>
+      <misc>&hon;</misc>
+      <s_inf>used as a polite imperative</s_inf>
+      <gloss>come</gloss>
+      <gloss>go</gloss>
+      <gloss>stay</gloss>
+      <gloss xml:lang="dut">(1) Kom binnen!</gloss>
+      <gloss xml:lang="dut">Entrez!</gloss>
+      <gloss xml:lang="dut">Wandel maar binnen!</gloss>
+      <gloss xml:lang="dut">(2) Welkom!</gloss>
+      <gloss xml:lang="ger">(1) Willkommen!</gloss>
+      <gloss xml:lang="ger">(2) Herzlich willkommen!</gloss>
+      <gloss xml:lang="ger">(3) Bitte!</gloss>
+      <gloss xml:lang="hun">fogadtatás</gloss>
+      <gloss xml:lang="hun">szívesen látott</gloss>
+      <gloss xml:lang="ita">(usato come imperativo gentile) venga</gloss>
+      <gloss xml:lang="ita">vada</gloss>
+      <gloss xml:lang="ita">resti</gloss>
+      <gloss xml:lang="ita">benvenuto!</gloss>
+      <gloss xml:lang="slv">dobrodošli</gloss>
+      <gloss xml:lang="spa">(1) (usado como imperativo cortés) ven</gloss>
+      <gloss xml:lang="spa">ves</gloss>
+      <gloss xml:lang="spa">quedate</gloss>
+      <gloss xml:lang="spa">(2) bienvenido!</gloss>
+    </sense>
+    <sense>
+      <xref>いらっしゃいませ</xref>
+      <gloss>welcome!</gloss>
+    </sense>
+  </entry>
+</JMdict>

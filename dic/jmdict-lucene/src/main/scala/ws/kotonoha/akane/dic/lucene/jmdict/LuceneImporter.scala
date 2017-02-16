@@ -162,8 +162,8 @@ object LuceneImporter {
   def parseLanguageInfo(base64repr: String): LangFrequencyPack = {
     if (base64repr == null || base64repr.isEmpty) return LangFrequencyPack.defaultInstance
 
-    val bytes = base64repr.getBytes(Charsets.utf8)
-    LangFrequencyPack.parseFrom(bytes)
+    val decoded = Base64.getDecoder.decode(base64repr)
+    LangFrequencyPack.parseFrom(decoded)
   }
 
 

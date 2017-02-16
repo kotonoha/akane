@@ -145,8 +145,11 @@ class LuceneJmdictImpl(ir: IndexReader, ec: ExecutionContextExecutor, val info: 
       iq.add(makeClause("r", cc, 0.95f))
       iq.add(makeClause("w", cc))
       iq.add(makeClause("t", cc, 0.9f))
-      iq.add(makeClause("eng", cc, 0.7f))
-      iq.add(makeClause("rus", cc, 0.7f))
+
+      for (lang <- q.langs) {
+        iq.add(makeClause(lang, cc, 0.7f))
+      }
+
       o.occur match {
         case Occur.MUST_NOT | Occur.MUST =>
           iq.setMinimumNumberShouldMatch(1)

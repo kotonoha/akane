@@ -35,6 +35,7 @@ case class JmdictQuery(
   writings: Seq[JmdictQueryPart] = Nil,
   tags: Seq[JmdictQueryPart] = Nil,
   other: Seq[JmdictQueryPart] = Nil,
+  langs: Seq[String] = Seq("eng"),
   ignore: Seq[Long] = Nil,
   explain: Boolean = false
 )
