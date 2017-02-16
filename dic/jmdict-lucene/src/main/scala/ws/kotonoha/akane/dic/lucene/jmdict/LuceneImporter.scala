@@ -18,6 +18,7 @@ package ws.kotonoha.akane.dic.lucene.jmdict
 
 import java.io.StringReader
 import java.util
+import java.util.Base64
 
 import org.apache.lucene.analysis.TokenStream
 import org.apache.lucene.analysis.ngram.NGramTokenizer
@@ -27,7 +28,9 @@ import org.apache.lucene.document._
 import org.apache.lucene.index.{IndexOptions, IndexWriter}
 import org.apache.lucene.util.{BytesRef, BytesRefBuilder}
 import org.joda.time.{DateTime, LocalDate}
+import ws.kotonoha.akane.dic.freq.{LangFrequency, LangFrequencyPack}
 import ws.kotonoha.akane.dic.jmdict.{JmdictEntry, JmdictTag, JmdictTagMap}
+import ws.kotonoha.akane.io.Charsets
 
 import scala.collection.mutable
 import scala.util.hashing.MurmurHash3
@@ -64,7 +67,10 @@ class LuceneImporter(iw: IndexWriter) {
     new BytesRef(abyte)
   }
 
-  def makeDoc(entry: JmdictEntry) = {
+  private val langEntryCounts = new mutable.HashMap[String, Long]()
+  private val langGlossCounts = new mutable.HashMap[String, Long]()
+
+  private def makeDoc(entry: JmdictEntry) = {
     val doc = new Document
 
     val id = new StringField("id", DataConversion.longBytes(entry.id), Store.YES)
@@ -93,12 +99,22 @@ class LuceneImporter(iw: IndexWriter) {
 
     doc.add(new Field("t", streamTags(entry), fullMatchField))
 
+    val localCounts = new mutable.HashMap[String, Int]()
+
     for {
       m <- entry.meanings
       c <- m.content
     } {
       doc.add(new TextField(c.lang, c.str, Store.NO))
+      localCounts.put(c.lang, localCounts.getOrElse(c.lang, 0) + 1)
     }
+
+
+    for ((lang, cnt) <- localCounts) {
+      langEntryCounts.put(lang, langEntryCounts.getOrElse(lang, 0L) + 1L)
+      langGlossCounts.put(lang, langGlossCounts.getOrElse(lang, 0L) + cnt)
+    }
+
     doc
   }
 
@@ -113,7 +129,8 @@ class LuceneImporter(iw: IndexWriter) {
     val data = new util.HashMap[String, String]()
     data.put(LuceneImporter.INFO_CREATION_DATE, jmdictString)
     data.put(LuceneImporter.INFO_BUILD_DATE, now)
-    iw.setCommitData(data)
+    data.put(LuceneImporter.INFO_LANGUAGE_STATS, LuceneImporter.makeLanguageInfo(langEntryCounts, langGlossCounts))
+    iw.setLiveCommitData(data.entrySet())
     iw.commit()
     iw.forceMerge(1, true)
   }
@@ -123,14 +140,36 @@ object LuceneImporter {
   def parseUserData(userData: util.Map[String, String]) = {
     val creationString = userData.get(INFO_CREATION_DATE)
     val buildString = userData.get(INFO_BUILD_DATE)
+    val langInfoString = userData.get(INFO_LANGUAGE_STATS)
     val creation = LocalDate.parse(creationString)
     val build = DateTime.parse(buildString)
-    JmdictInfo(creation, build)
+    val langInfo = parseLanguageInfo(langInfoString)
+    JmdictInfo(creation, build, langInfo)
+  }
+
+  def makeLanguageInfo(langEntries: mutable.Map[String, Long], glossCounts: mutable.Map[String, Long]): String = {
+    val entries = langEntries.map {
+      case (lang, entryCnt) =>
+        val glossCnt = glossCounts(lang)
+        LangFrequency(lang, entryCnt, glossCnt)
+    }
+
+    val pack = LangFrequencyPack(entries.toSeq)
+    val bytes = pack.toByteArray
+    new String(Base64.getEncoder.encode(bytes), Charsets.utf8)
+  }
+
+  def parseLanguageInfo(base64repr: String): LangFrequencyPack = {
+    if (base64repr == null || base64repr.isEmpty) return LangFrequencyPack.defaultInstance
+
+    val bytes = base64repr.getBytes(Charsets.utf8)
+    LangFrequencyPack.parseFrom(bytes)
   }
 
 
   val INFO_CREATION_DATE = "creationDate"
   val INFO_BUILD_DATE = "buildDate"
+  val INFO_LANGUAGE_STATS = "languageInfo"
 
   val blobField = {
     val tp = new FieldType()

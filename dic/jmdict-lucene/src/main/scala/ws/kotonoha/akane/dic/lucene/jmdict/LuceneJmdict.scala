@@ -27,6 +27,7 @@ import org.apache.lucene.search.BooleanClause.Occur
 import org.apache.lucene.search._
 import org.apache.lucene.util.automaton.TooComplexToDeterminizeException
 import org.joda.time.{DateTime, LocalDate}
+import ws.kotonoha.akane.dic.freq.LangFrequencyPack
 import ws.kotonoha.akane.dic.jmdict.JmdictEntry
 
 import scala.collection.mutable.ArrayBuffer
@@ -42,7 +43,7 @@ case class JmdictSearchResults(
   totalHits: Int = 0
 )
 
-case class JmdictInfo(update: LocalDate, build: DateTime)
+case class JmdictInfo(update: LocalDate, build: DateTime, langs: LangFrequencyPack)
 
 
 trait LuceneJmdict {

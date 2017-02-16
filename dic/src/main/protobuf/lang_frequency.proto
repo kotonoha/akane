@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+package jmdict;
+
+option java_package = "ws.kotonoha.akane.dic.freq";
+
+message LangFrequency {
+    required string language = 1;
+    required uint64 entryCnt = 2;
+    required uint64 glossCnt = 3;
+}
+
+message LangFrequencyPack {
+    repeated LangFrequency freqs = 1;
+}
