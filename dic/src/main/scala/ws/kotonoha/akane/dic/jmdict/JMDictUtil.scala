@@ -86,11 +86,15 @@ object JMDictUtil {
     }
   }
 
-  def cleanLanguages(e: JmdictEntry, langs: Set[String]): JmdictEntry = {
-    val ms = e.meanings.map { mi =>
+  def cleanMeanings(mns: Seq[MeaningInfo], langs: Set[String]): Seq[MeaningInfo] = {
+    mns.map { mi =>
       val content = mi.content.filter(l => langs.contains(l.lang))
       mi.copy(content = content)
     }
+  }
+
+  def cleanLanguages(e: JmdictEntry, langs: Set[String]): JmdictEntry = {
+    val ms = cleanMeanings(e.meanings, langs)
     e.copy(meanings = ms)
   }
 
