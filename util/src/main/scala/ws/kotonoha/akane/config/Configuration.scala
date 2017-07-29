@@ -56,7 +56,7 @@ object Configuration extends StrictLogging {
     logger.debug(s"For config {$name} trying [${names.mkString(", ")}]")
     val cfg = names.foldLeft(defaults) {
       case (c, cname) =>
-        val config = ConfigFactory.parseResources(cname)
+        val config = ConfigFactory.parseResources(getClass.getClassLoader, cname)
         if (!config.isEmpty) {
           logger.debug(s"Loaded config from file $cname")
           config.withFallback(c)
