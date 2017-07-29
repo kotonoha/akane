@@ -1,4 +1,4 @@
-lazy val scalaPbVersion = "0.5.43"
+lazy val scalaPbVersion = "0.6.1"
 
 def pbScala(): Seq[Setting[_]] = {
   Def.settings(
