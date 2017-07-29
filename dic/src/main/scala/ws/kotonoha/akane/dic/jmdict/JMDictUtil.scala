@@ -87,9 +87,12 @@ object JMDictUtil {
   }
 
   def cleanMeanings(mns: Seq[MeaningInfo], langs: Set[String]): Seq[MeaningInfo] = {
-    mns.map { mi =>
+    mns.flatMap { mi =>
       val content = mi.content.filter(l => langs.contains(l.lang))
-      mi.copy(content = content)
+      if (content.isEmpty) Nil
+      else {
+        mi.copy(content = content) :: Nil
+      }
     }
   }
 
