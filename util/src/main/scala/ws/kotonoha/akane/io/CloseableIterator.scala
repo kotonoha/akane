@@ -30,41 +30,42 @@ trait CloseableIterator[+T] extends Iterator[T] with Closeable with AutoCloseabl
     override def hasNext = self.hasNext
   }
 
-  override def flatMap[B](f: (T) => GenTraversableOnce[B]): CloseableIterator[B] = new WrappedClosableIterator[B](self) {
-    var cached: Iterator[B] = null
+  override def flatMap[B](f: (T) => GenTraversableOnce[B]): CloseableIterator[B] =
+    new WrappedClosableIterator[B](self) {
+      var cached: Iterator[B] = null
 
-    override def next(): B = {
-      if (cached != null && cached.hasNext) {
-        cached.next()
-      } else {
-        updateCached()
-        this.next()
-      }
-    }
-
-    private def updateCached(): Unit = {
-      cached match {
-        case x: CloseableIterator[_] => x.close()
-        case _ =>
-      }
-      if (self.hasNext) {
-        cached = f(self.next()).toIterator
-      } else {
-        cached = null
-      }
-    }
-
-    override def hasNext = {
-      if (cached == null) {
-        if (self.hasNext) {
+      override def next(): B = {
+        if (cached != null && cached.hasNext) {
+          cached.next()
+        } else {
           updateCached()
-          this.hasNext
-        } else false
-      } else {
-        cached.hasNext || self.hasNext
+          this.next()
+        }
+      }
+
+      private def updateCached(): Unit = {
+        cached match {
+          case x: CloseableIterator[_] => x.close()
+          case _                       =>
+        }
+        if (self.hasNext) {
+          cached = f(self.next()).toIterator
+        } else {
+          cached = null
+        }
+      }
+
+      override def hasNext = {
+        if (cached == null) {
+          if (self.hasNext) {
+            updateCached()
+            this.hasNext
+          } else false
+        } else {
+          cached.hasNext || self.hasNext
+        }
       }
     }
-  }
 
   override def foreach[U](f: (T) => U) = {
     try {
@@ -74,28 +75,29 @@ trait CloseableIterator[+T] extends Iterator[T] with Closeable with AutoCloseabl
     }
   }
 
-  override def filter(p: (T) => Boolean): CloseableIterator[T] = new WrappedClosableIterator[T](self) {
-    var item: T = _
-    var cached = false
-    override def next() = {
-      cached = false
-      item
-    }
-    override def hasNext: Boolean = {
-      if (cached) {
-        true
-      } else {
-        cached = true
-        while (self.hasNext) {
-          item = self.next()
-          if (p(item)) {
-            return true
+  override def filter(p: (T) => Boolean): CloseableIterator[T] =
+    new WrappedClosableIterator[T](self) {
+      var item: T = _
+      var cached = false
+      override def next() = {
+        cached = false
+        item
+      }
+      override def hasNext: Boolean = {
+        if (cached) {
+          true
+        } else {
+          cached = true
+          while (self.hasNext) {
+            item = self.next()
+            if (p(item)) {
+              return true
+            }
           }
+          false
         }
-        false
       }
     }
-  }
 
   override def zip[B](that: Iterator[B]): CloseableIterator[(T, B)] = {
     val wrapped = that match {

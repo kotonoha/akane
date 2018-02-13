@@ -17,16 +17,17 @@
 package ws.kotonoha.akane.unicode
 
 /**
- * @author eiennohito
- * @since 19.03.13 
- */
+  * @author eiennohito
+  * @since 19.03.13
+  */
 /**
- * Miscellaneous text utilities
- */
+  * Miscellaneous text utilities
+  */
 object KanaUtil {
+
   /**
-   * Converts all Katakana characters to hiragana characters
-   */
+    * Converts all Katakana characters to hiragana characters
+    */
   def kataToHira(input: String): String = {
     val buf: StringBuffer = new StringBuffer(input)
     val length: Int = buf.length
@@ -58,13 +59,10 @@ object KanaUtil {
       val c = iter.next()
       val cr = binding.get(c) match {
         case Some(cv) => cv
-        case None => c
+        case None     => c
       }
       bldr.appendCodePoint(cr)
     }
     bldr.toString
   }
 }
-
-
-

@@ -22,14 +22,13 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 /**
- * @author eiennohito
- * @since 2015/09/10
- */
+  * @author eiennohito
+  * @since 2015/09/10
+  */
 trait AnalyzerCore[I, O] {
   type Input = I
   type Output = O
 }
-
 
 trait SyncAnalyzer[I, O] extends AnalyzerCore[I, O] {
   def analyzeSync(input: I): Try[O]
@@ -49,9 +48,9 @@ trait FromStream[T] {
   def readFrom(s: InputStream): Try[T]
 }
 
-
 trait SyncToAsyncAnalyzer[I, O] extends AsyncAnalyzer[I, O] { self: SyncAnalyzer[I, O] =>
-  override def analyze(input: I)(implicit executionContext: ExecutionContext) = Future.fromTry(analyzeSync(input))
+  override def analyze(input: I)(implicit executionContext: ExecutionContext) =
+    Future.fromTry(analyzeSync(input))
 }
 
 class AnalyzerException(reason: String) extends RuntimeException(reason)

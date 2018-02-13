@@ -17,10 +17,9 @@
 package ws.kotonoha.akane.basic
 
 /**
- * @author eiennohito
- * @since 30.10.12 
- */
-
+  * @author eiennohito
+  * @since 30.10.12
+  */
 trait ReadingAndWriting {
   def reading: String
   def writing: String

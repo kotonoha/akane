@@ -1,8 +1,7 @@
-
 package ws.kotonoha.akane.dic.jmdict
 
 case class JmdictTagInfo(tag: JmdictTag, repr: String, explanation: String) {
-   def number: Int = tag.value
+  def number: Int = tag.value
 }
 
 object JmdictTagMap {
@@ -234,11 +233,17 @@ object JmdictTagMap {
   )
   val tagInfo: Array[JmdictTagInfo] = Array(
     JmdictTagInfo(JmdictTag.MA, "MA", """martial arts term"""),
-    JmdictTagInfo(JmdictTag.X, "X", """rude or X-rated term (not displayed in educational software)"""),
+    JmdictTagInfo(JmdictTag.X,
+                  "X",
+                  """rude or X-rated term (not displayed in educational software)"""),
     JmdictTagInfo(JmdictTag.abbr, "abbr", """abbreviation"""),
     JmdictTagInfo(JmdictTag.adjI, "adj-i", """adjective (keiyoushi)"""),
-    JmdictTagInfo(JmdictTag.adjNa, "adj-na", """adjectival nouns or quasi-adjectives (keiyodoshi)"""),
-    JmdictTagInfo(JmdictTag.adjNo, "adj-no", """nouns which may take the genitive case particle `no'"""),
+    JmdictTagInfo(JmdictTag.adjNa,
+                  "adj-na",
+                  """adjectival nouns or quasi-adjectives (keiyodoshi)"""),
+    JmdictTagInfo(JmdictTag.adjNo,
+                  "adj-no",
+                  """nouns which may take the genitive case particle `no'"""),
     JmdictTagInfo(JmdictTag.adjPn, "adj-pn", """pre-noun adjectival (rentaishi)"""),
     JmdictTagInfo(JmdictTag.adjT, "adj-t", """`taru' adjective"""),
     JmdictTagInfo(JmdictTag.adjF, "adj-f", """noun or verb acting prenominally"""),
@@ -265,7 +270,9 @@ object JmdictTagMap {
     JmdictTagInfo(JmdictTag.fem, "fem", """female term or language"""),
     JmdictTagInfo(JmdictTag.food, "food", """food term"""),
     JmdictTagInfo(JmdictTag.geom, "geom", """geometry term"""),
-    JmdictTagInfo(JmdictTag.gikun, "gikun", """gikun (meaning as reading)  or jukujikun (special kanji reading)"""),
+    JmdictTagInfo(JmdictTag.gikun,
+                  "gikun",
+                  """gikun (meaning as reading)  or jukujikun (special kanji reading)"""),
     JmdictTagInfo(JmdictTag.hon, "hon", """honorific or respectful (sonkeigo) language"""),
     JmdictTagInfo(JmdictTag.hum, "hum", """humble (kenjougo) language"""),
     JmdictTagInfo(JmdictTag.irrKanji, "iK", """word containing irregular kanji usage"""),
@@ -322,9 +329,13 @@ object JmdictTagMap {
     JmdictTagInfo(JmdictTag.v5t, "v5t", """Godan verb with `tsu' ending"""),
     JmdictTagInfo(JmdictTag.v5u, "v5u", """Godan verb with `u' ending"""),
     JmdictTagInfo(JmdictTag.v5uS, "v5u-s", """Godan verb with `u' ending (special class)"""),
-    JmdictTagInfo(JmdictTag.v5uru, "v5uru", """Godan verb - Uru old class verb (old form of Eru)"""),
+    JmdictTagInfo(JmdictTag.v5uru,
+                  "v5uru",
+                  """Godan verb - Uru old class verb (old form of Eru)"""),
     JmdictTagInfo(JmdictTag.v5z, "v5z", """Godan verb with `zu' ending"""),
-    JmdictTagInfo(JmdictTag.vz, "vz", """Ichidan verb - zuru verb (alternative form of -jiru verbs)"""),
+    JmdictTagInfo(JmdictTag.vz,
+                  "vz",
+                  """Ichidan verb - zuru verb (alternative form of -jiru verbs)"""),
     JmdictTagInfo(JmdictTag.vi, "vi", """intransitive verb"""),
     JmdictTagInfo(JmdictTag.vk, "vk", """Kuru verb - special class"""),
     JmdictTagInfo(JmdictTag.vn, "vn", """irregular nu verb"""),
@@ -347,4 +358,3 @@ object JmdictTagMap {
     JmdictTagInfo(JmdictTag.vulg, "vulg", """vulgar expression or word""")
   )
 }
-

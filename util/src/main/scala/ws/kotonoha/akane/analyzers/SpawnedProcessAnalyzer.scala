@@ -27,14 +27,16 @@ import scala.concurrent.Future
 import scala.util.Try
 
 /**
- * This analyzer implementation uses spawned processes to analyze something.
- * It does its work for 3 times and then gives up.
- * @param spawner
- * @tparam Input
- * @tparam Output
- */
-abstract class SpawnedProcessAnalyzer[Input: ToStream, Output: FromStream](spawner: => Process) extends SyncAnalyzer[Input, Output]
-  with SubprocessControls with StrictLogging {
+  * This analyzer implementation uses spawned processes to analyze something.
+  * It does its work for 3 times and then gives up.
+  * @param spawner
+  * @tparam Input
+  * @tparam Output
+  */
+abstract class SpawnedProcessAnalyzer[Input: ToStream, Output: FromStream](spawner: => Process)
+    extends SyncAnalyzer[Input, Output]
+    with SubprocessControls
+    with StrictLogging {
   var process: Process = null
 
   val maxRetries = 3
@@ -57,7 +59,8 @@ abstract class SpawnedProcessAnalyzer[Input: ToStream, Output: FromStream](spawn
     if (retry > maxRetries) {
       process = null
       val cname = getClass.getSimpleName
-      Future.failed(throw new AnalyzerException(s"$cname have tried for $maxRetries times, but still failed"))
+      Future.failed(
+        throw new AnalyzerException(s"$cname have tried for $maxRetries times, but still failed"))
     }
 
     try {
@@ -81,7 +84,6 @@ abstract class SpawnedProcessAnalyzer[Input: ToStream, Output: FromStream](spawn
         doWork(retry + 1, input)
     }
   }
-
 
   override def restart() = {
     if (process != null) {

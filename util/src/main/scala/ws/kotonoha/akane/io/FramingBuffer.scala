@@ -21,37 +21,39 @@ import java.nio.ByteBuffer
 import java.util.concurrent.{Future => JFuture}
 
 /**
- * @author eiennohito
- * @since 2015/10/07
- */
+  * @author eiennohito
+  * @since 2015/10/07
+  */
 trait FramingBuffer extends Closeable {
   def data: ByteBuffer
 
   /**
-   * @return false if EOF
-   */
+    * @return false if EOF
+    */
   def startFrame(): Boolean
 
   /**
-   * @return true if the end currently in buffer and
-   *         no calls to continueFrame is required to finish
-   */
+    * @return true if the end currently in buffer and
+    *         no calls to continueFrame is required to finish
+    */
   def isEndVisible: Boolean
 
   /**
-   *
-   * @return false if EOF
-   */
+    *
+    * @return false if EOF
+    */
   def continueFrame(): Boolean
 
   /**
-   * Call this before moving to next frame
-   */
+    * Call this before moving to next frame
+    */
   def endFrame(): Unit
 }
 
 final class InputStreamFramingBuffer(
-  input: InputStream, separator: Array[Byte], size: Int = 1024 * 1024
+    input: InputStream,
+    separator: Array[Byte],
+    size: Int = 1024 * 1024
 ) extends FramingBuffer {
   assert(separator.length < size + 1, "buffer should be at least as long as separator")
   val buffer = ByteBuffer.allocate(size)
@@ -114,7 +116,6 @@ final class InputStreamFramingBuffer(
     } else false
   }
 
-
   override def endFrame() = {
     buffer.position(sepIdx)
     val start = sepIdx
@@ -125,8 +126,8 @@ final class InputStreamFramingBuffer(
   }
 
   /**
-   * @return false if EOF
-   */
+    * @return false if EOF
+    */
   def resolveFrame(): Boolean = {
     val start = sepIdx
     val pos = BufferUtils.indexOf(buffer, start, buffer.limit(), separator)
@@ -147,37 +148,33 @@ final class InputStreamFramingBuffer(
 
 }
 
-
 trait FramingBufferX extends Closeable {
 
   /**
-   *
-   * @return read only byte buffer of content
-   *         Do not cache it
-   */
+    *
+    * @return read only byte buffer of content
+    *         Do not cache it
+    */
   def data: ByteBuffer
 
   /**
-   * Goes to next frame
-   *
-   * @return true if there could be more elements
-   */
+    * Goes to next frame
+    *
+    * @return true if there could be more elements
+    */
   def start(): Boolean
 
   /**
-   *
-   * @return true if all frame is in memory currently.
-   *         In this case #resolveRemaining() is a noop.
-   */
+    *
+    * @return true if all frame is in memory currently.
+    *         In this case #resolveRemaining() is a noop.
+    */
   def inMemory(): Boolean
 
-
   /**
-   * Tries to move more data to memory
-   *
-   * @return true if got to end
-   */
+    * Tries to move more data to memory
+    *
+    * @return true if got to end
+    */
   def resolveRemaining(): Boolean
 }
-
-

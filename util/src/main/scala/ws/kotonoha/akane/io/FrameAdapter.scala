@@ -20,9 +20,9 @@ import java.io.InputStream
 import java.nio.ByteBuffer
 
 /**
- * @author eiennohito
- * @since 2015/10/08
- */
+  * @author eiennohito
+  * @since 2015/10/08
+  */
 class FrameAdapter(inp: FramingBuffer) extends CloseableIterator[ByteBuffer] {
   private val buffer = new GrowableByteBuffer()
 

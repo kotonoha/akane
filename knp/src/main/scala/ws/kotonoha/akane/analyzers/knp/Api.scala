@@ -19,9 +19,9 @@ package ws.kotonoha.akane.analyzers.knp
 import scala.collection.mutable
 
 /**
- * @author eiennohito
- * @since 2015/09/18
- */
+  * @author eiennohito
+  * @since 2015/09/18
+  */
 trait TableApi extends LexemeAccess with BunsetsuAccess with KihonkuAccess {
   def kihonkuIdxForSurface(pos: Int): Int = {
     var i = 0
@@ -46,10 +46,10 @@ trait TableApi extends LexemeAccess with BunsetsuAccess with KihonkuAccess {
   }
 
   /**
-   * Transforms kihonku scope to bunsetsu scope
-   * @param kihonkuScope sorted array of kihonku indexes
-   * @return array of bunsetsu indices
-   */
+    * Transforms kihonku scope to bunsetsu scope
+    * @param kihonkuScope sorted array of kihonku indexes
+    * @return array of bunsetsu indices
+    */
   def bunsetsuScope(kihonkuScope: Array[Int]): Array[Int] = {
     val indices = new mutable.BitSet()
 
@@ -65,7 +65,7 @@ trait TableApi extends LexemeAccess with BunsetsuAccess with KihonkuAccess {
       cnt += bnst.kihonkuCnt
 
       while (curKih < kihonkuScope.length &&
-        kihonkuScope(curKih) < cnt) {
+             kihonkuScope(curKih) < cnt) {
         indices += i
         curKih += 1
       }
@@ -103,12 +103,8 @@ trait DependencyApi {
   def depType: String
 }
 
-trait BunsetsuApi extends LexemeAccess with KihonkuAccess with FeatureAccess with DependencyApi {
+trait BunsetsuApi extends LexemeAccess with KihonkuAccess with FeatureAccess with DependencyApi {}
 
-}
-
-trait KihonkuApi extends LexemeAccess with FeatureAccess with DependencyApi {
-
-}
+trait KihonkuApi extends LexemeAccess with FeatureAccess with DependencyApi {}
 
 trait LexemeApi extends JapaneseLexeme

@@ -16,6 +16,6 @@ object DependencyType {
     case 'p' | 'P' => Parallel
     case 'a' | 'A' => Apposition
     case 'i' | 'I' => Incomplete
-    case _ => 0xffff0000 | (c & 0xffff)
+    case _         => 0xffff0000 | (c & 0xffff)
   }
 }

@@ -16,18 +16,20 @@
 
 package ws.kotonoha.akane.bridj
 
+import java.nio.charset.StandardCharsets
+
 import org.bridj.Pointer
-import java.nio.charset.Charset
+
+import scala.language.implicitConversions
 
 /**
- * @author eiennohito
- * @since 11.11.12 
- */
-
+  * @author eiennohito
+  * @since 11.11.12
+  */
 class RichPointer[T](p: Pointer[T]) {
-  def u8s = p.getStringAtOffset(0L, Pointer.StringType.C, Charset.forName("UTF-8"))
+  def u8s: String = p.getStringAtOffset(0L, Pointer.StringType.C, StandardCharsets.UTF_8)
 }
 
 object PointerUtil {
-  implicit def ponter2richPointer[T](p: Pointer[T]) = new RichPointer[T](p)
+  implicit def ponter2richPointer[T](p: Pointer[T]): RichPointer[T] = new RichPointer[T](p)
 }

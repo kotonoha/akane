@@ -19,10 +19,9 @@ package ws.kotonoha.akane.kanji
 import collection.immutable.HashMap
 
 /**
- * @author eiennohito
- * @since 02.03.12
- */
-
+  * @author eiennohito
+  * @since 02.03.12
+  */
 object KanjiType extends Enumeration {
   type KanjiType = Value
   val Old, New, Removed, Absent = Value
@@ -33,11 +32,13 @@ object Jouyou {
   lazy private val lookupTable = {
     val kanji = JouyouKanji.kanji
     val from = JouyouKanji.newFrom
-    val old = kanji.toStream.take(from).zipWithIndex.
-      filterNot {  case (k, i) => JouyouKanji.removed.contains(i) }.
-      map { case (k, i) => k -> KanjiType.Old }
+    val old = kanji.toStream
+      .take(from)
+      .zipWithIndex
+      .filterNot { case (k, i) => JouyouKanji.removed.contains(i) }
+      .map { case (k, i) => k -> KanjiType.Old }
     val newK = kanji.drop(from).toStream.map(_ -> KanjiType.New)
-    val rem = JouyouKanji.removed.map{kanji(_)}.map(_ -> KanjiType.Removed)
+    val rem = JouyouKanji.removed.map { kanji(_) }.map(_ -> KanjiType.Removed)
     new HashMap[String, KanjiType.Value] ++ old ++ newK ++ rem
   }
 

@@ -16,12 +16,12 @@
 
 package ws.kotonoha.akane.io
 
-import java.nio.charset.Charset
+import java.nio.charset.{Charset, StandardCharsets}
 
 /**
   * @author eiennohito
   * @since 2016/07/12
   */
 object Charsets {
-  val utf8 = Charset.forName("utf-8")
+  val utf8: Charset = StandardCharsets.UTF_8
 }

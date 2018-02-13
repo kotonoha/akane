@@ -37,39 +37,35 @@ import javax.xml.stream.EventFilter
 import javax.xml.stream.events._
 
 /**
- * @author eiennohito
- * @since 13.04.12
- */
-
+  * @author eiennohito
+  * @since 13.04.12
+  */
 object Chars {
   def unapply(x: XMLEvent) = x match {
     case n: Characters => Some(n.getData)
-    case _ => None
+    case _             => None
   }
 }
 
 object StElem {
   def unapply(x: XMLEvent): Option[String] = x match {
     case n: StartElement => Some(n.getName.getLocalPart)
-    case _ => None
+    case _               => None
   }
 }
 
 object EnElem {
   def unapply(x: XMLEvent): Option[String] = x match {
     case n: EndElement => Some(n.getName.getLocalPart)
-    case _ => None
+    case _             => None
   }
 }
-
 
 object WhitespaceFilter extends EventFilter {
   val whitespace = Pattern.compile("^[\\s+]+$", Pattern.MULTILINE)
 
   def accept(event: XMLEvent) = event match {
     case Chars(s) => !whitespace.matcher(s).matches()
-    case _ => true
+    case _        => true
   }
 }
-
-

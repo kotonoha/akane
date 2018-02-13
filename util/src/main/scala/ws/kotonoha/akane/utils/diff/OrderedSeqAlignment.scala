@@ -25,9 +25,9 @@ case class SegmentDiff(spans: Seq[SegmentSpan], inserts: Int, deletes: Int, repl
   }
 
   def display(
-    obj: SegmentedSequence,
-    removed: String = "X",
-    added: String = "+"
+      obj: SegmentedSequence,
+      removed: String = "X",
+      added: String = "+"
   ): String = {
     val sb = new StringBuilder
     val seq = obj.segmentation
@@ -125,7 +125,11 @@ class SequenceAligner(s1: SegmentBorders, s2: SegmentBorders) extends DiffTypes 
 
   private def pushState() = {
     if (stateStart != stateEnd || replaceElements.length > 0) {
-      stateBuffer += SegmentSpan(stateStart, stateEnd, lastState, if (replaceElements.length > 0) replaceElements else IntBuffer.empty)
+      stateBuffer += SegmentSpan(stateStart,
+                                 stateEnd,
+                                 lastState,
+                                 if (replaceElements.length > 0) replaceElements
+                                 else IntBuffer.empty)
       if (replaceElements.length > 0) {
         replaceElements = new IntBuffer()
       }

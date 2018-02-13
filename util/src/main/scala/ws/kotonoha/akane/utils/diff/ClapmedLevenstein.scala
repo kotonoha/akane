@@ -6,7 +6,6 @@ import ws.kotonoha.akane.utils.IntBuffer
   * @author eiennohito
   * @since 2015/10/13
   */
-
 trait CharEquality {
   def insertionCost(ch: Int): Int
   def replacementCost(ch1: Int, ch2: Int): Int
@@ -62,8 +61,8 @@ class ClapmedLevenstein(maxDist: Int, equality: CharEquality = CharEquality.simp
         return minCost + s2.length() - s1.length()
       }
 
-      val start = 1 max leftMargin
-      val end = s1.length() min (pos + maxDist)
+      val start = 1.max(leftMargin)
+      val end = s1.length().min(pos + maxDist)
 
       //println(s"check $pos: [$start, $end]")
 
@@ -84,7 +83,7 @@ class ClapmedLevenstein(maxDist: Int, equality: CharEquality = CharEquality.simp
           val ifDel = cur(i - 1) + equality.insertionCost(ch2)
           val ifAdd = prev(i) + equality.insertionCost(ch)
           val ifRep = prevPrevCost + equality.replacementCost(ch, ch2)
-          cur(i) = ifDel min ifRep min ifAdd
+          cur(i) = ifDel.min(ifRep).min(ifAdd)
         }
 
         if (cur(i) < minCost) {

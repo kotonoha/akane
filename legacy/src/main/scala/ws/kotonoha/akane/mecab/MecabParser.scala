@@ -18,17 +18,16 @@ package ws.kotonoha.akane.mecab
 
 import ws.kotonoha.akane.utils.CalculatingIterator
 import org.bridj.Pointer
-import mecab.{MecabLibrary, mecab_node_t}
+import mecab.{mecab_node_t, MecabLibrary}
 
 /**
- * @author eiennohito
- * @since 30.10.12 
- */
-
+  * @author eiennohito
+  * @since 30.10.12
+  */
 case class MecabResult(surf: String, pos: Int, info: String)
 
 class NodeIterator(var node: Pointer[mecab_node_t]) extends CalculatingIterator[MecabResult] {
-  import  ws.kotonoha.akane.bridj.PointerUtil._
+  import ws.kotonoha.akane.bridj.PointerUtil._
 
   private def formatResult(node: mecab_node_t): Option[MecabResult] = {
     val bts = node.surface()

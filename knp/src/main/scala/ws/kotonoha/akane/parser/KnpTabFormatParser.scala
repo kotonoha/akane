@@ -27,9 +27,9 @@ import scala.collection.mutable.ArrayBuffer
 import scala.util.matching.Regex.Groups
 
 /**
- * @author eiennohito
- * @since 2014-04-10
- */
+  * @author eiennohito
+  * @since 2014-04-10
+  */
 class KnpTabFormatParser extends StrictLogging {
 
   private val initRe = """(\*|\+) (-?\d+)([A-Z]) (.*)""".r.anchored
@@ -48,12 +48,19 @@ class KnpTabFormatParser extends StrictLogging {
     for (line <- lines) {
       initRe.findPrefixMatchOf(line) match {
         case Some(Groups("+", XInt(depNum), depType, features)) => //kihonku begin with + in knp output
-          proc.kihonku += new KihonkuBuilder(proc.kihonku.size, depNum, depType,
-            parseFeatures(features), proc.lexemes.size)
+          proc.kihonku += new KihonkuBuilder(proc.kihonku.size,
+                                             depNum,
+                                             depType,
+                                             parseFeatures(features),
+                                             proc.lexemes.size)
           proc.bunsetsu.last.addKihonku()
         case Some(Groups("*", XInt(depNum), depType, features)) => //bunsetsu begin with * in knp output
-          proc.bunsetsu += new BunsetsuBuilder(proc.bunsetsu.size, depNum, depType,
-            parseFeatures(features), proc.lexemes.size, proc.kihonku.size)
+          proc.bunsetsu += new BunsetsuBuilder(proc.bunsetsu.size,
+                                               depNum,
+                                               depType,
+                                               parseFeatures(features),
+                                               proc.lexemes.size,
+                                               proc.kihonku.size)
         case _ if line == "EOS" => //do nothing
         case None if !startRe.pattern.matcher(line).find() => //it's a morpheme
           val lexeme = OldAndUglyKnpLexeme.fromTabFormat(line)
@@ -78,17 +85,30 @@ class KnpTabFormatParser extends StrictLogging {
 case class KnpInfo(id: Int, version: String, date: String, score: Double)
 
 /**
- * A builder for bunsetsu objects
- *
- * @param depNumber number of dependency
- * @param depType type of dependency
- * @param features features that are present in bunsetsu
- */
-class BunsetsuBuilder(val myNumber: Int, val depNumber: Int, val depType: String,
-                      val features: Array[String],
-                      val lexemeStart: Int, val kihonkuStart: Int)  {
+  * A builder for bunsetsu objects
+  *
+  * @param depNumber number of dependency
+  * @param depType type of dependency
+  * @param features features that are present in bunsetsu
+  */
+class BunsetsuBuilder(
+    val myNumber: Int,
+    val depNumber: Int,
+    val depType: String,
+    val features: Array[String],
+    val lexemeStart: Int,
+    val kihonkuStart: Int) {
   def result(lexs: LexemeStorage, kihs: KihonkuStorage): OldAndUglyBunsetsu =
-    OldAndUglyBunsetsu(lexs, kihs, myNumber, depNumber, depType, features, lexemeStart, lexemeCnt, kihonkuStart, kihonkuCnt)
+    OldAndUglyBunsetsu(lexs,
+                       kihs,
+                       myNumber,
+                       depNumber,
+                       depType,
+                       features,
+                       lexemeStart,
+                       lexemeCnt,
+                       kihonkuStart,
+                       kihonkuCnt)
 
   var lexemeCnt = 0
   def addLexeme() = lexemeCnt += 1
@@ -97,16 +117,18 @@ class BunsetsuBuilder(val myNumber: Int, val depNumber: Int, val depType: String
   def addKihonku() = kihonkuCnt += 1
 }
 
-class KihonkuBuilder(val myNumber: Int, val depNumber: Int, val depType: String,
-                     val features: Array[String],
-                     val lexemeStart: Int)  {
+class KihonkuBuilder(
+    val myNumber: Int,
+    val depNumber: Int,
+    val depType: String,
+    val features: Array[String],
+    val lexemeStart: Int) {
   def result(lexs: LexemeStorage): OldAndUglyKihonku =
     OldAndUglyKihonku(lexs, myNumber, depNumber, depType, features, lexemeStart, lexemeCnt)
 
   var lexemeCnt = 0
   def addLexeme() = lexemeCnt += 1
 }
-
 
 class KnpTabParseProcess {
   val lexemes = new ArrayBuffer[OldAndUglyKnpLexeme]()

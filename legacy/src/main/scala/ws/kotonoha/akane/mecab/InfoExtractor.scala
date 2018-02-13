@@ -21,9 +21,9 @@ import ws.kotonoha.akane.utils.StringUtil
 import ws.kotonoha.akane.basic.ReadingAndWriting
 
 /**
- * @author eiennohito
- * @since 30.10.12 
- */
+  * @author eiennohito
+  * @since 30.10.12
+  */
 object InfoExtractor {
   def restoreWriting(dform: String, dread: String, variants: String) = {
     UnicodeUtil.hasKanji(dform) match {
@@ -49,9 +49,11 @@ object InfoExtractor {
       case false => KanaUtil.kataToHira(df)
       case true => {
         val vars = nfo.split('/')
-        val sorted = vars.map {
-          w => (w, StringUtil.commonHead(w, df))
-        }.sortBy(-_._2)
+        val sorted = vars
+          .map { w =>
+            (w, StringUtil.commonHead(w, df))
+          }
+          .sortBy(-_._2)
         val lst = sorted.headOption
         lst match {
           case Some((wr, head)) => {
@@ -71,16 +73,16 @@ object InfoExtractor {
     }
   }
 
-  case class DefaultMecabInfo (
-    mecabNfo: MecabResult,
-    pos: MecabPosInfo,
-    dicForm: String,
-    reading: String,
-    normReading: String,
-    jdicNfo: String,
-    jdicXml: String,
-    dformNfo: Option[String]
-) extends MecabEntryInfo {
+  case class DefaultMecabInfo(
+      mecabNfo: MecabResult,
+      pos: MecabPosInfo,
+      dicForm: String,
+      reading: String,
+      normReading: String,
+      jdicNfo: String,
+      jdicXml: String,
+      dformNfo: Option[String]
+  ) extends MecabEntryInfo {
     def surface = mecabNfo.surf
 
     def calcWritingFromNfo = {
@@ -91,8 +93,8 @@ object InfoExtractor {
     }
 
     lazy val dicWriting = {
-      val v1 = dformNfo map(_.split("/")(0))
-      v1 orElse calcWritingFromNfo
+      val v1 = dformNfo.map(_.split("/")(0))
+      v1.orElse(calcWritingFromNfo)
     }
 
     lazy val dicReading = {
@@ -141,8 +143,8 @@ object InfoExtractor {
     nfo.length match {
       case 11 => parseDefaultInfo(en, nfo)
       case 12 => parseModifiedInfo(en, nfo)
-      case 7 => parseUnkWord(en, nfo)
-      case _ => throw new MalformattedInfoException(info)
+      case 7  => parseUnkWord(en, nfo)
+      case _  => throw new MalformattedInfoException(info)
     }
   }
 

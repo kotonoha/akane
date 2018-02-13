@@ -11,7 +11,9 @@ import scala.concurrent.Promise
   * @author eiennohito
   * @since 2016/07/19
   */
-private[impl] class DbWriterActor[K <: AnyRef](dbi: DbImplApi[K], ops: IdOps[K]) extends Actor with StrictLogging {
+private[impl] class DbWriterActor[K <: AnyRef](dbi: DbImplApi[K], ops: IdOps[K])
+    extends Actor
+    with StrictLogging {
   @inline
   final def transaction[T](p: Promise[TrOk])(f: => T): Unit = {
     try {
@@ -29,16 +31,18 @@ private[impl] class DbWriterActor[K <: AnyRef](dbi: DbImplApi[K], ops: IdOps[K])
   private val idx = dbi.index.asInstanceOf[BTreeMap[AnyRef, BlobIndexEntry]]
 
   override def receive = {
-    case DbWriterActor.Delete(ids, p) => transaction(p) {
-      ids.foreach(id => idx.remove(id))
-    }
-    case DbWriterActor.Commit(items, p, fileNo) => transaction(p) {
-      items.foreach { d =>
-        //logger.debug(s"insert id=${ops.debug(d.id.asInstanceOf[K])}")
-        idx.put(d.id.asInstanceOf[AnyRef], d.ptr)
+    case DbWriterActor.Delete(ids, p) =>
+      transaction(p) {
+        ids.foreach(id => idx.remove(id))
       }
-      dbi.invalidateShard(fileNo)
-    }
+    case DbWriterActor.Commit(items, p, fileNo) =>
+      transaction(p) {
+        items.foreach { d =>
+          //logger.debug(s"insert id=${ops.debug(d.id.asInstanceOf[K])}")
+          idx.put(d.id.asInstanceOf[AnyRef], d.ptr)
+        }
+        dbi.invalidateShard(fileNo)
+      }
   }
 }
 
@@ -48,4 +52,3 @@ private[impl] object DbWriterActor {
   case class Delete(ids: Seq[AnyRef], p: Promise[TrOk])
   case class Commit(data: Seq[DataRef[_]], p: Promise[TrOk], fileNo: Int)
 }
-

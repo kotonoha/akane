@@ -13,17 +13,19 @@ import scala.languageFeature.implicitConversions
   */
 object ScalaConfig {
   implicit class RichConfig(val conf: Config) extends AnyVal {
-    private def opt[T](f: => T) = try {
-      Some(f)
-    } catch {
-      case e: ConfigException.Missing => None
-    }
+    private def opt[T](f: => T) =
+      try {
+        Some(f)
+      } catch {
+        case e: ConfigException.Missing => None
+      }
 
-    private def optElse[@specialized T](f: => T, x: T) = try {
-      f
-    } catch {
-      case e: ConfigException.Missing => x
-    }
+    private def optElse[@specialized T](f: => T, x: T) =
+      try {
+        f
+      } catch {
+        case e: ConfigException.Missing => x
+      }
 
     @inline
     private[this] def optElse[T](name: String, extract: Config => T, other: => T): T = {
@@ -39,7 +41,7 @@ object ScalaConfig {
       } else None
     }
 
-    def optDouble(name: String): Option[Double]  = opt(conf.getDouble(name))
+    def optDouble(name: String): Option[Double] = opt(conf.getDouble(name))
     def optStr(name: String): Option[String] = opt(conf.getString(name))
     def doubleOr(name: String, default: Double): Double = optElse(conf.getDouble(name), default)
     def intOr(name: String, default: Int): Int = optElse(conf.getInt(name), default)
@@ -54,9 +56,10 @@ object ScalaConfig {
       FiniteDuration(millis, TimeUnit.MILLISECONDS)
     }
 
-    def optDuration(name: String): Option[FiniteDuration] = optName(name, cfg => {
-      finiteDuration(name)
-    })
+    def optDuration(name: String): Option[FiniteDuration] =
+      optName(name, cfg => {
+        finiteDuration(name)
+      })
   }
 }
 

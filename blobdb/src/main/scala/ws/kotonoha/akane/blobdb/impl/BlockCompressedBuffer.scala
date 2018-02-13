@@ -11,13 +11,18 @@ import com.github.benmanes.caffeine.cache.Cache
 import org.mapdb.Serializer
 
 /**
- * @author eiennohito
- * @since 2014-08-29
- */
-
+  * @author eiennohito
+  * @since 2014-08-29
+  */
 case class BufferDescription(buf: ByteBuffer, offset: Long, len: Int)
 
-final class LargeFileMemoryMapper(raf: RandomAccessFile, file: FileChannel, mode: FileChannel.MapMode, pageOffset: Int, overlap: Int) extends Closeable {
+final class LargeFileMemoryMapper(
+    raf: RandomAccessFile,
+    file: FileChannel,
+    mode: FileChannel.MapMode,
+    pageOffset: Int,
+    overlap: Int)
+    extends Closeable {
 
   override def close() = {
     file.close()
@@ -26,7 +31,6 @@ final class LargeFileMemoryMapper(raf: RandomAccessFile, file: FileChannel, mode
   private val pageSize = 1 << pageOffset
   private val mapSize = pageSize + overlap
 
-
   type Buffers = Array[BufferDescription]
 
   private val buffers = new AtomicReference[Buffers](createBuffers)
@@ -34,14 +38,16 @@ final class LargeFileMemoryMapper(raf: RandomAccessFile, file: FileChannel, mode
   private def createBuffers: Buffers = {
     val sz = file.size()
     val cnt = sz / pageSize + 1
-    (0L until cnt).map { i =>
-      val rest = sz - (pageSize * i)
-      val toMap = if (rest < pageSize) rest else mapSize
-      val offset = i * pageSize
-      val buf = file.map(mode, offset, toMap)
-      buf.order(ByteOrder.LITTLE_ENDIAN)
-      BufferDescription(buf, offset, toMap.toInt)
-    }.toArray
+    0L.until(cnt)
+      .map { i =>
+        val rest = sz - (pageSize * i)
+        val toMap = if (rest < pageSize) rest else mapSize
+        val offset = i * pageSize
+        val buf = file.map(mode, offset, toMap)
+        buf.order(ByteOrder.LITTLE_ENDIAN)
+        BufferDescription(buf, offset, toMap.toInt)
+      }
+      .toArray
   }
 
   private def recreateBuffers() = synchronized {
@@ -95,7 +101,6 @@ class CompressedFileBlockReader(mapper: LargeFileMemoryMapper) extends Closeable
   def invalidate(): Unit = mapper.invalidate()
 }
 
-
 class SentenceIndexEntrySerializer extends Serializer[BlobIndexEntry] with Serializable {
   override def serialize(out: DataOutput, value: BlobIndexEntry) = {
     out.writeInt(value.file)
@@ -115,10 +120,15 @@ class SentenceIndexEntrySerializer extends Serializer[BlobIndexEntry] with Seria
 
 case class DecompressedBuffer(compressedSize: Int, data: Array[Byte])
 
-class MapBufferWithCache(fileNo: Int, raf: RandomAccessFile, val reader: BlockReader, cache: Cache[BufferPointer, DecompressedBuffer]) extends Closeable {
+class MapBufferWithCache(
+    fileNo: Int,
+    raf: RandomAccessFile,
+    val reader: BlockReader,
+    cache: Cache[BufferPointer, DecompressedBuffer])
+    extends Closeable {
   private val chan = raf.getChannel
-  private val rdr = new CompressedFileBlockReader(new LargeFileMemoryMapper(raf, chan, MapMode.READ_ONLY, 29, 128 * 1024))
-
+  private val rdr = new CompressedFileBlockReader(
+    new LargeFileMemoryMapper(raf, chan, MapMode.READ_ONLY, 29, 128 * 1024))
 
   def block(ptr: Long, reader: BlockReader): DecompressedBuffer = {
     val bptr = BufferPointer(fileNo, ptr)

@@ -33,7 +33,6 @@ class KyteaReader(morphSep: Char, fieldSep: Char, fields: Int) {
   private val fieldRegex = Pattern.compile(Pattern.quote(fieldSep.toString))
   private val morphRegex = Pattern.compile(Pattern.quote(morphSep.toString))
 
-
   def processMorph(input: CharSequence, start: Int, end: Int, sink: Growable[RawMorpheme]): Unit = {
     val sseq = input.subSequence(start, end)
     val seq = fieldRegex.split(sseq)

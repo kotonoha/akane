@@ -17,7 +17,7 @@
 package ws.kotonoha.akane.tools
 
 import scalax.file.Path
-import ws.kotonoha.akane.parser.{StreamReaderInput, AozoraInput, AozoraParser}
+import ws.kotonoha.akane.parser.{AozoraInput, AozoraParser, StreamReaderInput}
 import java.io.InputStreamReader
 import ws.kotonoha.akane.ast.Sentence
 import ws.kotonoha.akane.render.MetaStringRenderer
@@ -25,10 +25,9 @@ import scalax.io.Codec
 import org.apache.commons.lang3.StringUtils
 
 /**
- * @author eiennohito
- * @since 09.07.13 
- */
-
+  * @author eiennohito
+  * @since 09.07.13
+  */
 object TextScanner {
 
   def main(args: Array[String]) {

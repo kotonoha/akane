@@ -19,7 +19,7 @@ class JumanppActor(conf: JumanppConfig) extends Actor {
       val res = process.analyzeSync(data)
       res match {
         case Success(seq) => sender() ! AnalysisSuccess(ref, seq)
-        case Failure(x) => sender() ! AnalysisFailure(ref, x)
+        case Failure(x)   => sender() ! AnalysisFailure(ref, x)
       }
     case RestartSubprocess =>
       process.restart()

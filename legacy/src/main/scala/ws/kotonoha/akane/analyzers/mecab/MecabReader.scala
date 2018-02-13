@@ -20,7 +20,6 @@ import java.util.regex.Pattern
 
 import ws.kotonoha.akane.utils.DelimetedIterator
 
-
 case class RawMecabSentence(morphemes: Seq[RawMecabMorpheme])
 case class RawMecabMorpheme(parts: IndexedSeq[String])
 
@@ -31,7 +30,7 @@ case class RawMecabMorpheme(parts: IndexedSeq[String])
 class MecabReader {
   private val columnRegex = Pattern.compile("\t")
   def readOne(inp: DelimetedIterator) = {
-    val lines = inp.map{ line =>
+    val lines = inp.map { line =>
       val fields = columnRegex.split(line)
       RawMecabMorpheme(fields)
     }

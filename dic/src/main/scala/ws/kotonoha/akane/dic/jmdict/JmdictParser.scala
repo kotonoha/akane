@@ -26,7 +26,6 @@ import ws.kotonoha.akane.xml._
 
 import scala.collection.mutable.ArrayBuffer
 
-
 /**
   * @author eiennohito
   * @since 2016/07/20
@@ -37,7 +36,7 @@ class JmdictParser {
 
   def isJmdicNode(x: XmlData) = x match {
     case XmlEl("JMdict") => true
-    case _ => false
+    case _               => false
   }
 
   def parse(stream: InputStream): Iterator[JmdictEntry] = {
@@ -52,8 +51,8 @@ class JmdictParser {
 
     val parser = XmlParser.parse(reader)
     while (parser.hasNext && isJmdicNode(parser.next())) {} //skip until jmdic node
-    val entries = parser.transSeq("entry") {
-      it => parseEntry(it)
+    val entries = parser.transSeq("entry") { it =>
+      parseEntry(it)
     }
     entries
   }
@@ -66,13 +65,13 @@ class JmdictParser {
       val prio = new ArrayBuffer[Priority]()
 
       it.selector {
-        case x@XmlEl("keb") => data = it.content()
-        case x@XmlEl("ke_inf") =>
+        case x @ XmlEl("keb") => data = it.content()
+        case x @ XmlEl("ke_inf") =>
           tag(it.content()).foreach(tags += _)
-        case x@XmlEl("ke_pri") =>
+        case x @ XmlEl("ke_pri") =>
           it.content() match {
             case i if i.startsWith("nf") => freq = Some(i.substring(2).toInt)
-            case i => priorities.get(i).foreach(prio += _)
+            case i                       => priorities.get(i).foreach(prio += _)
           }
       }
 
@@ -93,7 +92,6 @@ class JmdictParser {
       str = cont
     )
   }
-
 
   def parseXref(it: XmlParseTransformer): CrossReference = {
     val data = it.content()
@@ -127,7 +125,10 @@ class JmdictParser {
     SourceInfo(cont, wasei, part, lang)
   }
 
-  private[jmdict] def parseSense(it: XmlParseTransformer, ki: ArrayBuffer[KanjiInfo], ri: ArrayBuffer[ReadingInfo]): MeaningInfo = {
+  private[jmdict] def parseSense(
+      it: XmlParseTransformer,
+      ki: ArrayBuffer[KanjiInfo],
+      ri: ArrayBuffer[ReadingInfo]): MeaningInfo = {
     it.trans("sense") { it =>
       val pos = new ArrayBuffer[JmdictTag]()
       val info = new ArrayBuffer[JmdictTag]()
@@ -140,26 +141,26 @@ class JmdictParser {
       val remarks = new ArrayBuffer[String]()
 
       it.selector {
-        case x@XmlEl("gloss") => cont += parseGloss(it)
-        case x@XmlEl("stagk") =>
+        case x @ XmlEl("gloss") => cont += parseGloss(it)
+        case x @ XmlEl("stagk") =>
           val data = it.content()
           val idx = ki.indexWhere(_.content == data)
           if (idx != -1) {
             kres += idx
           }
-        case x@XmlEl("stagr") =>
+        case x @ XmlEl("stagr") =>
           val data = it.content()
           val idx = ri.indexWhere(_.content == data)
           if (idx != -1) {
             rres += idx
           }
-        case x@XmlEl("pos") => tag(it.content()).foreach(pos += _)
-        case x@XmlEl("field" | "misc" | "dial") => tag(it.content()).foreach(info += _)
-        case x@XmlEl("xref") => xref += parseXref(it)
-        case x@XmlEl("ant") => ant += parseXref(it)
-        case x@XmlEl("lsource") => src += parseSource(it)
-        case x@XmlEl("s_inf") => remarks += it.content()
-        case x@XmlEl("example") => it.skipTag()
+        case x @ XmlEl("pos")                     => tag(it.content()).foreach(pos += _)
+        case x @ XmlEl("field" | "misc" | "dial") => tag(it.content()).foreach(info += _)
+        case x @ XmlEl("xref")                    => xref += parseXref(it)
+        case x @ XmlEl("ant")                     => ant += parseXref(it)
+        case x @ XmlEl("lsource")                 => src += parseSource(it)
+        case x @ XmlEl("s_inf")                   => remarks += it.content()
+        case x @ XmlEl("example")                 => it.skipTag()
       }
 
       MeaningInfo(
@@ -176,9 +177,10 @@ class JmdictParser {
     }
   }
 
-  private[jmdict] def parseReading(it: XmlParseTransformer, ki: ArrayBuffer[KanjiInfo]): ReadingInfo = {
+  private[jmdict] def parseReading(
+      it: XmlParseTransformer,
+      ki: ArrayBuffer[KanjiInfo]): ReadingInfo = {
     it.trans("r_ele") { it =>
-
       var data = ""
       var nokanji = false
       var freq: Option[Int] = None
@@ -187,20 +189,20 @@ class JmdictParser {
       val restr = new ArrayBuffer[Int]()
 
       it.selector {
-        case x@XmlEl("reb") => data = it.content()
-        case x@XmlEl("re_nokanji") => it.skipTag(); nokanji = true
-        case x@XmlEl("re_restr") =>
+        case x @ XmlEl("reb")        => data = it.content()
+        case x @ XmlEl("re_nokanji") => it.skipTag(); nokanji = true
+        case x @ XmlEl("re_restr") =>
           val data = it.content()
           val idx = ki.indexWhere(_.content == data)
           if (idx != -1) {
             restr += idx
           }
-        case x@XmlEl("re_inf") =>
+        case x @ XmlEl("re_inf") =>
           tag(it.content()).foreach(tags += _)
-        case x@XmlEl("re_pri") =>
+        case x @ XmlEl("re_pri") =>
           it.content() match {
             case i if i.startsWith("nf") => freq = Some(i.substring(2).toInt)
-            case i => priorities.get(i).foreach(prio += _)
+            case i                       => priorities.get(i).foreach(prio += _)
           }
       }
 
@@ -221,11 +223,11 @@ class JmdictParser {
     val ri = new ArrayBuffer[ReadingInfo]()
     val mi = new ArrayBuffer[MeaningInfo]()
     it.selector {
-      case x@XmlEl("ent_seq") => id = it.content().toLong
-      case XmlEl("k_ele") => ki += parseKanji(it)
-      case XmlEl("r_ele") => ri += parseReading(it, ki)
-      case XmlEl("info") => it.skipTag() //skip for the time being
-      case XmlEl("sense") => mi += parseSense(it, ki, ri)
+      case x @ XmlEl("ent_seq") => id = it.content().toLong
+      case XmlEl("k_ele")       => ki += parseKanji(it)
+      case XmlEl("r_ele")       => ri += parseReading(it, ki)
+      case XmlEl("info")        => it.skipTag() //skip for the time being
+      case XmlEl("sense")       => mi += parseSense(it, ki, ri)
     }
     JmdictEntry(
       id = id,
@@ -238,6 +240,8 @@ class JmdictParser {
 }
 
 object JmdictParser {
-  val priorities: Map[String, Priority] = Priority.values.map { v => v.name -> v }.toMap
+  val priorities: Map[String, Priority] = Priority.values.map { v =>
+    v.name -> v
+  }.toMap
   def tag(s: String): Option[JmdictTag] = JmdictTagMap.tagMap.get(s)
 }

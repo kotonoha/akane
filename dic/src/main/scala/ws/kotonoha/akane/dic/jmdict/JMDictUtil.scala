@@ -24,7 +24,6 @@ import ws.kotonoha.akane.dic.jmdict
 import ws.kotonoha.akane.io.LineIterator
 import ws.kotonoha.akane.resources.FSPaths
 
-
 /**
   * @author eiennohito
   * @since 2016/07/27
@@ -48,10 +47,9 @@ object JMDictUtil {
   def convertStream(ext: String, is: InputStream): InputStream = {
     ext match {
       case "gz" => new GZIPInputStream(is)
-      case _ => is
+      case _    => is
     }
   }
-
 
   def calculatePriority(entry: CommonInfo): Int = {
     val prs = entry.priority.map {
@@ -61,13 +59,13 @@ object JMDictUtil {
       case jmdict.Priority.ichi2 => 1
       case jmdict.Priority.spec1 => 2
       case jmdict.Priority.spec2 => 1
-      case jmdict.Priority.gai1 => 2
-      case jmdict.Priority.gai2 => 1
-      case _ => 0
+      case jmdict.Priority.gai1  => 2
+      case jmdict.Priority.gai2  => 1
+      case _                     => 0
     }
 
     val avg = prs.sum.toFloat / prs.length
-    Math.round(avg) max entry.freq.map(_ / 24).getOrElse(0)
+    Math.round(avg).max(entry.freq.map(_ / 24).getOrElse(0))
   }
 
   def calculatePriority(s: Seq[CommonInfo]): Int = {
@@ -75,13 +73,13 @@ object JMDictUtil {
   }
 
   def calculatePriority(entry: JmdictEntry): Int = {
-    calculatePriority(entry.readings) max calculatePriority(entry.writings)
+    calculatePriority(entry.readings).max(calculatePriority(entry.writings))
   }
 
   object priorityOrder extends Ordering[JmdictEntry] {
     override def compare(x: JmdictEntry, y: JmdictEntry) = {
-      val xp = calculatePriority(x.readings) max calculatePriority(x.writings)
-      val yp = calculatePriority(y.readings) max calculatePriority(y.writings)
+      val xp = calculatePriority(x.readings).max(calculatePriority(x.writings))
+      val yp = calculatePriority(y.readings).max(calculatePriority(y.writings))
       xp.compareTo(yp)
     }
   }
@@ -101,7 +99,8 @@ object JMDictUtil {
     e.copy(meanings = ms)
   }
 
-  def cleanLanguages(es: Seq[JmdictEntry], langs: Set[String]): Seq[JmdictEntry] = es.map(cleanLanguages(_, langs))
+  def cleanLanguages(es: Seq[JmdictEntry], langs: Set[String]): Seq[JmdictEntry] =
+    es.map(cleanLanguages(_, langs))
 
   val verbTags = Set(
     JmdictTag.v1,

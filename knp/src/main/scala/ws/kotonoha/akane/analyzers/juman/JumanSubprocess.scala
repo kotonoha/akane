@@ -29,16 +29,15 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.util.Success
 
-
 trait JumanAnalyzer extends SyncAnalyzer[String, JumanSequence]
 trait AsyncJumanAnalyzer extends AsyncAnalyzer[String, JumanSequence]
 
 /**
- * Actually this is a blocking analyzer using juman in a subprocess mode
- *
- * @author eiennohito
- * @since 2015/09/10
- */
+  * Actually this is a blocking analyzer using juman in a subprocess mode
+  *
+  * @author eiennohito
+  * @since 2015/09/10
+  */
 object JumanSubprocess extends StrictLogging {
 
   def process(config: JumanConfig): Process = {
@@ -69,9 +68,9 @@ object JumanSubprocess extends StrictLogging {
     }
   }
 
-  private final class Impl(cfg: JumanConfig) extends
-    SpawnedProcessAnalyzer[String, JumanSequence](process(cfg))(writer(cfg), reader(cfg))
-    with JumanAnalyzer
+  private final class Impl(cfg: JumanConfig)
+      extends SpawnedProcessAnalyzer[String, JumanSequence](process(cfg))(writer(cfg), reader(cfg))
+      with JumanAnalyzer
 }
 
 object JumanText {
@@ -79,26 +78,28 @@ object JumanText {
   def reader(enc: String) = new FromStream[JumanSequence] {
     private val cs = Charset.forName(enc)
 
-    override def readFrom(s: InputStream) = try {
-      val lexemes = new mutable.ArrayBuffer[JumanLexeme]
-      val reader = new BufferedReader(new InputStreamReader(s, cs))
-      var ok = true
-      while (ok) {
-        val line = reader.readLine()
-        if (line == null || line == "EOS") {
-          ok = false
-        } else {
-          if (line.startsWith("@")) {
-            val item = lexemes(lexemes.length - 1)
-            lexemes(lexemes.length - 1) = item.copy(variants = item.variants :+ JumanText.parseLine(line, 1, line.length))
-          } else lexemes += JumanText.parseLine(line, 0, line.length)
+    override def readFrom(s: InputStream) =
+      try {
+        val lexemes = new mutable.ArrayBuffer[JumanLexeme]
+        val reader = new BufferedReader(new InputStreamReader(s, cs))
+        var ok = true
+        while (ok) {
+          val line = reader.readLine()
+          if (line == null || line == "EOS") {
+            ok = false
+          } else {
+            if (line.startsWith("@")) {
+              val item = lexemes(lexemes.length - 1)
+              lexemes(lexemes.length - 1) =
+                item.copy(variants = item.variants :+ JumanText.parseLine(line, 1, line.length))
+            } else lexemes += JumanText.parseLine(line, 0, line.length)
+          }
         }
+        Success(JumanSequence(lexemes.result()))
+      } catch {
+        case e: IOException => throw e
+        case e: Exception   => scala.util.Failure(e)
       }
-      Success(JumanSequence(lexemes.result()))
-    } catch {
-      case e: IOException => throw e
-      case e: Exception => scala.util.Failure(e)
-    }
   }
 
   def parseOptions(input: CharSequence, start: Int, end: Int): Seq[JumanOption] = {

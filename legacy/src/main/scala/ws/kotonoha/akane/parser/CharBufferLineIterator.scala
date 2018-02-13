@@ -19,10 +19,11 @@ package ws.kotonoha.akane.parser
 import java.nio.CharBuffer
 
 /**
- * @author eiennohito
- * @since 2014-10-28
- */
-class CharBufferLineIterator(buffer: CharBuffer, globalSeparator: CharSequence) extends Iterator[CharSequence] {
+  * @author eiennohito
+  * @since 2014-10-28
+  */
+class CharBufferLineIterator(buffer: CharBuffer, globalSeparator: CharSequence)
+    extends Iterator[CharSequence] {
   var processing = true
 
   import ws.kotonoha.akane.parser.CharBufferLineIterator._

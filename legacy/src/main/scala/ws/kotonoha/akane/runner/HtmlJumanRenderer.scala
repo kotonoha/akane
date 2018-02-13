@@ -18,7 +18,7 @@ package ws.kotonoha.akane.runner
 
 import ws.kotonoha.akane.parser.{AozoraParser, StreamReaderInput}
 import scalax.file.Path
-import java.io.{PrintWriter, InputStreamReader}
+import java.io.{InputStreamReader, PrintWriter}
 import ws.kotonoha.akane.transform.JumanTransformer
 import ws.kotonoha.akane.juman.JumanPipeExecutor
 import ws.kotonoha.akane.ast.Sentence
@@ -26,14 +26,13 @@ import ws.kotonoha.akane.render.HtmlRenderer
 import xml.{MinimizeMode, Utility}
 
 /**
- * @author eiennohito
- * @since 17.08.12
- */
-
+  * @author eiennohito
+  * @since 17.08.12
+  */
 object HtmlJumanRenderer {
   def main(args: Array[String]) = {
     val fn = args(0)
-    val res = Path.fromString(fn) inputStream
+    val res = Path.fromString(fn).inputStream
     val pe = JumanPipeExecutor.apply()
     val jt = new JumanTransformer(pe)
     for (is <- res) {
@@ -43,12 +42,14 @@ object HtmlJumanRenderer {
       val hr = new HtmlRenderer
       val sb = new StringBuilder(8 * 1024)
       val parsed = parser.toArray
-      val nodes = parsed map {
-        case s: Sentence => jt.transformSentence(s)
-        case n => n
-      } map {
-        hr.render(_)
-      }
+      val nodes = parsed
+        .map {
+          case s: Sentence => jt.transformSentence(s)
+          case n           => n
+        }
+        .map {
+          hr.render(_)
+        }
       val out = Path.fromString(args(0) + ".html")
 
       val doc =

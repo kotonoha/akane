@@ -16,15 +16,14 @@
 
 package ws.kotonoha.akane.parser
 
-import java.io.{Reader, InputStreamReader}
+import java.io.{InputStreamReader, Reader}
 import java.nio.CharBuffer
 import ws.kotonoha.akane.unicode.UnicodeUtil
 
 /**
- * @author eiennohito
- * @since 17.08.12
- */
-
+  * @author eiennohito
+  * @since 17.08.12
+  */
 class StreamReaderInput(in: InputStreamReader) extends AozoraInput {
   private val charbuf = new Array[Char](8 * 4096)
   private var cur = 0
@@ -38,7 +37,9 @@ class StreamReaderInput(in: InputStreamReader) extends AozoraInput {
     System.arraycopy(charbuf, sz, charbuf, 0, charbuf.length - sz)
     cur -= sz
     end -= sz
-    mark_ = mark_ map { m => (m - sz) max (-1) }
+    mark_ = mark_.map { m =>
+      (m - sz).max(-1)
+    }
   }
 
   private def checkJapanese(cnt: Int) {

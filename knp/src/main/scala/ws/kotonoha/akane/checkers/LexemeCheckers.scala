@@ -3,13 +3,11 @@ package ws.kotonoha.akane.checkers
 import ws.kotonoha.akane.analyzers.knp.LexemeApi
 
 import scala.language.implicitConversions
-import scala.languageFeature.implicitConversions
 
 /**
   * @author eiennohito
   * @since 2016/01/15
   */
-
 trait LexemeChecker extends Serializable {
   def check(lex: LexemeApi): Boolean
 }
@@ -39,8 +37,10 @@ final class CanonicalFormChecker(form: String) extends LexemeChecker {
 object LexemeCheckers {
   implicit def posChecker2LexemeChecher(pc: PosCheck): LexemeChecker = new PosLexemeChecker(pc)
 
-  implicit class PosCheckerApi (val pc: PosCheck) extends AnyVal {
-    def withDicForm(form: String): LexemeChecker = new PosAndLexemeChecker(pc, new DicFormLexemeChecker(form))
-    def exceptDicForm(form: String): LexemeChecker = new PosAndLexemeChecker(pc, new DicFormExceptChecker(form))
+  implicit class PosCheckerApi(val pc: PosCheck) extends AnyVal {
+    def withDicForm(form: String): LexemeChecker =
+      new PosAndLexemeChecker(pc, new DicFormLexemeChecker(form))
+    def exceptDicForm(form: String): LexemeChecker =
+      new PosAndLexemeChecker(pc, new DicFormExceptChecker(form))
   }
 }

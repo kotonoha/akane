@@ -18,11 +18,11 @@ import scala.util.Try
   * @author eiennohito
   * @since 2016/09/28
   */
-
 trait JumanppAnalyzer extends SyncAnalyzer[String, Lattice]
 
 object JumanppSubprocess extends StrictLogging {
-  def create(cfg: JumanppConfig): JumanppAnalyzer with SubprocessControls = new JumanppSubprocessImpl(cfg)
+  def create(cfg: JumanppConfig): JumanppAnalyzer with SubprocessControls =
+    new JumanppSubprocessImpl(cfg)
 
   private def process(cfg: JumanppConfig): Process = {
     val commands = new util.ArrayList[String]()
@@ -40,7 +40,8 @@ object JumanppSubprocess extends StrictLogging {
     val pb = new ProcessBuilder(commands)
     val process = pb.start()
 
-    logger.debug(s"starting juman++ using ${cfg.executable} with lattice of ${cfg.latticeSize}: isalive = ${process.isAlive}")
+    logger.debug(
+      s"starting juman++ using ${cfg.executable} with lattice of ${cfg.latticeSize}: isalive = ${process.isAlive}")
 
     process
   }
@@ -67,7 +68,7 @@ object JumanppSubprocess extends StrictLogging {
         val c = inp(i)
         c match {
           case '\t' => inputBuffer.put(' ')
-          case _ => inputBuffer.put(c)
+          case _    => inputBuffer.put(c)
         }
         i += 1
       }
@@ -84,18 +85,17 @@ object JumanppSubprocess extends StrictLogging {
   }
 
   private class JumanppSubprocessImpl(cfg: JumanppConfig)
-    extends SpawnedProcessAnalyzer[String, Lattice](process(cfg))(new JumanppInput, new JumanppOutput)
-    with JumanppAnalyzer {
-
-  }
+      extends SpawnedProcessAnalyzer[String, Lattice](process(cfg))(new JumanppInput,
+                                                                    new JumanppOutput)
+      with JumanppAnalyzer {}
 
 }
 
-case class JumanppConfig (
-  executable: String,
-  resources: Option[String] = None,
-  latticeSize: Int = 1,
-  otherArgs: Seq[String] = Nil
+case class JumanppConfig(
+    executable: String,
+    resources: Option[String] = None,
+    latticeSize: Int = 1,
+    otherArgs: Seq[String] = Nil
 )
 
 object JumanppConfig {

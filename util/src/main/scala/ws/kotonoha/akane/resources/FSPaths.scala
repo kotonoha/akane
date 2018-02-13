@@ -16,7 +16,14 @@
 
 package ws.kotonoha.akane.resources
 
-import java.io.{BufferedReader, Closeable, IOException, InputStream, InputStreamReader, OutputStream}
+import java.io.{
+  BufferedReader,
+  Closeable,
+  IOException,
+  InputStream,
+  InputStreamReader,
+  OutputStream
+}
 import java.nio.charset.Charset
 import java.nio.file._
 import java.nio.file.attribute.{BasicFileAttributes, FileTime}
@@ -25,10 +32,12 @@ import java.util.function.BiPredicate
 
 import ws.kotonoha.akane.io.{CloseableIterator, FrameAdapter, StreamClosableIterator}
 
+import scala.util.Try
+
 /**
- * @author eiennohito
- * @since 2015/09/24
- */
+  * @author eiennohito
+  * @since 2015/09/24
+  */
 object FSPaths {
   import scala.collection.JavaConverters._
 
@@ -66,21 +75,29 @@ object FSPaths {
   }
 
   def recursiveDelete(path: Path): Path = {
-    Files.walkFileTree(path, new SimpleFileVisitor[Path] {
-      override def visitFile(file: Path, attrs: BasicFileAttributes) = {
-        Files.delete(file)
-        FileVisitResult.CONTINUE
-      }
+    Files.walkFileTree(
+      path,
+      new SimpleFileVisitor[Path] {
+        override def visitFile(file: Path, attrs: BasicFileAttributes) = {
+          Files.delete(file)
+          FileVisitResult.CONTINUE
+        }
 
-      override def postVisitDirectory(dir: Path, exc: IOException) = {
-        exc match {
-          case null =>
-            Files.delete(dir)
-            FileVisitResult.CONTINUE
-          case _ => throw exc
+        override def postVisitDirectory(dir: Path, exc: IOException) = {
+          exc match {
+            case null =>
+              Files.delete(dir)
+              FileVisitResult.CONTINUE
+            case _ => throw exc
+          }
         }
       }
-    })
+    )
+  }
+
+  def children(p: Path, opts: FileVisitOption*): CloseableIterator[Path] = {
+    val stream = Files.walk(p, 1, opts: _*)
+    new StreamClosableIterator[Path](stream)
   }
 
   def deleteChildren(path: Path): Unit = {
@@ -107,14 +124,15 @@ object FSPaths {
   }
 
   def ensureParent(p: Path): Path = {
-    p.parent.foreach( x => if (x.notExists) x.mkdirs() )
+    p.parent.foreach(x => if (x.notExists) x.mkdirs())
     p
   }
 
   def extension(path: Path): String = {
     val name = path.getFileName.toString
     val pos = name.lastIndexOf('.')
-    if (pos == -1) "" else {
+    if (pos == -1) ""
+    else {
       name.substring(pos + 1)
     }
   }
@@ -128,41 +146,48 @@ object FSPaths {
     } finally {
       lines match {
         case l: Closeable => l.close()
-        case _ =>
+        case _            =>
       }
     }
   }
 
-  def writeStrings(p: Path, strings: TraversableOnce[String], separator: String, enc: Charset): Path = {
+  def writeStrings(
+      p: Path,
+      strings: TraversableOnce[String],
+      separator: String,
+      enc: Charset): Path = {
     try {
-      val ret = Files.write(p, new java.lang.Iterable[String] {
-        val iter: Iterator[String] = strings.toIterator
-        override def iterator = new java.util.Iterator[String] {
-          private var haveSep = false
-          override def hasNext = iter.hasNext || haveSep
-          override def next() = {
-            if (haveSep) {
-              haveSep = false
-              separator
-            } else {
-              haveSep = iter.hasNext
-              iter.next()
+      val ret = Files.write(
+        p,
+        new java.lang.Iterable[String] {
+          val iter: Iterator[String] = strings.toIterator
+          override def iterator = new java.util.Iterator[String] {
+            private var haveSep = false
+            override def hasNext = iter.hasNext || haveSep
+            override def next() = {
+              if (haveSep) {
+                haveSep = false
+                separator
+              } else {
+                haveSep = iter.hasNext
+                iter.next()
+              }
             }
           }
-        }
-      }, enc)
+        },
+        enc
+      )
       ret
     } finally {
       strings match {
         case l: Closeable => l.close()
-        case _ => //nop
+        case _            => //nop
       }
     }
   }
 
-
-
-  def find(path: Path, depth: Int = Int.MaxValue)(fn: (Path, BasicFileAttributes) => Boolean): AutoClosableWrapper[CloseableIterator[Path]] = {
+  def find(path: Path, depth: Int = Int.MaxValue)(
+      fn: (Path, BasicFileAttributes) => Boolean): AutoClosableWrapper[CloseableIterator[Path]] = {
     new CloseableIterator[Path] {
       private val stream = Files.find(path, depth, new BiPredicate[Path, BasicFileAttributes] {
         override def test(t: Path, u: BasicFileAttributes) = fn(t, u)
@@ -202,6 +227,21 @@ object FSPaths {
         obj.close()
       }
     }
+
+    def either[R](fn: T => R): Either[Exception, R] =
+      try {
+        Right(fn(obj))
+      } catch {
+        case e: Exception => Left(e)
+      }
+
+    def exec[R](fn: T => R): Try[R] = {
+      try {
+        scala.util.Success(fn(obj))
+      } catch {
+        case e: Exception => scala.util.Failure(e)
+      }
+    }
   }
 
   class EmptyWrapper[T](val obj: T) extends AnyVal {
@@ -227,11 +267,12 @@ object FSPaths {
     def lines(enc: Charset = utf8): CloseableIterator[String] = wrapStream(Files.lines(p, enc))
     def ensureDirectory(): Path = FSPaths.ensureDir(p)
     def ensureParent(): Path = FSPaths.ensureParent(p)
-    def outputStream(openOption: OpenOption*): AutoClosableWrapper[OutputStream] = Files.newOutputStream(p, openOption: _*).res
+    def outputStream(openOption: OpenOption*): AutoClosableWrapper[OutputStream] =
+      Files.newOutputStream(p, openOption: _*).res
     def walk(globPattern: String): CloseableIterator[Path] = FSPaths.recursiveWalk(p, globPattern)
+    def children(opts: FileVisitOption*): CloseableIterator[Path] = FSPaths.children(p, opts: _*)
 
     def mkdirs(): Path = Files.createDirectories(p)
-
 
     def inputStream: AutoClosableWrapper[InputStream] = Files.newInputStream(p).res
     def framedBy(sep: Array[Byte]): FrameAdapter = FrameAdapter.apply(p.inputStream.obj, sep)
@@ -246,19 +287,24 @@ object FSPaths {
       Files.write(p, Collections.singleton(s), enc)
     }
 
-    def writeLines(lines: TraversableOnce[String], enc: Charset = utf8): Path = FSPaths.writeLines(p, lines, enc)
-    def writeStrings(strings: TraversableOnce[String], separator: String, enc: Charset = utf8): Path = FSPaths.writeStrings(p, strings, separator, enc)
+    def writeLines(lines: TraversableOnce[String], enc: Charset = utf8): Path =
+      FSPaths.writeLines(p, lines, enc)
+    def writeStrings(
+        strings: TraversableOnce[String],
+        separator: String,
+        enc: Charset = utf8): Path = FSPaths.writeStrings(p, strings, separator, enc)
 
-    def / (s: String): Path = p.resolve(s)
-    def / (px: Path): Path = p.resolve(px)
+    def /(s: String): Path = p.resolve(s)
+    def /(px: Path): Path = p.resolve(px)
   }
 
   implicit class RichFileTime(val t: FileTime) extends AnyVal {
-    def < (o: FileTime): Boolean = t.compareTo(o) < 0
-    def > (o: FileTime): Boolean = t.compareTo(o) > 0
+    def <(o: FileTime): Boolean = t.compareTo(o) < 0
+    def >(o: FileTime): Boolean = t.compareTo(o) > 0
   }
 
   val utf8: Charset = Charset.forName("utf-8")
 
-  private def wrapStream[T](str: java.util.stream.Stream[T]): CloseableIterator[T] = new StreamClosableIterator(str)
+  private def wrapStream[T](str: java.util.stream.Stream[T]): CloseableIterator[T] =
+    new StreamClosableIterator(str)
 }

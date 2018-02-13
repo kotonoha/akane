@@ -38,13 +38,12 @@ import scala.concurrent.ExecutionContextExecutor
   * @since 2016/07/21
   */
 case class JmdictSearchResults(
-  data: Seq[JmdictEntry],
-  expls: Map[Long, Explanation] = Map.empty,
-  totalHits: Int = 0
+    data: Seq[JmdictEntry],
+    expls: Map[Long, Explanation] = Map.empty,
+    totalHits: Int = 0
 )
 
 case class JmdictInfo(update: LocalDate, build: DateTime, langs: LangFrequencyPack)
-
 
 trait LuceneJmdict {
   def find(q: JmdictQuery): JmdictSearchResults
@@ -53,15 +52,16 @@ trait LuceneJmdict {
   def info: JmdictInfo
 }
 
-class LuceneJmdictImpl(ir: IndexReader, ec: ExecutionContextExecutor, val info: JmdictInfo) extends LuceneJmdict {
+class LuceneJmdictImpl(ir: IndexReader, ec: ExecutionContextExecutor, val info: JmdictInfo)
+    extends LuceneJmdict {
 
   val specialChars = "?*.？＊。．"
 
   def rewriteForLucene(s: String) = {
     s.map {
       case '.' | '。' | '．' | '？' => '?'
-      case '＊' => '*'
-      case x => x
+      case '＊'                   => '*'
+      case x                     => x
     }
   }
 
@@ -72,7 +72,9 @@ class LuceneJmdictImpl(ir: IndexReader, ec: ExecutionContextExecutor, val info: 
       val q = new WildcardQuery(new Term(field, toLucene))
       q.rewrite(ir)
     } catch {
-      case x if x.isInstanceOf[BooleanQuery.TooManyClauses] || x.isInstanceOf[TooComplexToDeterminizeException] =>
+      case x
+          if x.isInstanceOf[BooleanQuery.TooManyClauses] || x
+            .isInstanceOf[TooComplexToDeterminizeException] =>
         new TermQuery(new Term(field, StringUtils.removePattern(toLucene, "[\\?\\*]")))
     }
 
@@ -92,9 +94,9 @@ class LuceneJmdictImpl(ir: IndexReader, ec: ExecutionContextExecutor, val info: 
 
   def parseSpecialQuery(field: String, termString: String): Query = {
     field match {
-      case "w" | "r" => makeNgramQuery(field, termString)
+      case "w" | "r"          => makeNgramQuery(field, termString)
       case s if s.length == 3 => makeLanguageQuery(field, termString)
-      case _ => new TermQuery(new Term(field, termString))
+      case _                  => new TermQuery(new Term(field, termString))
     }
   }
 
@@ -108,12 +110,14 @@ class LuceneJmdictImpl(ir: IndexReader, ec: ExecutionContextExecutor, val info: 
 
     val wrapped = q match {
       case x: ConstantScoreQuery => x
-      case _ => new ConstantScoreQuery(q)
+      case _                     => new ConstantScoreQuery(q)
     }
 
-    val boosted = if (boost == 1.0) wrapped else {
-      new BoostQuery(wrapped, boost)
-    }
+    val boosted =
+      if (boost == 1.0) wrapped
+      else {
+        new BoostQuery(wrapped, boost)
+      }
 
     new BooleanClause(boosted, jqp.occur)
   }
@@ -134,7 +138,7 @@ class LuceneJmdictImpl(ir: IndexReader, ec: ExecutionContextExecutor, val info: 
     }
 
     if (q.ignore.nonEmpty) {
-      val qx = LongPoint.newSetQuery("idset", q.ignore :_*)
+      val qx = LongPoint.newSetQuery("idset", q.ignore: _*)
       qb.add(qx, Occur.MUST_NOT)
     }
 
@@ -164,7 +168,8 @@ class LuceneJmdictImpl(ir: IndexReader, ec: ExecutionContextExecutor, val info: 
   private val searcher = new IndexSearcher(ir)
 
   private val docsCache = {
-    Caffeine.newBuilder()
+    Caffeine
+      .newBuilder()
       .executor(ec)
       .maximumSize(20000)
       .expireAfterAccess(1, TimeUnit.DAYS)
@@ -240,13 +245,16 @@ class LuceneJmdictImpl(ir: IndexReader, ec: ExecutionContextExecutor, val info: 
     val ids = new ArrayBuffer[Long]()
     q.parts.grouped(500).foreach { qp =>
       val lq = makeIdQuery(qp)
-      searcher.search(lq, new SimpleCollector {
-        override def collect(doc: Int) = {
-          val binary = searcher.doc(doc, onlyId).getBinaryValue("id")
-          ids += DataConversion.readSignedVLong(binary)
+      searcher.search(
+        lq,
+        new SimpleCollector {
+          override def collect(doc: Int) = {
+            val binary = searcher.doc(doc, onlyId).getBinaryValue("id")
+            ids += DataConversion.readSignedVLong(binary)
+          }
+          override def needsScores() = false
         }
-        override def needsScores() = false
-      })
+      )
     }
 
     ids

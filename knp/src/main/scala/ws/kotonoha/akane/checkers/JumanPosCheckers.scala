@@ -19,16 +19,24 @@ trait PosCheck extends Serializable {
 
 class JumanPosCheckers(posInfo: JumanPosSet) {
   def pos(name: String): PosCheck = {
-    val id = posInfo.pos.find(_.name == name).map(_.num)
+    val id = posInfo.pos
+      .find(_.name == name)
+      .map(_.num)
       .getOrElse(throw new Exception(s"pos name $name is invalid"))
     new OnlyPosChecker(id, name)
   }
 
   def posSubPos(name: String, subname: String): PosCheck = {
-    val id = posInfo.pos.find(_.name == name).map(_.num)
+    val id = posInfo.pos
+      .find(_.name == name)
+      .map(_.num)
       .getOrElse(throw new Exception(s"pos name $name is invalid"))
 
-    val subid = posInfo.pos(id).subtypes.find(_.name == subname).map(_.num)
+    val subid = posInfo
+      .pos(id)
+      .subtypes
+      .find(_.name == subname)
+      .map(_.num)
       .getOrElse(throw new Exception(s"subpos name $subname is invalid"))
 
     new PosSubposChecker(name, subname, id, subid)

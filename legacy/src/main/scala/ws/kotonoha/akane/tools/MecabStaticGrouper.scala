@@ -24,10 +24,9 @@ import collection.mutable.ListBuffer
 import collection.immutable
 
 /**
- * @author eiennohito
- * @since 14.11.12 
- */
-
+  * @author eiennohito
+  * @since 14.11.12
+  */
 class StaticGrouper(in: Iterator[String]) extends CalculatingIterator[String] {
   lazy val iter = in.map(x => re.pattern.split(x, -1)).buffered
   lazy val re = ",".r
@@ -44,9 +43,9 @@ class StaticGrouper(in: Iterator[String]) extends CalculatingIterator[String] {
       forms.filter(expr.pattern.matcher(_).matches())
     } else frm :: Nil
 
-    val self =  if (UnicodeUtil.hasKanji(frm)) frm :: Nil else Nil
+    val self = if (UnicodeUtil.hasKanji(frm)) frm :: Nil else Nil
     val jmdict = items.flatMap(i => JMDictGrouper.items.get(i).map(_.toList)).flatten
-     (jmdict ++ items ++ self).distinct
+    (jmdict ++ items ++ self).distinct
   }
 
   def fillQueue(): Option[String] = {
@@ -58,13 +57,17 @@ class StaticGrouper(in: Iterator[String]) extends CalculatingIterator[String] {
       lb += iter.next()
     }
     val items = lb.toList
-    val dforms = items.map(_(10)).filter{x => UnicodeUtil.hasKanji(x)} //drop nonkanji writings
-    val x :: xs = items.map { i => i.mkString(",") + ",%s".format(forms(i, dforms).mkString("/"))}
+    val dforms = items.map(_(10)).filter { x =>
+      UnicodeUtil.hasKanji(x)
+    } //drop nonkanji writings
+    val x :: xs = items.map { i =>
+      i.mkString(",") + ",%s".format(forms(i, dforms).mkString("/"))
+    }
     queue ++= xs
     Some(x)
   }
 
-  protected def calculate() = queue.dequeueFirst(_ => true) orElse(fillQueue())
+  protected def calculate() = queue.dequeueFirst(_ => true).orElse(fillQueue())
 }
 
 object JMDictGrouper {

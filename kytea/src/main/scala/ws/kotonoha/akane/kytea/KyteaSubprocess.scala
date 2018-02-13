@@ -30,7 +30,6 @@ import scala.util.{Failure, Success, Try}
   * @author eiennohito
   * @since 2016/09/06
   */
-
 trait KyteaRaw extends SyncAnalyzer[String, KyteaSentence]
 trait KyteaAsync extends AsyncAnalyzer[String, KyteaSentence]
 
@@ -43,7 +42,7 @@ object KyteaSubprocess extends StrictLogging {
         Success(format.parse(rdr.readLine()))
       } catch {
         case e: IOException => throw e
-        case e: Exception => Failure(e)
+        case e: Exception   => Failure(e)
       }
     }
   }
@@ -65,8 +64,9 @@ object KyteaSubprocess extends StrictLogging {
     proc
   }
 
-  private final class Impl(cfg: KyteaConfig) extends
-    SpawnedProcessAnalyzer[String, KyteaSentence](process(cfg))(writer(), reader(cfg)) with KyteaRaw
+  private final class Impl(cfg: KyteaConfig)
+      extends SpawnedProcessAnalyzer[String, KyteaSentence](process(cfg))(writer(), reader(cfg))
+      with KyteaRaw
 
   def create(cfg: KyteaConfig): KyteaRaw with SubprocessControls = new Impl(cfg)
 }

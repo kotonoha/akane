@@ -37,7 +37,7 @@ class JppLatticeGviz(writer: Appendable) {
 
   private def println(): this.type = {
     writer.append("\n")
-    (0 until level).foreach(_ => writer.append(" "))
+    0.until(level).foreach(_ => writer.append(" "))
     this
   }
 
@@ -62,7 +62,7 @@ class JppLatticeGviz(writer: Appendable) {
         val lid = s"n_$prev"
         val rid = s"n_$id"
         val common = left match {
-          case None => n.rank.toSet
+          case None    => n.rank.toSet
           case Some(l) => l.rank.toSet.intersect(n.rank.toSet)
         }
 
@@ -72,7 +72,7 @@ class JppLatticeGviz(writer: Appendable) {
           case Some(1) => "red"
           case Some(2) => "blue"
           case Some(3) => "green"
-          case _ => "black"
+          case _       => "black"
         }
 
         val label = sorted.mkString(",")
@@ -95,7 +95,8 @@ class JppLatticeGviz(writer: Appendable) {
         case _ => sub.name
       }
 
-      val repr = s"""label=<<table><tr><td border="0">${n.surface}</td><td border="0">${n.canonic}</td></tr><tr><td border="0">${pos.name}</td><td border="0">$pform</td></tr></table>>"""
+      val repr =
+        s"""label=<<table><tr><td border="0">${n.surface}</td><td border="0">${n.canonic}</td></tr><tr><td border="0">${pos.name}</td><td border="0">$pform</td></tr></table>>"""
       println(s"$ids [$repr]")
     }
   }
@@ -122,7 +123,8 @@ object Jpp2Gviz {
       val prs = new JppLatticeParser
       val lattice = prs.parse(rdr)
 
-      for (out <- (args(0) + ".dot").p.outputStream(StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
+      for (out <- (args(0) + ".dot").p
+             .outputStream(StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
         val writer = new OutputStreamWriter(out, Charsets.utf8)
         val prr = new JppLatticeGviz(writer)
         prr.render(lattice)

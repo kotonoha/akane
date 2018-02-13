@@ -24,7 +24,7 @@ class PosCodec(data: Array[JumanPos]) {
     val rawCode = PosCodec.encodeRaw(pos)
     reverse.get(rawCode) match {
       case Some(code) => code
-      case None => rawCode
+      case None       => rawCode
     }
   }
 
@@ -35,11 +35,13 @@ class PosCodec(data: Array[JumanPos]) {
 
 object PosCodec {
   lazy val default: PosCodec = {
-    Classpath.inputStream("/juman/pos.freq").map {
-      fromStream
-    }.obj
+    Classpath
+      .inputStream("/juman/pos.freq")
+      .map {
+        fromStream
+      }
+      .obj
   }
-
 
   private val posset = JumanPosSet.default
 
@@ -68,7 +70,7 @@ object PosCodec {
     val reader = new BufferedReader(new InputStreamReader(s, Charsets.utf8))
     val result = new ArrayBuffer[JumanPos]()
     var line: String = null
-    while ( {
+    while ({
       line = reader.readLine()
       line != null
     }) {

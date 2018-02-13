@@ -31,14 +31,14 @@ class ByteBufferInputStream(buf: ByteBuffer) extends InputStream {
   override def read(b: Array[Byte]): Int = {
     if (buf.remaining() == 0) return -1
     val pos = buf.position()
-    val toRead = b.length min buf.remaining()
+    val toRead = b.length.min(buf.remaining())
     buf.get(b, 0, toRead)
     toRead
   }
   override def read(b: Array[Byte], off: Int, len: Int): Int = {
     if (buf.remaining() == 0) return -1
     val pos = buf.position()
-    val toRead = len min buf.remaining()
+    val toRead = len.min(buf.remaining())
     buf.get(b, off, toRead)
     toRead
   }

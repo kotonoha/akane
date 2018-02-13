@@ -22,16 +22,21 @@ import collection.mutable
 import scalax.io.Codec
 
 /**
- * @author eiennohito
- * @since 30.10.12 
- */
-
+  * @author eiennohito
+  * @since 30.10.12
+  */
 object PathUtil {
   def enumeratePaths(in: TraversableOnce[Path]): Iterator[Path] = {
-    in.map{p => (p.parent, p.name)}.map{
-      case (Some(dir), nm) => dir ** GlobNameMatcher(nm)
-      case (None, nm) => Path.fromString(nm)
-    }.reduce(_ +++ _).iterator.filter(Exists)
+    in.map { p =>
+        (p.parent, p.name)
+      }
+      .map {
+        case (Some(dir), nm) => dir ** GlobNameMatcher(nm)
+        case (None, nm)      => Path.fromString(nm)
+      }
+      .reduce(_ +++ _)
+      .iterator
+      .filter(Exists)
   }
 
   def enumerateStrings(in: TraversableOnce[String]): Iterator[Path] = {
@@ -39,11 +44,15 @@ object PathUtil {
   }
 
   def stoplist(in: Iterator[Path]): Set[String] = {
-    in.foldLeft(new mutable.HashSet[String]()) {case (hs, p) => {
-      p.lines()(Codec.UTF8).filter(!_.startsWith("#")).
-        map (w => w.split("\\|").map(_.trim).filter(_.length > 0)).
-        foreach { hs ++= _ }
-      hs
-    }}.toSet
+    in.foldLeft(new mutable.HashSet[String]()) {
+        case (hs, p) => {
+          p.lines()(Codec.UTF8)
+            .filter(!_.startsWith("#"))
+            .map(w => w.split("\\|").map(_.trim).filter(_.length > 0))
+            .foreach { hs ++= _ }
+          hs
+        }
+      }
+      .toSet
   }
 }

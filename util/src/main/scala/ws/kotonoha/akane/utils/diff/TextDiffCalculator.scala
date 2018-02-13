@@ -9,7 +9,6 @@ import scala.collection.mutable.ArrayBuffer
   * @author eiennohito
   * @since 2016/09/12
   */
-
 final class TextDiffCfg(data: Array[Int]) {
   if (data.length != 16) {
     throw new Exception("length should be 16")
@@ -22,24 +21,36 @@ final class TextDiffCfg(data: Array[Int]) {
 
 object TextDiffCfg {
   def apply(
-    replaceCost: Int = 1,
-    insertCost: Int = 1,
-    deleteCost: Int = 1,
-    insertInsert: Int = 1,
-    insertDelete: Int = 1,
-    insertReplace: Int = 1,
-    deleteInsert: Int = 1,
-    deleteDelete: Int = 1,
-    deleteReplace: Int = 1,
-    replaceInsert: Int = 1,
-    replaceDelete: Int = 1,
-    replaceReplace: Int = 1
+      replaceCost: Int = 1,
+      insertCost: Int = 1,
+      deleteCost: Int = 1,
+      insertInsert: Int = 1,
+      insertDelete: Int = 1,
+      insertReplace: Int = 1,
+      deleteInsert: Int = 1,
+      deleteDelete: Int = 1,
+      deleteReplace: Int = 1,
+      replaceInsert: Int = 1,
+      replaceDelete: Int = 1,
+      replaceReplace: Int = 1
   ): TextDiffCfg = {
     val data = Array[Int](
-      0, insertCost, deleteCost, replaceCost,
-      0, insertInsert, insertDelete, insertReplace,
-      0, deleteInsert, deleteDelete, deleteReplace,
-      0, replaceInsert, replaceDelete, replaceReplace
+      0,
+      insertCost,
+      deleteCost,
+      replaceCost,
+      0,
+      insertInsert,
+      insertDelete,
+      insertReplace,
+      0,
+      deleteInsert,
+      deleteDelete,
+      deleteReplace,
+      0,
+      replaceInsert,
+      replaceDelete,
+      replaceReplace
     )
     new TextDiffCfg(data)
   }
@@ -56,7 +67,8 @@ class TextDiffCalculator(cfg: TextDiffCfg = TextDiffCfg.default) {
 
   private def checkCoord(x: Int, y: Int) = {
     if (x > xlen || y > ylen || x < 0 || y < 0) {
-      throw new IndexOutOfBoundsException(s"coordinate was invalid: [$x, $y], can be [$xlen, $ylen]")
+      throw new IndexOutOfBoundsException(
+        s"coordinate was invalid: [$x, $y], can be [$xlen, $ylen]")
     }
   }
 
@@ -196,9 +208,9 @@ class TextDiffCalculator(cfg: TextDiffCfg = TextDiffCfg.default) {
         val cost = matval & 0xffffff
         val tp = matval >> 24
         val tpchar = tp match {
-          case DiffTypes.TRANSITION_EQUALS => 'e'
-          case DiffTypes.TRANSITION_INSERT => 'i'
-          case DiffTypes.TRANSITION_DELETE => 'd'
+          case DiffTypes.TRANSITION_EQUALS  => 'e'
+          case DiffTypes.TRANSITION_INSERT  => 'i'
+          case DiffTypes.TRANSITION_DELETE  => 'd'
           case DiffTypes.TRANSITION_REPLACE => 'r'
         }
         bldr.append(f"$cost%2d$tpchar")
@@ -303,8 +315,8 @@ class TextDiffCalculator(cfg: TextDiffCfg = TextDiffCfg.default) {
 
     @tailrec
     private def computeSpans(inx: Int, iny: Int): Unit = {
-      val x = inx max -1
-      val y = iny max -1
+      val x = inx.max(-1)
+      val y = iny.max(-1)
       if (x == -1 || y == -1) {
         if (x == -1 && y == -1) return
         if (x == -1) {

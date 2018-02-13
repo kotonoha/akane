@@ -20,22 +20,27 @@ import scalax.file.Path
 import org.apache.commons.lang3.StringUtils
 
 /**
- * @author eiennohito
- * @since 10.11.12 
- */
-
+  * @author eiennohito
+  * @since 10.11.12
+  */
 object Filter {
   def main(args: Array[String]) = {
     val filter = Path.fromString(args(1))
-    val flt = filter.lines() map (_.split("\t")) flatMap {
-      case Array(s1, _) => {
-        Some(StringUtils.strip(s1, "\""))
+    val flt = filter
+      .lines()
+      .map(_.split("\t"))
+      .flatMap {
+        case Array(s1, _) => {
+          Some(StringUtils.strip(s1, "\""))
+        }
+        case _ => None
       }
-      case _ => None
-    } toSet
+      .toSet
 
     val items = Path.fromString(args(0))
-    val present = items.lines().map(_.trim).filter{x => flt.contains(x)}
+    val present = items.lines().map(_.trim).filter { x =>
+      flt.contains(x)
+    }
     val out = Path.fromString(args(0) + ".out")
     out.writeStrings(present, "\n")
   }

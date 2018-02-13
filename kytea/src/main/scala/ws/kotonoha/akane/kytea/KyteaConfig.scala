@@ -25,13 +25,12 @@ import scala.collection.mutable.ArrayBuffer
   * @author eiennohito
   * @since 2016/09/06
   */
-
 case class KyteaConfig(
-  model: Option[String] = None,
-  executable: String = "kytea",
-  wordBound: String = KyteaConfig.wordBound,
-  tagBound: String = KyteaConfig.tagBound,
-  elemBound: String = KyteaConfig.elemBound
+    model: Option[String] = None,
+    executable: String = "kytea",
+    wordBound: String = KyteaConfig.wordBound,
+    tagBound: String = KyteaConfig.tagBound,
+    elemBound: String = KyteaConfig.elemBound
 ) {
   def cmdline: Seq[String] = {
     val result = new ArrayBuffer[String]()

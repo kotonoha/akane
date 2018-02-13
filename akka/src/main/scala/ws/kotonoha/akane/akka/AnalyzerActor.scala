@@ -13,7 +13,8 @@ import scala.util.{Failure, Success}
   * @author eiennohito
   * @since 2016/10/14
   */
-class AnalyzerActor[I: ClassTag, O](factory: => SyncAnalyzer[I, O] with SubprocessControls) extends Actor {
+class AnalyzerActor[I: ClassTag, O](factory: => SyncAnalyzer[I, O] with SubprocessControls)
+    extends Actor {
   private var sync = factory
   private val itag = implicitly[ClassTag[I]]
 
@@ -29,7 +30,10 @@ class AnalyzerActor[I: ClassTag, O](factory: => SyncAnalyzer[I, O] with Subproce
     case AnalyzerActor.Request(ref, data) =>
       data match {
         case itag(x) => doAnalyze(sender(), ref, x)
-        case _ => sender() ! AnalyzerActor.Failure(ref, new ClassCastException(s"$data was not $itag, but ${data.getClass}"))
+        case _ =>
+          sender() ! AnalyzerActor.Failure(
+            ref,
+            new ClassCastException(s"$data was not $itag, but ${data.getClass}"))
       }
     case AnalyzerActor.RestartSubprocess =>
       sync.close()
@@ -54,7 +58,11 @@ object AnalyzerActor {
   case object RestartSubprocess
 }
 
-class ActorBackedAsyncAnalyzer[I: ClassTag, O](arf: ActorRefFactory, factory: => SyncAnalyzer[I, O] with SubprocessControls, concurrency: Int) extends AsyncAnalyzer[I, O] {
+class ActorBackedAsyncAnalyzer[I: ClassTag, O](
+    arf: ActorRefFactory,
+    factory: => SyncAnalyzer[I, O] with SubprocessControls,
+    concurrency: Int)
+    extends AsyncAnalyzer[I, O] {
 
   val actor: ActorRef = {
     val props = AnalyzerActor.props(factory)
@@ -72,14 +80,17 @@ class ActorBackedAsyncAnalyzer[I: ClassTag, O](arf: ActorRefFactory, factory: =>
     import scala.concurrent.duration._
     implicit val timeout: Timeout = 5.seconds
     (actor ? AnalyzerActor.Request[I](None, input)).map {
-      case AnalyzerActor.Reply(_, d) => d.asInstanceOf[O]
+      case AnalyzerActor.Reply(_, d)   => d.asInstanceOf[O]
       case AnalyzerActor.Failure(_, t) => throw t
     }
   }
 }
 
 object ActorBackedAsyncAnalyzer {
-  def create[I: ClassTag, O](arf: ActorRefFactory, factory: SyncAnalyzer[I, O] with SubprocessControls, concurrrency: Int): AsyncAnalyzer[I, O] = {
+  def create[I: ClassTag, O](
+      arf: ActorRefFactory,
+      factory: SyncAnalyzer[I, O] with SubprocessControls,
+      concurrrency: Int): AsyncAnalyzer[I, O] = {
     new ActorBackedAsyncAnalyzer[I, O](arf, factory, concurrrency)
   }
 }

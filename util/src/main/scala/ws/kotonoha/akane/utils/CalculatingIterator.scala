@@ -17,10 +17,9 @@
 package ws.kotonoha.akane.utils
 
 /**
- * @author eiennohito
- * @since 14.04.12
- */
-
+  * @author eiennohito
+  * @since 14.04.12
+  */
 trait CalculatingIterator[T] extends Iterator[T] with BufferedIterator[T] {
   protected def calculate(): Option[T]
 

@@ -23,10 +23,9 @@ import collection.mutable.ListBuffer
 import ws.kotonoha.akane.ast.Node
 
 /**
- * @author eiennohito
- * @since 17.08.12
- */
-
+  * @author eiennohito
+  * @since 17.08.12
+  */
 class HtmlRenderer {
 
   def renderLowLvl(node: Node, bfr: ListBuffer[XNode]): ListBuffer[XNode] = {
@@ -36,7 +35,8 @@ class HtmlRenderer {
       case RubyNode(rd, in) => {
         bfr += <ruby>{renderLowLvl(in, new ListBuffer[xml.Node])}<rt>{rd}</rt></ruby>
       }
-      case HighlightNode(nd) => bfr += <span class="hl">{renderLowLvl(nd, new ListBuffer[xml.Node])}</span>
+      case HighlightNode(nd) =>
+        bfr += <span class="hl">{renderLowLvl(nd, new ListBuffer[xml.Node])}</span>
     }
     bfr
   }
@@ -44,8 +44,8 @@ class HtmlRenderer {
   def render(in: HighLvlNode): NodeSeq = {
     in match {
       case Image(href) => <img src={href}></img>
-      case PageBreak => <br/>
-      case EndLine => <br/>
+      case PageBreak   => <br/>
+      case EndLine     => <br/>
       case Sentence(s) => renderLowLvl(s, new ListBuffer[XNode])
     }
   }

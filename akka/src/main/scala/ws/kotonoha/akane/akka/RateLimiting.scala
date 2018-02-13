@@ -32,7 +32,10 @@ class MaxAtOnceActor(cfg: RateLimitCfg) extends Actor with ActorLogging {
 
   private[this] val queue = new mutable.Queue[QueueInfo]()
   private[this] val inFlight = new ArrayBuffer[InFlightInfo]()
-  private val cancel = context.system.scheduler.schedule(1.second, (cfg.lifetime / 3) max 1.second, self, Timeout)(context.dispatcher, self)
+  private val cancel =
+    context.system.scheduler.schedule(1.second, (cfg.lifetime / 3).max(1.second), self, Timeout)(
+      context.dispatcher,
+      self)
 
   override def postStop(): Unit = {
     cancel.cancel()
@@ -117,8 +120,8 @@ trait RateLimitTracing {
   def timeout(ref: ActorRef, tag: Any, start: Long): Unit = {}
 }
 
-case class RateLimitCfg (
-  concurrency: Int,
-  lifetime: FiniteDuration,
-  tracing: RateLimitTracing = null
+case class RateLimitCfg(
+    concurrency: Int,
+    lifetime: FiniteDuration,
+    tracing: RateLimitTracing = null
 )

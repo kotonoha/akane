@@ -9,7 +9,7 @@ import java.util
 object ArrayUtil {
   def grow(arr: Array[Int], toSize: Int): Array[Int] = {
     val curSize = arr.length
-    val newSize = (curSize * 6 / 5) max toSize
+    val newSize = (curSize * 6 / 5).max(toSize)
     util.Arrays.copyOf(arr, newSize)
   }
 }

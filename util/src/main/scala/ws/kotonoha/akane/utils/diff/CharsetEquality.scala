@@ -6,7 +6,13 @@ import java.util
   * @author eiennohito
   * @since 2015/10/13
   */
-class CharsetEquality(characters: String, repCostSet: Int, repCost: Int, addCostSet: Int, addCost: Int) extends CharEquality {
+class CharsetEquality(
+    characters: String,
+    repCostSet: Int,
+    repCost: Int,
+    addCostSet: Int,
+    addCost: Int)
+    extends CharEquality {
   private val mySet = {
     val arr: Array[Int] = characters.codePoints().distinct().toArray
     util.Arrays.sort(arr)

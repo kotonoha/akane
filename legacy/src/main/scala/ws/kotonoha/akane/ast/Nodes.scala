@@ -17,10 +17,9 @@
 package ws.kotonoha.akane.ast
 
 /**
- * @author eiennohito
- * @since 15.08.12
- */
-
+  * @author eiennohito
+  * @since 15.08.12
+  */
 sealed trait Node
 
 case class StringNode(s: String) extends Node {}

@@ -18,13 +18,12 @@ package ws.kotonoha.akane.tools
 
 import scalax.file.Path
 import java.io.InputStreamReader
-import ws.kotonoha.akane.parser.{StreamReaderInput, AozoraParser}
+import ws.kotonoha.akane.parser.{AozoraParser, StreamReaderInput}
 
 /**
- * @author eiennohito
- * @since 27.03.13 
- */
-
+  * @author eiennohito
+  * @since 27.03.13
+  */
 object Tester {
   def main(args: Array[String]) {
     val file = Path.fromString(args(0))

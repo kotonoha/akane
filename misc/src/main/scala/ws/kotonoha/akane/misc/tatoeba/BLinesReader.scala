@@ -26,12 +26,16 @@ import scala.collection.mutable.ArrayBuffer
   * @author eiennohito
   * @since 2016/09/12
   */
-case class BLineUnit(headword: String, reading: Option[String], surface: Option[String], sense: Int, recommended: Boolean) {
+case class BLineUnit(
+    headword: String,
+    reading: Option[String],
+    surface: Option[String],
+    sense: Int,
+    recommended: Boolean) {
   def original: String = {
     if (surface.isDefined) surface.get else headword
   }
 }
-
 
 case class BLine(japId: Long, engId: Long, content: Seq[BLineUnit])
 
@@ -85,15 +89,19 @@ object BLinesReader {
       hwEnd = barIdx
     }
 
-    val reading = if (rdStart < 0) None else {
-      val rd = data.subSequence(rdStart + 1, rdEnd).toString
-      Some(rd)
-    }
+    val reading =
+      if (rdStart < 0) None
+      else {
+        val rd = data.subSequence(rdStart + 1, rdEnd).toString
+        Some(rd)
+      }
 
-    val surface = if (surfStart < 0) None else {
-      val sf = data.subSequence(surfStart + 1, surfEnd).toString
-      Some(sf)
-    }
+    val surface =
+      if (surfStart < 0) None
+      else {
+        val sf = data.subSequence(surfStart + 1, surfEnd).toString
+        Some(sf)
+      }
 
     BLineUnit(
       headword = data.subSequence(0, hwEnd).toString,
@@ -111,7 +119,11 @@ object BLinesReader {
   }
 
   @tailrec
-  private def parseUnitsImpl(units: ArrayBuffer[BLineUnit], data: CharSequence, from: Int, to: Int): Unit = {
+  private def parseUnitsImpl(
+      units: ArrayBuffer[BLineUnit],
+      data: CharSequence,
+      from: Int,
+      to: Int): Unit = {
     val spaceIdx = StringUtils.indexOf(data, ' ', from)
     if (spaceIdx < 0 || spaceIdx > to) {
       units += readUnit(data.subSequence(from, to))

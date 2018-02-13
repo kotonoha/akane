@@ -26,18 +26,17 @@ import scala.collection.mutable.ArrayBuffer
   * @author eiennohito
   * @since 2016/07/28
   */
-
 case class JmdictQueryPart(term: String, occur: Occur = Occur.SHOULD)
 
 case class JmdictQuery(
-  limit: Int,
-  readings: Seq[JmdictQueryPart] = Nil,
-  writings: Seq[JmdictQueryPart] = Nil,
-  tags: Seq[JmdictQueryPart] = Nil,
-  other: Seq[JmdictQueryPart] = Nil,
-  langs: Seq[String] = Seq("eng"),
-  ignore: Seq[Long] = Nil,
-  explain: Boolean = false
+    limit: Int,
+    readings: Seq[JmdictQueryPart] = Nil,
+    writings: Seq[JmdictQueryPart] = Nil,
+    tags: Seq[JmdictQueryPart] = Nil,
+    other: Seq[JmdictQueryPart] = Nil,
+    langs: Seq[String] = Seq("eng"),
+    ignore: Seq[Long] = Nil,
+    explain: Boolean = false
 )
 
 object JmdictQuery {
@@ -51,13 +50,11 @@ object JmdictQuery {
     val tags = new ArrayBuffer[JmdictQueryPart]()
     val other = new ArrayBuffer[JmdictQueryPart]()
 
-
     parts.foreach { p =>
-
       val (occur, next) = p.charAt(0) match {
         case '+' | '＋' => (Occur.MUST, p.substring(1))
         case '-' | '−' => (Occur.MUST_NOT, p.substring(1))
-        case _ => (Occur.SHOULD, p)
+        case _         => (Occur.SHOULD, p)
       }
 
       next.split(":") match {
@@ -67,7 +64,7 @@ object JmdictQuery {
             case s if s.startsWith("w") => wrs
             case s if s.startsWith("r") => rds
             case s if s.startsWith("t") => tags
-            case _ => other
+            case _                      => other
           }
           coll += part
         case _ =>
@@ -76,9 +73,11 @@ object JmdictQuery {
     }
     JmdictQuery(
       limit = limit,
-      rds, wrs, tags, other,
+      rds,
+      wrs,
+      tags,
+      other,
       explain = explain
     )
   }
 }
-

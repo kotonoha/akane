@@ -23,9 +23,9 @@ import java.util
 import ws.kotonoha.akane.unicode.impl.UnicodeUtilLowLevel
 
 /**
- * @author eiennohito
- * @since 15/08/11
- */
+  * @author eiennohito
+  * @since 15/08/11
+  */
 final class GrowableByteBuffer(initSize: Int = 4096) {
 
   var array = new Array[Byte](initSize)

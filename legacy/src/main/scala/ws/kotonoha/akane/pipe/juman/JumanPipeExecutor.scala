@@ -14,28 +14,31 @@ import java.util
 
 import ws.kotonoha.akane.analyzers.juman.JumanConfig
 
-
-class ProcessException(msg: String, errCode: Int, inner: Throwable) extends RuntimeException(msg, inner)
+class ProcessException(msg: String, errCode: Int, inner: Throwable)
+    extends RuntimeException(msg, inner)
 
 trait ProcessSupport {
-  def withProcess[T](p: Process, enc: String)(f: => T): T = try {
-    f
-  } catch {
-    case e: Throwable =>
-      val exv = p.exitValue()
-      val es = p.getErrorStream
-      val s = IOUtils.toString(es, enc)
-      val msg = s"Error with process, retcode = $exv\n$s"
-      throw new ProcessException(msg, exv, e)
-  }
+  def withProcess[T](p: Process, enc: String)(f: => T): T =
+    try {
+      f
+    } catch {
+      case e: Throwable =>
+        val exv = p.exitValue()
+        val es = p.getErrorStream
+        val s = IOUtils.toString(es, enc)
+        val msg = s"Error with process, retcode = $exv\n$s"
+        throw new ProcessException(msg, exv, e)
+    }
 }
 
 /**
- * @author eiennohito
- * @since 16.08.12
- */
-
-class JumanPipeAnalyzer (process: Process, encoding: String) extends Analyzer[List[JumanEntry]] with StrictLogging with ProcessSupport {
+  * @author eiennohito
+  * @since 16.08.12
+  */
+class JumanPipeAnalyzer(process: Process, encoding: String)
+    extends Analyzer[List[JumanEntry]]
+    with StrictLogging
+    with ProcessSupport {
 
   def analyze(input: String) = withProcess(process, encoding) { parseInner(input) }
 
@@ -73,18 +76,17 @@ class JumanPipeAnalyzer (process: Process, encoding: String) extends Analyzer[Li
     do {
       val line = buf.readLine()
       line match {
-        case "EOS" => ok = false
+        case "EOS"                  => ok = false
         case x if x.startsWith("@") =>
-        case x => bldr += JumanEntry.parse(line)
+        case x                      => bldr += JumanEntry.parse(line)
       }
     } while (ok)
     bldr.toList
   }
 }
 
-class JumanPipeExecutor private(fact: () => JumanPipeAnalyzer) extends AbstractRetryExecutor[List[JumanEntry]](fact) {
-
-}
+class JumanPipeExecutor private (fact: () => JumanPipeAnalyzer)
+    extends AbstractRetryExecutor[List[JumanEntry]](fact) {}
 
 object JumanPipeExecutor {
   def apply(config: Config = ConfigFactory.empty()) = {

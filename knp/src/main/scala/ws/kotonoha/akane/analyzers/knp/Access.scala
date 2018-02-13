@@ -17,10 +17,9 @@
 package ws.kotonoha.akane.analyzers.knp
 
 /**
- * @author eiennohito
- * @since 2015/09/18
- */
-
+  * @author eiennohito
+  * @since 2015/09/18
+  */
 trait FeatureAccess {
   def valueOfFeature(name: String): Option[String]
   def featureExists(name: String): Boolean
@@ -89,5 +88,3 @@ trait BunsetsuAccess {
     }
   }
 }
-
-

@@ -23,19 +23,19 @@ import org.bridj.Pointer
 import windows.Kernel32
 
 /**
- * @author eiennohito
- * @since 2013-09-03
- */
+  * @author eiennohito
+  * @since 2013-09-03
+  */
 object NamedPipes {
   lazy val piper = System.getProperty("os.name") match {
     case n if n.contains("Windows") => WindowsNamedPipes
-    case _ => UnixPipeGenerator
+    case _                          => UnixPipeGenerator
   }
 
   def pipe() = piper.apply()
 }
 
-object UnixPipeGenerator extends PipeGenerator{
+object UnixPipeGenerator extends PipeGenerator {
   val directory = {
     val p = Path.fromString("/tmp/kotonoha/pipes/")
     if (p.nonExistent)

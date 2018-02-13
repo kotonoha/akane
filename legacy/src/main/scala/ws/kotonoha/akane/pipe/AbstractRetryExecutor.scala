@@ -22,15 +22,16 @@ import com.typesafe.scalalogging.StrictLogging
 import scala.util.control.NonFatal
 
 /**
- * @author eiennohito
- * @since 2013-09-03
- */
-
+  * @author eiennohito
+  * @since 2013-09-03
+  */
 trait Analyzer[RType] extends Closeable {
   def analyze(input: String): RType
 }
 
-class AbstractRetryExecutor[RType] (factory: () => Analyzer[RType]) extends StrictLogging with Closeable {
+class AbstractRetryExecutor[RType](factory: () => Analyzer[RType])
+    extends StrictLogging
+    with Closeable {
   val maxRetries = 3
 
   var analyzer: Analyzer[RType] = _

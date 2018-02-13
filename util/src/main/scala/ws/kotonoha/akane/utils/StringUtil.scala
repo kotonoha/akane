@@ -20,10 +20,9 @@ import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
 /**
- * @author eiennohito
- * @since 30.10.12 
- */
-
+  * @author eiennohito
+  * @since 30.10.12
+  */
 object StringUtil {
   def fromByteBuffer(v1: ByteBuffer, cs: Charset): String = {
     if (v1.hasArray) {
@@ -54,7 +53,7 @@ object StringUtil {
   }
 
   def commonHead(s1: String, s2: String): Int = {
-    val rest = s1.length min s2.length
+    val rest = s1.length.min(s2.length)
     var i = 0
     var cont = true
     while (i < rest && cont) {
@@ -68,9 +67,9 @@ object StringUtil {
   }
 
   def isHeadOf(needle: CharSequence, haystack: CharSequence, pos: Int): Boolean = {
-    val rest = needle.length() min (haystack.length() - pos)
+    val rest = needle.length().min(haystack.length() - pos)
     var i = 0
-    while(i < rest) {
+    while (i < rest) {
       val c1 = needle.charAt(i)
       val c2 = haystack.charAt(pos + i)
       if (c1 != c2) return false

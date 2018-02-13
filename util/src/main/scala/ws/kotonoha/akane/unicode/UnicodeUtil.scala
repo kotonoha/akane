@@ -18,26 +18,20 @@ package ws.kotonoha.akane.unicode
 
 import java.io.{Reader, StringReader}
 
-
 /**
- * @author eiennohito
- * @since 02.03.12
- */
-
+  * @author eiennohito
+  * @since 02.03.12
+  */
 object UnicodeUtil {
   val kanjiRanges = Array(0x4e00 -> 0x9fff,
-    0x3400 -> 0x4dbf,
-    0x20000 -> 0x2a6df,
-    0x2a700 -> 0x2b73f,
-    0x2b840 -> 0x2b81f)
+                          0x3400 -> 0x4dbf,
+                          0x20000 -> 0x2a6df,
+                          0x2a700 -> 0x2b73f,
+                          0x2b840 -> 0x2b81f)
 
-  val hiraganaRange = Array(0x3040 -> 0x309f,
-    0x1b000 -> 0x1b0ff)
+  val hiraganaRange = Array(0x3040 -> 0x309f, 0x1b000 -> 0x1b0ff)
 
-  val katakanaRange = Array(0x30a0 -> 0x30ff,
-    0xff60 -> 0xff96,
-    0x32d0 -> 0x32fe,
-    0x31f0 -> 0x31ff)
+  val katakanaRange = Array(0x30a0 -> 0x30ff, 0xff60 -> 0xff96, 0x32d0 -> 0x32fe, 0x31f0 -> 0x31ff)
 
   def inRange(c: Int, ranges: Array[(Int, Int)]): Boolean = {
     var i = 0
@@ -76,10 +70,12 @@ object UnicodeUtil {
 
   def isJapanese(s: String): Boolean = stream(s).take(50).forall { isJapanese }
 
-  def kanji(s: String) = stream(s).filter(isKanji).map(cp => new String(Character.toChars(cp))).toList
+  def kanji(s: String) =
+    stream(s).filter(isKanji).map(cp => new String(Character.toChars(cp))).toList
 
   def stream(s: CharSequence): SeqCodepointIterator = stream(s, 0, s.length)
-  def stream(s: CharSequence, start: Int, end: Int): SeqCodepointIterator = new SeqCodepointIterator(s, start, end)
+  def stream(s: CharSequence, start: Int, end: Int): SeqCodepointIterator =
+    new SeqCodepointIterator(s, start, end)
 
   def stream(r: Reader): CodepointIterator = new ReaderCodepointIterator(r)
 
@@ -110,7 +106,8 @@ final class ReaderCodepointIterator(input: Reader) extends CodepointIterator {
   }
 }
 
-final class SeqCodepointIterator(input: CharSequence, from: Int, to: Int) extends CodepointIterator {
+final class SeqCodepointIterator(input: CharSequence, from: Int, to: Int)
+    extends CodepointIterator {
   private[this] var position = init()
 
   private def init() = {

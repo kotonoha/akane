@@ -16,14 +16,13 @@
 
 package ws.kotonoha.akane.ruby
 
-import ws.kotonoha.akane.ast.{ListNode, RubyNode, StringNode, Node}
+import ws.kotonoha.akane.ast.{ListNode, Node, RubyNode, StringNode}
 import collection.mutable.ListBuffer
 
 /**
- * @author eiennohito
- * @since 15.08.12
- */
-
+  * @author eiennohito
+  * @since 15.08.12
+  */
 object AfterLexical {
 
   def matchFront(wr: String, rd: String) = {
@@ -52,13 +51,13 @@ object AfterLexical {
   }
 
   /**
-   * Makes node from parsed values
-   * @param writing - writing (as from lexical analyzer)
-   * @param reading - reading (as from lexical analyzer)
-   * @return
-   */
+    * Makes node from parsed values
+    * @param writing - writing (as from lexical analyzer)
+    * @param reading - reading (as from lexical analyzer)
+    * @return
+    */
   def makeNode(writing: String, reading: String): Node = {
-    if (writing equals reading) {
+    if (writing.equals(reading)) {
       return StringNode(reading)
     }
     val nodes = ListBuffer[Node]()

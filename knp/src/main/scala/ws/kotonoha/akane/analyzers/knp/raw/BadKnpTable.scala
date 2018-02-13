@@ -20,7 +20,6 @@ import ws.kotonoha.akane.analyzers.knp._
 
 import scala.collection.mutable
 
-@deprecated("use protobuf-based apis", "0.3")
 trait LexemeStorage {
   def lexeme(num: Int): OldAndUglyKnpLexeme
   def lexemeCnt: Int
@@ -34,7 +33,6 @@ class ArrayLexemeStorage(data: Array[OldAndUglyKnpLexeme]) extends LexemeStorage
   override def lexemeCnt = data.length
 }
 
-@deprecated("use protobuf-based apis", "0.3")
 trait KihonkuStorage {
   def kihonku(num: Int): OldAndUglyKihonku
   def kihonkuCnt: Int
@@ -47,21 +45,36 @@ class ArrayKihonkuStorage(data: Array[OldAndUglyKihonku]) extends KihonkuStorage
 }
 
 /**
- * A unit of knp table entry that represents either a bunsetsu
- * dependency tree or a kihonku dependency tree
- * @param number number of entry
- * @param depNumber number of direct dependency
- * @param depType type of dependency
- * @param features features that are assigned to table entry
- * @param lexs lexeme storage
- */
-case class OldAndUglyBunsetsu(lexs: LexemeStorage, kihs: KihonkuStorage,
-                    number: Int, depNumber: Int, depType: String, features: Array[String],
-                    lexemeStart: Int, lexemeCnt: Int,
-                    kihonkuStart: Int, kihonkuCnt: Int)
-  extends LexemeHelper with KihonkuHelper with FeatureLocation with BunsetsuApi {
+  * A unit of knp table entry that represents either a bunsetsu
+  * dependency tree or a kihonku dependency tree
+  * @param number number of entry
+  * @param depNumber number of direct dependency
+  * @param depType type of dependency
+  * @param features features that are assigned to table entry
+  * @param lexs lexeme storage
+  */
+case class OldAndUglyBunsetsu(
+    lexs: LexemeStorage,
+    kihs: KihonkuStorage,
+    number: Int,
+    depNumber: Int,
+    depType: String,
+    features: Array[String],
+    lexemeStart: Int,
+    lexemeCnt: Int,
+    kihonkuStart: Int,
+    kihonkuCnt: Int)
+    extends LexemeHelper
+    with KihonkuHelper
+    with FeatureLocation
+    with BunsetsuApi {
 
-  def toNode = KnpNode(number, depType, lexemeIter.map(_.asInstanceOf[OldAndUglyKnpLexeme]).toList, features.toList, Nil)
+  def toNode =
+    KnpNode(number,
+            depType,
+            lexemeIter.map(_.asInstanceOf[OldAndUglyKnpLexeme]).toList,
+            features.toList,
+            Nil)
 
   override def toString = {
     s"Bunsetsu($number,$depNumber,$depType,[${lexemes.map(_.surface).mkString}])"
@@ -71,9 +84,17 @@ case class OldAndUglyBunsetsu(lexs: LexemeStorage, kihs: KihonkuStorage,
   override protected def featureSeq = features
 }
 
-case class OldAndUglyKihonku(lexs: LexemeStorage, number: Int, depNumber: Int, depType: String, features: Array[String],
-                   lexemeStart: Int, lexemeCnt: Int)
-  extends LexemeHelper with FeatureLocation with KihonkuApi {
+case class OldAndUglyKihonku(
+    lexs: LexemeStorage,
+    number: Int,
+    depNumber: Int,
+    depType: String,
+    features: Array[String],
+    lexemeStart: Int,
+    lexemeCnt: Int)
+    extends LexemeHelper
+    with FeatureLocation
+    with KihonkuApi {
   override def toString = {
     s"Kihonku($number,$depNumber,$depType,[${lexemes.map(_.surface).mkString}])"
   }
@@ -82,7 +103,6 @@ case class OldAndUglyKihonku(lexs: LexemeStorage, number: Int, depNumber: Int, d
   override protected def featureSeq = features
 }
 
-@deprecated("use protobuf-based apis", "0.3")
 trait FeatureLocation extends FeatureAccess {
   //TODO: move to key-value API
   protected def featureSeq: Traversable[String]
@@ -118,7 +138,7 @@ trait FeatureLocation extends FeatureAccess {
   }
 
   override def featureKeys = {
-    featureSeq.map {f =>
+    featureSeq.map { f =>
       val pos = f.indexOf(':')
       if (pos < 0) {
         f
@@ -144,8 +164,6 @@ trait LexemeHelper extends LexemeAccess {
     lexs.lexeme(idx)
   }
 }
-
-
 @deprecated("use protobuf-based apis", "0.3")
 trait KihonkuHelper extends KihonkuAccess {
   def kihs: KihonkuStorage
@@ -158,8 +176,14 @@ trait KihonkuHelper extends KihonkuAccess {
   }
 }
 
-case class OldAngUglyKnpTable(info: String, lexemes: Array[OldAndUglyKnpLexeme], bunsetsuData: Array[OldAndUglyBunsetsu], kihonkuData: Array[OldAndUglyKihonku])
-  extends KihonkuStorage with LexemeAccess with TableApi {
+case class OldAngUglyKnpTable(
+    info: String,
+    lexemes: Array[OldAndUglyKnpLexeme],
+    bunsetsuData: Array[OldAndUglyBunsetsu],
+    kihonkuData: Array[OldAndUglyKihonku])
+    extends KihonkuStorage
+    with LexemeAccess
+    with TableApi {
 
   override def lexeme(idx: Int) = lexemes(idx)
 
@@ -167,25 +191,32 @@ case class OldAngUglyKnpTable(info: String, lexemes: Array[OldAndUglyKnpLexeme],
   override def lexemeEnd = lexemes.length
   override def lexemeCnt = lexemes.length
 
-  private def makeNode(unit: OldAndUglyBunsetsu, units: Traversable[OldAndUglyBunsetsu]): KnpNode = {
+  private def makeNode(
+      unit: OldAndUglyBunsetsu,
+      units: Traversable[OldAndUglyBunsetsu]): KnpNode = {
     val node = unit.toNode
     val children = units.filter(_.depNumber == unit.number)
     node.copy(children = children.map(n => makeNode(n, units)).toList)
   }
 
   def bunsetsuTree: KnpNode = {
-    val root = bunsetsuData.find(_.depNumber == -1)
+    val root = bunsetsuData
+      .find(_.depNumber == -1)
       .getOrElse(throw new NullPointerException("There is no root node in tree!"))
     makeNode(root, bunsetsuData)
   }
 
   def toJson: JsonKnpTable = {
     def jsonizeB(units: Array[OldAndUglyBunsetsu]): Array[JsonTableUnit] = {
-      units.map { u => JsonTableUnit(u.number, u.depNumber, u.depType, u.features, u.lexemeCnt, u.kihonkuCnt)  }
+      units.map { u =>
+        JsonTableUnit(u.number, u.depNumber, u.depType, u.features, u.lexemeCnt, u.kihonkuCnt)
+      }
     }
 
     def jsonizeK(units: Array[OldAndUglyKihonku]): Array[JsonTableUnit] = {
-      units.map { u => JsonTableUnit(u.number, u.depNumber, u.depType, u.features, u.lexemeCnt, 0)  }
+      units.map { u =>
+        JsonTableUnit(u.number, u.depNumber, u.depType, u.features, u.lexemeCnt, 0)
+      }
     }
 
     JsonKnpTable(info, lexemes, jsonizeB(bunsetsuData), jsonizeK(kihonkuData))
@@ -202,15 +233,23 @@ case class OldAngUglyKnpTable(info: String, lexemes: Array[OldAndUglyKnpLexeme],
   override def kihonkuEnd = kihonkuData.length
 }
 
-
-case class JsonKnpTable(info: String, lexemes: Array[OldAndUglyKnpLexeme],
-                        bunsetsu: Array[JsonTableUnit], kihonku: Array[JsonTableUnit]) {
+case class JsonKnpTable(
+    info: String,
+    lexemes: Array[OldAndUglyKnpLexeme],
+    bunsetsu: Array[JsonTableUnit],
+    kihonku: Array[JsonTableUnit]) {
   def toModel: OldAngUglyKnpTable = {
     def normalizeK(lexs: LexemeStorage, units: Array[JsonTableUnit]) = {
       val bldr = new mutable.ArrayBuilder.ofRef[OldAndUglyKihonku]()
       var start = 0
       for (k <- units) {
-        bldr += OldAndUglyKihonku(lexs, k.number, k.depNumber, k.depType, k.features, start, k.lexemes)
+        bldr += OldAndUglyKihonku(lexs,
+                                  k.number,
+                                  k.depNumber,
+                                  k.depType,
+                                  k.features,
+                                  start,
+                                  k.lexemes)
         start += k.lexemes
       }
       bldr.result()
@@ -220,8 +259,16 @@ case class JsonKnpTable(info: String, lexemes: Array[OldAndUglyKnpLexeme],
       var lexStart = 0
       var kiStart = 0
       for (b <- data) {
-        bldr += OldAndUglyBunsetsu(lexs, kis, b.number, b.depNumber, b.depType, b.features,
-          lexStart, b.lexemes, kiStart, b.kihonku)
+        bldr += OldAndUglyBunsetsu(lexs,
+                                   kis,
+                                   b.number,
+                                   b.depNumber,
+                                   b.depType,
+                                   b.features,
+                                   lexStart,
+                                   b.lexemes,
+                                   kiStart,
+                                   b.kihonku)
         lexStart += b.lexemes
         kiStart += b.kihonku
       }
@@ -233,5 +280,10 @@ case class JsonKnpTable(info: String, lexemes: Array[OldAndUglyKnpLexeme],
     OldAngUglyKnpTable(info, lexemes, normalizeB(lexs, khs, bunsetsu), kh)
   }
 }
-case class JsonTableUnit(number: Int, depNumber: Int, depType: String, features: Array[String],
-                         lexemes: Int, kihonku: Int)
+case class JsonTableUnit(
+    number: Int,
+    depNumber: Int,
+    depType: String,
+    features: Array[String],
+    lexemes: Int,
+    kihonku: Int)

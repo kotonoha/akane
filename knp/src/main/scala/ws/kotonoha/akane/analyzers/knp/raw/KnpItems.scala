@@ -23,15 +23,14 @@ import ws.kotonoha.akane.utils.ParseUtil
 
 import scala.collection.mutable.ListBuffer
 
-
-
-
-
-@deprecated("use protobuf-based apis", "0.3")
 case class PosItem(name: String, id: Int)
 
-@deprecated("use protobuf-based apis", "0.3")
-case class JumanPosInfo(partOfSpeech: PosItem, subPart: PosItem, conjType: PosItem, conjForm: PosItem) extends JumanStylePos {
+case class JumanPosInfo(
+    partOfSpeech: PosItem,
+    subPart: PosItem,
+    conjType: PosItem,
+    conjForm: PosItem)
+    extends JumanStylePos {
   override def pos = partOfSpeech.id
   override def subpos = subPart.id
   override def category = conjType.id
@@ -39,13 +38,15 @@ case class JumanPosInfo(partOfSpeech: PosItem, subPart: PosItem, conjType: PosIt
 }
 
 //かわったり かわったり かわる 動詞 2 * 0 子音動詞ラ行 10 タ系連用タリ形 15 "代表表記:代わる/かわる 自他動詞:他:代える/かえる
-case class OldAndUglyKnpLexeme (
-                      surface: String,
-                      reading: String,
-                      dicForm: String,
-                      pos: JumanPosInfo,
-                      info: String,
-                      tags: List[String]) extends LexemeApi with FeatureLocation {
+case class OldAndUglyKnpLexeme(
+    surface: String,
+    reading: String,
+    dicForm: String,
+    pos: JumanPosInfo,
+    info: String,
+    tags: List[String])
+    extends LexemeApi
+    with FeatureLocation {
 
   def canonicForm(): String = valueOfFeature("代表表記").getOrElse(s"$surface/$reading")
 
@@ -53,7 +54,7 @@ case class OldAndUglyKnpLexeme (
 }
 
 object OldAndUglyKnpLexeme {
-  val spaceRe = " ".r
+  private val spaceRe = " ".r
   def fromTabFormat(line: CharSequence): OldAndUglyKnpLexeme = {
 
     val end0 = 0
@@ -69,12 +70,12 @@ object OldAndUglyKnpLexeme {
     val end10 = StringUtils.indexOf(line, ' ', end9 + 1)
     val end11 = StringUtils.indexOf(line, ' ', end10 + 1)
 
-
     val rest0 = StringUtils.indexOf(line, '"', end11)
     val rest1 = StringUtils.indexOf(line, '"', rest0 + 1)
 
-    val rest = if (rest0 < 0 || rest1 < 0) ""
-               else line.subSequence(rest0 + 1, rest1).toString
+    val rest =
+      if (rest0 < 0 || rest1 < 0) ""
+      else line.subSequence(rest0 + 1, rest1).toString
 
     val bldr = new ListBuffer[String]
 
@@ -97,13 +98,16 @@ object OldAndUglyKnpLexeme {
         PosItem(
           line.subSequence(end3 + 1, end4).toString,
           ParseUtil.parseInt(line, end4 + 1, end5)
-        ), PosItem(
+        ),
+        PosItem(
           line.subSequence(end5 + 1, end6).toString,
           ParseUtil.parseInt(line, end6 + 1, end7)
-        ), PosItem(
+        ),
+        PosItem(
           line.subSequence(end7 + 1, end8).toString,
           ParseUtil.parseInt(line, end8 + 1, end9)
-        ), PosItem(
+        ),
+        PosItem(
           line.subSequence(end9 + 1, end10).toString,
           ParseUtil.parseInt(line, end10 + 1, end11)
         )
@@ -113,28 +117,39 @@ object OldAndUglyKnpLexeme {
     )
   }
 
-  @deprecated("use protobuf-based apis", "0.3")
   def fromTabFormatSlow(line: CharSequence): OldAndUglyKnpLexeme = {
     val fields = spaceRe.pattern.split(line, 12)
     val rest = fields(11)
     val featuresBegin = rest.indexOf('<')
     val info = StringUtils.strip(rest.substring(0, featuresBegin - 1), " \"")
     val features = rest.substring(featuresBegin).split("><").map(s => StringUtils.strip(s, ">< "))
-    OldAndUglyKnpLexeme(fields(0), fields(1), fields(2),
-      JumanPosInfo(
-        PosItem(fields(3), fields(4).toInt),
-        PosItem(fields(5), fields(6).toInt),
-        PosItem(fields(7), fields(8).toInt),
-        PosItem(fields(9), fields(10).toInt)),
-      info, features.toList)
+    OldAndUglyKnpLexeme(
+      fields(0),
+      fields(1),
+      fields(2),
+      JumanPosInfo(PosItem(fields(3), fields(4).toInt),
+                   PosItem(fields(5), fields(6).toInt),
+                   PosItem(fields(7), fields(8).toInt),
+                   PosItem(fields(9), fields(10).toInt)),
+      info,
+      features.toList
+    )
   }
 }
 
-@deprecated("use protobuf-based apis", "0.3")
 case class KnpItemRelation(to: Int, tags: List[String])
 
-@deprecated("use protobuf-based apis", "0.3")
-case class KnpItem(num: Int, star: KnpItemRelation, plus: KnpItemRelation, lexems: Seq[OldAndUglyKnpLexeme])
+case class KnpItem(
+    num: Int,
+    star: KnpItemRelation,
+    plus: KnpItemRelation,
+    lexems: Seq[OldAndUglyKnpLexeme]
+)
 
-@deprecated("use protobuf-based apis", "0.3")
-case class KnpNode(num: Int, kind: String, surface: List[OldAndUglyKnpLexeme], features: List[String], children: List[KnpNode] = Nil)
+case class KnpNode(
+    num: Int,
+    kind: String,
+    surface: List[OldAndUglyKnpLexeme],
+    features: List[String],
+    children: List[KnpNode] = Nil
+)

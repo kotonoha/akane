@@ -21,6 +21,7 @@ import java.io.InputStreamReader
 import org.scalatest.{FreeSpec, Matchers}
 import ws.kotonoha.akane.analyzers.knp.raw.OldAngUglyKnpTable
 import ws.kotonoha.akane.helpers.lisp.LispParser
+import ws.kotonoha.akane.io.Charsets
 
 import scala.util.parsing.input.StreamReader
 import scalax.io.Resource
@@ -33,7 +34,7 @@ class JumanPosInfoSpec extends FreeSpec with Matchers {
 
   def parseLisp(res: String) = {
     Resource.fromClasspath(res, this.getClass).inputStream.acquireAndGet { is =>
-      LispParser.lists.apply(StreamReader(new InputStreamReader(is, "utf-8"))) match {
+      LispParser.lists.apply(StreamReader(new InputStreamReader(is, Charsets.utf8))) match {
         case LispParser.Success(x, _) => x
         case x => throw new Exception(x.toString)
       }

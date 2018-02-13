@@ -27,7 +27,7 @@ sealed trait ParseResult[+T] {
   final def map[R](fn: T => R): ParseResult[R] = {
     this match {
       case s: ParseSuccess[T] => new ParseSuccess[R](fn(s.obj), s.pos)
-      case pf: ParseFailure => pf
+      case pf: ParseFailure   => pf
     }
   }
 
@@ -35,7 +35,6 @@ sealed trait ParseResult[+T] {
 }
 case class ParseSuccess[T](obj: T, pos: Int) extends ParseResult[T]
 case class ParseFailure(msg: String, pos: Int) extends ParseResult[Nothing]
-
 
 /**
   * @author eiennohito
@@ -57,8 +56,9 @@ class SexpParser {
       }
       val next = skipComments(input, end)
       ParseSuccess(new KAtom(
-        input.subSequence(index, end).toString
-      ), next)
+                     input.subSequence(index, end).toString
+                   ),
+                   next)
     }
   }
 
@@ -122,9 +122,9 @@ class SexpParser {
             return ParseFailure("no end of comment", idx)
           }
           idx = end + 1
-        case '(' => return parseList(input, idx + 1)
+        case '('                            => return parseList(input, idx + 1)
         case c if Character.isWhitespace(c) => idx += 1
-        case _ => return parseAtom(input, idx)
+        case _                              => return parseAtom(input, idx)
       }
     }
     ParseFailure("end of input", index)

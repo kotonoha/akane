@@ -21,43 +21,46 @@ import ws.kotonoha.akane.unicode.UnicodeUtil
 import scala.collection.immutable.HashMap
 
 /**
- * @author eiennohito
- * @since 02.03.12
- */
-
+  * @author eiennohito
+  * @since 02.03.12
+  */
 case class KanjiEntry(kanji: String, count: Int, category: KanjiType.KanjiType)
 
-class KanjiTagResult(val oldKanji: List[KanjiEntry],
-                      val newKanji: List[KanjiEntry],
-                      val removedKanji: List[KanjiEntry],
-                      val absentKanji: List[KanjiEntry]) {
+class KanjiTagResult(
+    val oldKanji: List[KanjiEntry],
+    val newKanji: List[KanjiEntry],
+    val removedKanji: List[KanjiEntry],
+    val absentKanji: List[KanjiEntry]) {
   def total = oldKanji ++ newKanji ++ removedKanji ++ absentKanji
 }
 
 class KanjiTagger {
   def tag(r: InputStreamReader) = {
-    val kanji = UnicodeUtil.stream(r).filter(UnicodeUtil.isKanji(_)).foldLeft(new HashMap[String, Int]()) {
-      case (map, el) => {
-        val c = new String(Character.toChars(el))
-        map.get(c) match {
-          case Some(v) => map.updated(c, v + 1)
-          case None => map.updated(c, 1)
+    val kanji =
+      UnicodeUtil.stream(r).filter(UnicodeUtil.isKanji(_)).foldLeft(new HashMap[String, Int]()) {
+        case (map, el) => {
+          val c = new String(Character.toChars(el))
+          map.get(c) match {
+            case Some(v) => map.updated(c, v + 1)
+            case None    => map.updated(c, 1)
+          }
+          map
         }
-        map
       }
-    }
 
-    val cats = kanji.map {
-      case (k, cnt) => KanjiEntry(k, cnt, Jouyou.category(k))
-    }.groupBy(_.category)
+    val cats = kanji
+      .map {
+        case (k, cnt) => KanjiEntry(k, cnt, Jouyou.category(k))
+      }
+      .groupBy(_.category)
 
     import KanjiType._
 
     new KanjiTagResult(
-      cats.get(Old).map(_.toList) getOrElse Nil,
-      cats.get(New).map(_.toList) getOrElse Nil,
-      cats.get(Removed).map(_.toList) getOrElse Nil,
-      cats.get(Absent).map(_.toList) getOrElse Nil
+      cats.get(Old).map(_.toList).getOrElse(Nil),
+      cats.get(New).map(_.toList).getOrElse(Nil),
+      cats.get(Removed).map(_.toList).getOrElse(Nil),
+      cats.get(Absent).map(_.toList).getOrElse(Nil)
     )
   }
 }

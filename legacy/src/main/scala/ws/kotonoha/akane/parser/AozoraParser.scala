@@ -26,10 +26,9 @@ import collection.immutable.HashSet
 import ws.kotonoha.akane.unicode.UnicodeUtil
 
 /**
- * @author eiennohito
- * @since 16.08.12
- */
-
+  * @author eiennohito
+  * @since 16.08.12
+  */
 trait AozoraInput extends StrictLogging {
   def peek: Int //doesn't go forward
   def next: Int //goes forward
@@ -75,8 +74,6 @@ trait AozoraInput extends StrictLogging {
   }
 }
 
-
-
 object AozoraParser {
   val SENTENCE_SEPARATORS = HashSet('。', '？', '！', '?', '!', '」')
 }
@@ -112,10 +109,10 @@ class AozoraParser(inp: AozoraInput) extends BufferedIterator[HighLvlNode] with 
 
   def parseEndline(): Option[HighLvlNode] = {
     (inp.next.toChar, inp.peek.toChar) match {
-      case ('\n', '\r') => inp.next;  Some(EndLine)
+      case ('\n', '\r') => inp.next; Some(EndLine)
       case ('\r', '\n') => inp.next; Some(EndLine)
-      case ('\n', _) => Some(EndLine)
-      case _ => calculateNextNode()
+      case ('\n', _)    => Some(EndLine)
+      case _            => calculateNextNode()
     }
   }
 
@@ -192,12 +189,12 @@ class AozoraParser(inp: AozoraInput) extends BufferedIterator[HighLvlNode] with 
     def rec(in: Int): Unit = {
       if (in == -1) return
       in.toChar match {
-        case '｜' => bldr += StringNode(content)
-        case '《' => handleRuby(bldr)
-        case '［' => handleSystem(bldr); return
-        case '\n' | '\r' => return
+        case '｜'                                               => bldr += StringNode(content)
+        case '《'                                               => handleRuby(bldr)
+        case '［'                                               => handleSystem(bldr); return
+        case '\n' | '\r'                                       => return
         case c if AozoraParser.SENTENCE_SEPARATORS.contains(c) => handleSep(bldr); return
-        case c => buf.append(c)
+        case c                                                 => buf.append(c)
       }
       inp.next
       rec(inp.peek)
@@ -211,7 +208,7 @@ class AozoraParser(inp: AozoraInput) extends BufferedIterator[HighLvlNode] with 
       bldr += StringNode(content)
       Some(Sentence(ListNode(bldr.toList.filter {
         case StringNode("") => false
-        case _ => true
+        case _              => true
       })))
     }
   }
@@ -222,18 +219,17 @@ class AozoraParser(inp: AozoraInput) extends BufferedIterator[HighLvlNode] with 
       return None
     }
     nn.toChar match {
-      case '<' => parseImgTag()
+      case '<'         => parseImgTag()
       case '\n' | '\r' => parseEndline()
-      case '［' => parseSystem()
-      case _ => parseSentence()
+      case '［'         => parseSystem()
+      case _           => parseSentence()
     }
   }
 
   private var nextNode: Option[HighLvlNode] = calculateNextNode()
 
-
   def hasNext = !nextNode.isEmpty
-  def next() =  {
+  def next() = {
     val node = nextNode.get
     nextNode = calculateNextNode()
     node

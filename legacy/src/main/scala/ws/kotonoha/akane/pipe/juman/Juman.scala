@@ -22,9 +22,15 @@ import ws.kotonoha.akane.juman.JumanUtil
 sealed trait JumanMessage
 case class JumanQuery(input: String) extends JumanMessage
 case class DelayedJumanQuery(input: String, returnAdress: ActorRef) extends JumanMessage
-case class ParsedQuery(inner : List[JumanEntry]) extends JumanMessage
+case class ParsedQuery(inner: List[JumanEntry]) extends JumanMessage
 
-case class JumanEntry(writing: String, reading: String, dictForm: String, spPart: String, comment: String) extends JumanMessage {
+case class JumanEntry(
+    writing: String,
+    reading: String,
+    dictForm: String,
+    spPart: String,
+    comment: String)
+    extends JumanMessage {
   @transient lazy val daihyou = JumanUtil.daihyouWriting(this)
   def tag(tag: String) = JumanUtil.extractTag(this, tag)
   def tags = JumanUtil.extractTags(this)
@@ -49,4 +55,3 @@ object JumanEntry {
 object JumanRW {
   def unapply(in: JumanEntry) = Some((in.writing, in.reading))
 }
-

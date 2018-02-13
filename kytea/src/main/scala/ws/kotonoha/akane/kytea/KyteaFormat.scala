@@ -29,7 +29,10 @@ import scala.collection.mutable.ArrayBuffer
 class KyteaFormat(cfg: KyteaConfig) {
 
   @tailrec
-  private def parseMorphmemeImpl(buffer: ArrayBuffer[String], line: CharSequence, start: Int): Unit = {
+  private def parseMorphmemeImpl(
+      buffer: ArrayBuffer[String],
+      line: CharSequence,
+      start: Int): Unit = {
     val endOfLexeme = StringUtils.indexOf(line, cfg.tagBound, start)
     if (endOfLexeme == -1) {
       buffer += line.subSequence(start, line.length()).toString
@@ -39,7 +42,6 @@ class KyteaFormat(cfg: KyteaConfig) {
     }
   }
 
-
   def parseMorpheme(sequence: CharSequence): KyteaUnit = {
     val parts = new ArrayBuffer[String](4)
     parseMorphmemeImpl(parts, sequence, 0)
@@ -47,7 +49,10 @@ class KyteaFormat(cfg: KyteaConfig) {
   }
 
   @tailrec
-  private def parseSentenceImpl(buffer: ArrayBuffer[KyteaUnit], line: CharSequence, start: Int): Unit = {
+  private def parseSentenceImpl(
+      buffer: ArrayBuffer[KyteaUnit],
+      line: CharSequence,
+      start: Int): Unit = {
     val endOfLexeme = StringUtils.indexOf(line, cfg.wordBound, start)
     if (endOfLexeme == -1) {
       buffer += parseMorpheme(line.subSequence(start, line.length()))

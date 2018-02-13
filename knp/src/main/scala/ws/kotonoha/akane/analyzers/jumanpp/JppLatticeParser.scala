@@ -68,11 +68,11 @@ class JppLatticeParser {
         val key = f.substring(0, semi)
         val other = f.substring(semi + 1)
         key match {
-          case "特徴量スコア" => fscore = other.toFloat
+          case "特徴量スコア"   => fscore = other.toFloat
           case "言語モデルスコア" => lmscore = other.toFloat
           case "形態素解析スコア" => anscore = other.toFloat
-          case "ランク" => rank = intList(other, ';')
-          case _ => rest += JumanOption(key, Some(other))
+          case "ランク"      => rank = intList(other, ';')
+          case _          => rest += JumanOption(key, Some(other))
         }
       }
     }
@@ -82,7 +82,10 @@ class JppLatticeParser {
       prev,
       tokStart,
       tokEnd,
-      surfForm, canon, reading, midasi,
+      surfForm,
+      canon,
+      reading,
+      midasi,
       JumanPos(pos1.toInt, pos2.toInt, pos3.toInt, pos4.toInt),
       fscore,
       lmscore,

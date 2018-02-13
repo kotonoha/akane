@@ -9,8 +9,6 @@ import ws.kotonoha.akane.blobdb.api._
 
 import scala.concurrent.{Future, Promise}
 
-
-
 private[impl] trait CompressedShardWriter {
   def file: Int
 
@@ -23,9 +21,9 @@ private[impl] trait CompressedShardWriter {
 }
 
 class BlobImporterImpl[K <: AnyRef](
-  idref: IdRef[K],
-  transformer: BlobTransformer[K],
-  writer: CompressedShardWriter
+    idref: IdRef[K],
+    transformer: BlobTransformer[K],
+    writer: CompressedShardWriter
 ) extends BlobImporter[K] {
   private var committed = false
   private var lastAddr = writer.blockAddress
@@ -61,11 +59,15 @@ class BlobImporterImpl[K <: AnyRef](
   }
 }
 
-class BlDbWriterImpl[K <: AnyRef](impl: BlDbImpl[K], cfg: BlobDbConfig, ops: IdOps[K], dtf: BlobTransformer[K])
-  extends BlobDbWriter[K] with Closeable with StrictLogging {
+class BlDbWriterImpl[K <: AnyRef](
+    impl: BlDbImpl[K],
+    cfg: BlobDbConfig,
+    ops: IdOps[K],
+    dtf: BlobTransformer[K])
+    extends BlobDbWriter[K]
+    with Closeable
+    with StrictLogging {
   private[this] val actor = cfg.forCommit.actorOf(DbWriterActor.props(impl))
-
-
   @volatile
   private var streamCache = new ConcurrentLinkedQueue[CompressedShardWriter]()
 
@@ -117,7 +119,6 @@ class BlDbWriterImpl[K <: AnyRef](impl: BlDbImpl[K], cfg: BlobDbConfig, ops: IdO
       }
     }
   }
-
 
   override def delete(ids: Seq[K]) = {
     val p = Promise[TrOk]

@@ -16,17 +16,24 @@
 
 package ws.kotonoha.akane.analyzers.knp
 
-import ws.kotonoha.akane.analyzers.juman.{JumanText, JumanPos, JumanLexeme, JumanOption}
-import ws.kotonoha.akane.analyzers.knp.wire.{Kihonku, Bunsetsu, KnpTable}
-import ws.kotonoha.akane.analyzers.knp.raw.{OldAngUglyKnpTable => OldTable, OldAndUglyBunsetsu => OldBunsetsu, OldAndUglyKihonku => OldKihonku}
+import ws.kotonoha.akane.analyzers.juman.{JumanLexeme, JumanOption, JumanPos, JumanText}
+import ws.kotonoha.akane.analyzers.knp.wire.{Bunsetsu, Kihonku, KnpTable}
+import ws.kotonoha.akane.analyzers.knp.raw.{
+  OldAngUglyKnpTable => OldTable,
+  OldAndUglyBunsetsu => OldBunsetsu,
+  OldAndUglyKihonku => OldKihonku
+}
 import ws.kotonoha.akane.analyzers.knp.raw.OldAndUglyKnpLexeme
 
 /**
- * @author eiennohito
- * @since 2015/09/18
- */
+  * @author eiennohito
+  * @since 2015/09/18
+  */
 //noinspection ScalaDeprecation
-class TableConverter(filterLexeme: Set[String], filterBunsetsu: Set[String], filterKihonku: Set[String]) {
+class TableConverter(
+    filterLexeme: Set[String],
+    filterBunsetsu: Set[String],
+    filterKihonku: Set[String]) {
   final def transformFeatures(features: Seq[String], filter: Set[String]): Seq[JumanOption] = {
     if (filter.isEmpty) {
       transformWoFilter(features)
@@ -40,7 +47,9 @@ class TableConverter(filterLexeme: Set[String], filterBunsetsu: Set[String], fil
       val semi = f.indexOf(':')
       val key = if (semi == -1) f else f.substring(0, semi)
       if (filter.contains(key))
-        Seq(if (semi == -1) JumanOption(key, None) else JumanOption(key, Some(f.substring(semi + 1, f.length))))
+        Seq(
+          if (semi == -1) JumanOption(key, None)
+          else JumanOption(key, Some(f.substring(semi + 1, f.length))))
       else Seq.empty
     }
   }
@@ -82,7 +91,10 @@ class TableConverter(filterLexeme: Set[String], filterBunsetsu: Set[String], fil
         category = lexeme.pos.category,
         conjugation = lexeme.pos.conjugation
       ),
-      options = (JumanText.parseOptionsInner(lexeme.info, 0, lexeme.info.length) ++ transformFeatures(lexeme.tags, filterLexeme)).distinct
+      options =
+        (JumanText.parseOptionsInner(lexeme.info, 0, lexeme.info.length) ++ transformFeatures(
+          lexeme.tags,
+          filterLexeme)).distinct
     )
   }
 

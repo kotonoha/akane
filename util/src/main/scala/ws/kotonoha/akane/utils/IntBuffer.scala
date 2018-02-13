@@ -5,9 +5,9 @@ import java.util
 import ws.kotonoha.akane.utils.diff.SegmentBorders
 
 /**
- * @author eiennohito
- * @since 15/08/13
- */
+  * @author eiennohito
+  * @since 15/08/13
+  */
 final class IntBuffer(private var arr: Array[Int] = Array.emptyIntArray) extends SegmentBorders {
 
   def this(capacity: Int) = {
@@ -65,7 +65,7 @@ final class IntBuffer(private var arr: Array[Int] = Array.emptyIntArray) extends
       i += 1
     }
     val len = sb.length - 2
-    sb.replace(len max 1, sb.length, "]")
+    sb.replace(len.max(1), sb.length, "]")
     sb.toString()
   }
 
@@ -73,7 +73,7 @@ final class IntBuffer(private var arr: Array[Int] = Array.emptyIntArray) extends
 
   override def equals(obj: scala.Any) = obj match {
     case o: IntBuffer => elementsEquals(o)
-    case _ => false
+    case _            => false
   }
 }
 

@@ -23,9 +23,9 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 /**
- * @author eiennohito
- * @since 15/10/02
- */
+  * @author eiennohito
+  * @since 15/10/02
+  */
 class JumanActor(conf: JumanConfig) extends Actor {
   lazy val process = JumanSubprocess.create(conf)
 
@@ -36,7 +36,7 @@ class JumanActor(conf: JumanConfig) extends Actor {
       val res = process.analyzeSync(data)
       res match {
         case Success(seq) => sender() ! AnalysisSuccess(ref, seq)
-        case Failure(x) => sender() ! AnalysisFailure(ref)
+        case Failure(x)   => sender() ! AnalysisFailure(ref)
       }
     case RestartSubprocess =>
       process.restart()
@@ -62,15 +62,18 @@ object JumanActor {
   case object RestartSubprocess
 }
 
-
 class JumanActorAnalyzer(ref: ActorRef, timeout: Timeout) extends AsyncJumanAnalyzer {
 
   import akka.pattern.ask
 
   override def analyze(input: String)(implicit ec: ExecutionContext) = {
-    ref.ask(JumanActor.AnalyzeRequest(null, input))(timeout).mapTo[JumanActor.AnalysisResult].flatMap {
-      case JumanActor.AnalysisSuccess(_, seq) => Future.successful(seq)
-      case JumanActor.AnalysisFailure(_) => Future.failed(throw new Exception(s"could not parse $input"))
-    }
+    ref
+      .ask(JumanActor.AnalyzeRequest(null, input))(timeout)
+      .mapTo[JumanActor.AnalysisResult]
+      .flatMap {
+        case JumanActor.AnalysisSuccess(_, seq) => Future.successful(seq)
+        case JumanActor.AnalysisFailure(_) =>
+          Future.failed(throw new Exception(s"could not parse $input"))
+      }
   }
 }

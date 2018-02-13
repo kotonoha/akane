@@ -18,39 +18,45 @@ package ws.kotonoha.akane.statistics
 
 import akka.actor.ActorRef
 import akka.pattern.ask
-import ws.kotonoha.akane.ast.{Sentence, HighLvlNode}
-import ws.kotonoha.akane.pipe.juman.{ParsedQuery, JumanQuery}
+import ws.kotonoha.akane.ast.{HighLvlNode, Sentence}
+import ws.kotonoha.akane.pipe.juman.{JumanQuery, ParsedQuery}
 import ws.kotonoha.akane.render.MetaStringRenderer
 import ws.kotonoha.akane.juman.{JumanDaihyou, JumanUtil}
 import akka.util.Timeout
-import concurrent.{Future, ExecutionContext}
+import concurrent.{ExecutionContext, Future}
 
 /**
- * @author eiennohito
- * @since 20.08.12
- */
-
+  * @author eiennohito
+  * @since 20.08.12
+  */
 class UniqueWordsExtractor(juman: ActorRef, ex: ExecutionContext) {
   import concurrent.duration._
-  implicit val timeout = Timeout(5 seconds)
-  implicit val ec : ExecutionContext = ex
+  implicit val timeout = Timeout(5.seconds)
+  implicit val ec: ExecutionContext = ex
 
   private def parse(q: String) = (juman ? JumanQuery(q)).mapTo[ParsedQuery]
 
-  def uniqueWords(nodes: TraversableOnce[HighLvlNode], stoplist: Set[String] = Set()): Future[List[JumanDaihyou]] = {
+  def uniqueWords(
+      nodes: TraversableOnce[HighLvlNode],
+      stoplist: Set[String] = Set()): Future[List[JumanDaihyou]] = {
     val mir = new MetaStringRenderer()
     val items = nodes.flatMap {
       case Sentence(s) => List(mir.render(s).data)
-      case _ => Nil
+      case _           => Nil
     }.toList
-    val f = items map { s => parse(s) }
-    Future.sequence(f) map {
-      i => i.flatMap {
-        pq => pq.inner.map(JumanUtil.daihyouWriting(_)) filter {
-          j => JumanUtil.ignored(j.writing)
-        } filterNot {
-          j => stoplist.contains(j.writing) || stoplist.contains(j.reading)
-        }
+    val f = items.map { s =>
+      parse(s)
+    }
+    Future.sequence(f).map { i =>
+      i.flatMap { pq =>
+        pq.inner
+          .map(JumanUtil.daihyouWriting)
+          .filter { j =>
+            JumanUtil.ignored(j.writing)
+          }
+          .filterNot { j =>
+            stoplist.contains(j.writing) || stoplist.contains(j.reading)
+          }
       }.distinct
     }
   }

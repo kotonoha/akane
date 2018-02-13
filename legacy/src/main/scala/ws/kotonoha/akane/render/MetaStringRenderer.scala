@@ -22,10 +22,9 @@ import ws.kotonoha.akane.ast.StringNode
 import ws.kotonoha.akane.ast.ListNode
 
 /**
- * @author eiennohito
- * @since 17.08.12
- */
-
+  * @author eiennohito
+  * @since 17.08.12
+  */
 case class MetaInfo()
 
 case class MetaString(data: String, info: MetaInfo)
@@ -40,9 +39,9 @@ class MetaStringRenderer {
   private def renderCore(n: Node, sb: StringBuilder): Int = {
     val start = sb.length
     n match {
-      case StringNode(str) => sb.append(str)
-      case RubyNode(_, n1) => renderCore(n1, sb)
-      case ListNode(l) => l.foreach(renderCore(_, sb))
+      case StringNode(str)   => sb.append(str)
+      case RubyNode(_, n1)   => renderCore(n1, sb)
+      case ListNode(l)       => l.foreach(renderCore(_, sb))
       case HighlightNode(n1) => renderCore(n1, sb)
     }
     sb.length - start

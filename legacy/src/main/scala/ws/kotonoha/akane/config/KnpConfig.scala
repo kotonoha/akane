@@ -19,7 +19,6 @@ package ws.kotonoha.akane.config
 import com.typesafe.config.{Config, ConfigFactory}
 import ws.kotonoha.akane.analyzers.juman.JumanConfig
 
-
 class KnpConfig(val juman: JumanConfig, val executable: String, val params: List[String])
 object KnpConfig {
   val knpEx = "akane.knp.executable"

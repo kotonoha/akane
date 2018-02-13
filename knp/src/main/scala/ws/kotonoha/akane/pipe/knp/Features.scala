@@ -19,9 +19,9 @@ package ws.kotonoha.akane.pipe.knp
 import ws.kotonoha.akane.analyzers.knp.FeatureAccess
 
 /**
- * @author eiennohito
- * @since 15/07/14
- */
+  * @author eiennohito
+  * @since 15/07/14
+  */
 object Features {
 
   val yougen: String = "用言"

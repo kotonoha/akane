@@ -21,12 +21,10 @@ import ws.kotonoha.akane.utils.{XDouble, XInt}
 import scala.util.parsing.combinator.RegexParsers
 
 /**
- * @author eiennohito
- * @since 2013-09-04
- */
-class Lisp {
-
-}
+  * @author eiennohito
+  * @since 2013-09-04
+  */
+class Lisp {}
 
 sealed trait KElement
 case class KAtom(content: String) extends KElement
@@ -97,8 +95,8 @@ object LispRenderer {
 
   def renderList(list: KList, builder: StringBuilder) = {
     builder.append('(')
-    list.items.foreach {
-      i => render(i, builder)
+    list.items.foreach { i =>
+      render(i, builder)
     }
     if (builder.last == ' ') {
       builder(builder.length - 1) = ')'
@@ -112,6 +110,3 @@ object LispRenderer {
     }
   }
 }
-
-
-

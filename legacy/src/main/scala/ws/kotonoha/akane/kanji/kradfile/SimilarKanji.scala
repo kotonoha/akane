@@ -17,31 +17,38 @@
 package ws.kotonoha.akane.kanji.kradfile
 
 /**
- * @author eiennohito
- * @since 08.07.13 
- */
-
-case class SimilarKanji(text: String, rads: Seq[String], common: Seq[String], diff: Seq[String], score: Int)
+  * @author eiennohito
+  * @since 08.07.13
+  */
+case class SimilarKanji(
+    text: String,
+    rads: Seq[String],
+    common: Seq[String],
+    diff: Seq[String],
+    score: Int)
 
 object SimilarKanji {
 
   def findSimilar(rads: Seq[String]) = {
     val cands = rads.flatMap(x => RadicalDb.reverse(x)).distinct //get all kanji that have first radical
-    cands.map { k =>
-      val krads = RadicalDb.table(k)
-      val common = rads.intersect(krads)
-      val other = krads.diff(common)
-      val score = 10 * common.length - 3 * other.length
-      SimilarKanji(k, krads, common, other, score)
-    } filter(_.score > 0) sortBy(-_.score)
+    cands
+      .map { k =>
+        val krads = RadicalDb.table(k)
+        val common = rads.intersect(krads)
+        val other = krads.diff(common)
+        val score = 10 * common.length - 3 * other.length
+        SimilarKanji(k, krads, common, other, score)
+      }
+      .filter(_.score > 0)
+      .sortBy(-_.score)
   }
 
   def find(k: String) = {
     //for first we find all radicals of our kanji
     val rads = RadicalDb.table.get(k)
     rads match {
-      case Some(x) => findSimilar(x) filterNot(_.text == k)
-      case None => Seq.empty
+      case Some(x) => findSimilar(x).filterNot(_.text == k)
+      case None    => Seq.empty
     }
   }
 }

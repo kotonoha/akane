@@ -22,14 +22,13 @@ import ws.kotonoha.akane.conjuation.{Renderable, Verb}
 import org.apache.commons.lang3.StringUtils
 
 /**
- * @author eiennohito
- * @since 16.11.12 
- */
-
+  * @author eiennohito
+  * @since 16.11.12
+  */
 object VerbFormsOutput {
   val tags = {
     val lines = Path.fromString("e:\\Temp\\wap_soft\\verbs.txt").lines()
-    val flt = lines map (_.split("\t")) flatMap {
+    val flt = lines.map(_.split("\t")).flatMap {
       case Array(s1, s2) => {
         Some(StringUtils.strip(s1, "\"") -> StringUtils.strip(s2, "\""))
       }
@@ -69,28 +68,33 @@ object VerbFormsOutput {
     )
 
     def render(pos: Int, dic: Option[String], item: Option[String]) = {
-      item.zip(dic) map {case (i, i2) => {
-        val sb = new StringBuilder
-        for (p <- 0 until renderers.length) {
-          if (p == pos) {
-            sb.append(i2)
-            sb.append("->")
-            sb.append(i)
+      item.zip(dic).map {
+        case (i, i2) => {
+          val sb = new StringBuilder
+          for (p <- 0.until(renderers.length)) {
+            if (p == pos) {
+              sb.append(i2)
+              sb.append("->")
+              sb.append(i)
+            }
+            //sb.append('\t')
           }
-          //sb.append('\t')
+          sb.toString()
         }
-        sb.toString()
-      }}
+      }
     }
 
-    val x = (1 to 60).map(x => Random.nextInt(renderers.length))
+    val x = 1.to(60).map(x => Random.nextInt(renderers.length))
 
-    val res = candidates.zip(x).flatMap {
-      case (w, ind) => {
-        val r = renderers(ind)
-        render(r._1, w.render, r._2(w).render)
+    val res = candidates
+      .zip(x)
+      .flatMap {
+        case (w, ind) => {
+          val r = renderers(ind)
+          render(r._1, w.render, r._2(w).render)
+        }
       }
-    }.toList
+      .toList
 
     res.foreach(println(_))
   }

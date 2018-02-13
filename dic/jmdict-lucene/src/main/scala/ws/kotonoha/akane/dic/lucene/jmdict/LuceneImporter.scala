@@ -57,7 +57,6 @@ class LuceneImporter(iw: IndexWriter) {
     new StringSeqTokenStream(iter)
   }
 
-
   def fixedInt(i: Int): BytesRef = {
     val abyte = new Array[Byte](4)
     abyte(0) = ((i >>> 24) & 0xff).toByte
@@ -109,7 +108,6 @@ class LuceneImporter(iw: IndexWriter) {
       localCounts.put(c.lang, localCounts.getOrElse(c.lang, 0) + 1)
     }
 
-
     for ((lang, cnt) <- localCounts) {
       langEntryCounts.put(lang, langEntryCounts.getOrElse(lang, 0L) + 1L)
       langGlossCounts.put(lang, langGlossCounts.getOrElse(lang, 0L) + cnt)
@@ -129,7 +127,8 @@ class LuceneImporter(iw: IndexWriter) {
     val data = new util.HashMap[String, String]()
     data.put(LuceneImporter.INFO_CREATION_DATE, jmdictString)
     data.put(LuceneImporter.INFO_BUILD_DATE, now)
-    data.put(LuceneImporter.INFO_LANGUAGE_STATS, LuceneImporter.makeLanguageInfo(langEntryCounts, langGlossCounts))
+    data.put(LuceneImporter.INFO_LANGUAGE_STATS,
+             LuceneImporter.makeLanguageInfo(langEntryCounts, langGlossCounts))
     iw.setLiveCommitData(data.entrySet())
     iw.commit()
     iw.forceMerge(1, true)
@@ -147,7 +146,9 @@ object LuceneImporter {
     JmdictInfo(creation, build, langInfo)
   }
 
-  def makeLanguageInfo(langEntries: mutable.Map[String, Long], glossCounts: mutable.Map[String, Long]): String = {
+  def makeLanguageInfo(
+      langEntries: mutable.Map[String, Long],
+      glossCounts: mutable.Map[String, Long]): String = {
     val entries = langEntries.map {
       case (lang, entryCnt) =>
         val glossCnt = glossCounts(lang)
@@ -165,7 +166,6 @@ object LuceneImporter {
     val decoded = Base64.getDecoder.decode(base64repr)
     LangFrequencyPack.parseFrom(decoded)
   }
-
 
   val INFO_CREATION_DATE = "creationDate"
   val INFO_BUILD_DATE = "buildDate"

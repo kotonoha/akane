@@ -32,10 +32,9 @@ package ws.kotonoha.akane.kanji
  * limitations under the License.
  */
 /**
- * @author eiennohito
- * @since 02.03.12
- */
-
+  * @author eiennohito
+  * @since 02.03.12
+  */
 object JouyouKanji {
 
   val newFrom = 1945

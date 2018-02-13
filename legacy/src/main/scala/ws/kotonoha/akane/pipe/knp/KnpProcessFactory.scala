@@ -24,10 +24,9 @@ import scala.collection.mutable.ListBuffer
 import scala.concurrent.ExecutionContext
 
 /**
- * @author eiennohito
- * @since 2013-09-03
- */
-
+  * @author eiennohito
+  * @since 2013-09-03
+  */
 object KnpOutputType extends Enumeration {
   val tab = Value("tab")
   val sexp = Value("sexp")
@@ -35,7 +34,8 @@ object KnpOutputType extends Enumeration {
   type KnpOutputType = KnpOutputType.Value
 }
 
-class KnpProcessFactory(config: KnpConfig, kind: KnpOutputType.Value)(implicit val ec: ExecutionContext = ExecutionContext.global) {
+class KnpProcessFactory(config: KnpConfig, kind: KnpOutputType.Value)(
+    implicit val ec: ExecutionContext = ExecutionContext.global) {
 
   private def winLaunch() = {
     val args = new util.ArrayList[String]()
@@ -54,14 +54,14 @@ class KnpProcessFactory(config: KnpConfig, kind: KnpOutputType.Value)(implicit v
   def launch(): KnpProcessContainer = {
     System.getProperty("os.name") match {
       case x if x.contains("Windows") => winLaunch()
-      case _ => unixLaunch()
+      case _                          => unixLaunch()
     }
   }
 
   lazy val normKind = kind match {
-    case KnpOutputType.tab => "-tab"
+    case KnpOutputType.tab  => "-tab"
     case KnpOutputType.sexp => "-sexp"
-    case _ => throw new KnpInitException(s"invalid knp output type: $kind")
+    case _                  => throw new KnpInitException(s"invalid knp output type: $kind")
   }
 
   private def unixLaunch() = {
@@ -87,6 +87,5 @@ class KnpProcessFactory(config: KnpConfig, kind: KnpOutputType.Value)(implicit v
     new SingleProcessKnpContainer(pb.start())
   }
 }
-
 
 class KnpInitException(msg: String) extends RuntimeException(msg)

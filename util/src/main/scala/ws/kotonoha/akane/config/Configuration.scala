@@ -40,13 +40,17 @@ object Configuration extends StrictLogging {
     }).map(_.mkString(".")).filter(_.length > 2).distinct
   }
 
-  def withUsername(name: String, config: Config = ConfigFactory.defaultOverrides()): List[String] = {
+  def withUsername(
+      name: String,
+      config: Config = ConfigFactory.defaultOverrides()): List[String] = {
     val cfg = config.withFallback(theOverrides)
     val uname = cfg.getString("user.name")
     s"$uname.$name" :: Nil
   }
 
-  def possibleNamesFor(name: String, defaults: Config = ConfigFactory.defaultOverrides()): List[String] = {
+  def possibleNamesFor(
+      name: String,
+      defaults: Config = ConfigFactory.defaultOverrides()): List[String] = {
     val c1 = name :: withHostname(name) ::: withUsername(name, defaults).flatMap(withHostname)
     c1.map(_ + ".conf").distinct
   }

@@ -7,16 +7,17 @@ import net.jpountz.lz4.{LZ4BlockOutputStream2, LZ4Factory}
 import ws.kotonoha.akane.blobdb.impl.bgz.BlockGunzipper
 
 /**
- * @author eiennohito
- * @since 2014-10-24
- */
+  * @author eiennohito
+  * @since 2014-10-24
+  */
 trait BlockReader {
+
   /**
-   * Read compressed block from bytebuffer, starting from position
-   * @param buffer in the LE byte order
-   * @param position position to read from
-   * @return decompressed data with compressed length
-   */
+    * Read compressed block from bytebuffer, starting from position
+    * @param buffer in the LE byte order
+    * @param position position to read from
+    * @return decompressed data with compressed length
+    */
   def readBlock(buffer: ByteBuffer, position: Int): DecompressedBuffer
 }
 

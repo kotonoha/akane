@@ -38,7 +38,7 @@ object JumanUtil {
       val x = if (e == -1) c.substring(i) else c.substring(i, e)
       x.split(":") match {
         case Array(tag, tp, cnt) => Some(JumanTag(tag, tp, cnt))
-        case _ => None
+        case _                   => None
       }
     }
   }
@@ -46,7 +46,7 @@ object JumanUtil {
   val tagRe = """([^ ]+):([^ ]+):([^ ]+)""".r
 
   def extractTags(entry: JumanEntry) = {
-    val x = tagRe.findAllMatchIn(entry.comment) map {
+    val x = tagRe.findAllMatchIn(entry.comment).map {
       case Groups(tag, tp, cnt) => JumanTag(tag, tp, cnt)
     }
     x.toList

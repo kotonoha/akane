@@ -18,7 +18,6 @@ import ws.kotonoha.akane.resources.FSPaths
   * @author eiennohito
   * @since 2016/07/19
   */
-
 private[impl] trait DbImplApi[K <: AnyRef] extends BlobDb[K] {
   //Low-level API for reading blocks
   private[impl] def blockFor(idx: BlobIndexEntry): DecompressedBuffer
@@ -30,8 +29,13 @@ private[impl] trait DbImplApi[K <: AnyRef] extends BlobDb[K] {
   private[impl] def nextFileNo(): Int
 }
 
-class BlDbImpl[Key <: AnyRef](cfg: BlobDbConfig, val ops: IdOps[Key], defaultTransform: BlobTransformer[Key])
-  extends Closeable with StrictLogging with DbImplApi[Key] {
+class BlDbImpl[Key <: AnyRef](
+    cfg: BlobDbConfig,
+    val ops: IdOps[Key],
+    defaultTransform: BlobTransformer[Key])
+    extends Closeable
+    with StrictLogging
+    with DbImplApi[Key] {
 
   private final val blockSize = 64 * 1024
 
@@ -39,7 +43,8 @@ class BlDbImpl[Key <: AnyRef](cfg: BlobDbConfig, val ops: IdOps[Key], defaultTra
     val size = cfg.decompressedCache / blockSize
     logger.trace(s"storing up to $size blocks of 64k")
     val bldr = Caffeine.newBuilder()
-    bldr.maximumSize(size)
+    bldr
+      .maximumSize(size)
       .expireAfterAccess(20, TimeUnit.MINUTES)
       .executor(cfg.cacheEc)
       .build[BufferPointer, DecompressedBuffer]
@@ -55,11 +60,10 @@ class BlDbImpl[Key <: AnyRef](cfg: BlobDbConfig, val ops: IdOps[Key], defaultTra
     f.make()
   }
 
-
   override def invalidateShard(file: Int) = {
     treeBuffers.get(file) match {
       case null => //nothing to do
-      case buf => buf.invalidate()
+      case buf  => buf.invalidate()
     }
   }
 
@@ -80,7 +84,8 @@ class BlDbImpl[Key <: AnyRef](cfg: BlobDbConfig, val ops: IdOps[Key], defaultTra
 
   private[this] val treeBuffers = new ConcurrentHashMap[Int, MapBufferWithCache]()
 
-  protected[impl] val index: BTreeMap[Key, BlobIndexEntry] = db.createTreeMap("index")
+  protected[impl] val index: BTreeMap[Key, BlobIndexEntry] = db
+    .createTreeMap("index")
     .keySerializer(ops.serializer)
     .valueSerializer(new SentenceIndexEntrySerializer)
     .comparator(ops.comparator)
@@ -133,7 +138,6 @@ class BlDbImpl[Key <: AnyRef](cfg: BlobDbConfig, val ops: IdOps[Key], defaultTra
 
   import scala.collection.JavaConverters._
 
-
   override def infoFor(id: Key) = Option(index.get(id))
 
   override def valueGetter[Val](rc: ResultCreator[Val]) = new DefaultSearchImpl[Key, Val](this, rc)
@@ -153,7 +157,11 @@ class BlDbImpl[Key <: AnyRef](cfg: BlobDbConfig, val ops: IdOps[Key], defaultTra
   }
 }
 
-private[impl] final class DefaultSearchImpl[Key <: AnyRef, T](dbi: DbImplApi[Key], rc: ResultCreator[T]) extends ItemSearch[Key, T] with StrictLogging {
+private[impl] final class DefaultSearchImpl[Key <: AnyRef, T](
+    dbi: DbImplApi[Key],
+    rc: ResultCreator[T])
+    extends ItemSearch[Key, T]
+    with StrictLogging {
   private lazy val growBuffer = new GrowableByteBuffer()
 
   override def get(id: Key) = {
@@ -199,9 +207,3 @@ private[impl] final class DefaultSearchImpl[Key <: AnyRef, T](dbi: DbImplApi[Key
     rc.result(buf.asBuffer)
   }
 }
-
-
-
-
-
-

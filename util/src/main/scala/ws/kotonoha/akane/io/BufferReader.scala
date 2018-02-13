@@ -20,12 +20,12 @@ import java.io.InputStream
 import java.nio.ByteBuffer
 
 /**
- * @author eiennohito
- * @since 15/08/11
- */
+  * @author eiennohito
+  * @since 15/08/11
+  */
 final class BufferReader(buffer: ByteBuffer, ratio: Double = 0.1) {
 
-  val refresh = (buffer.capacity() * ratio).toInt
+  private val refresh = (buffer.capacity() * ratio).toInt
 
   buffer.position(buffer.capacity())
 
@@ -51,5 +51,5 @@ final class BufferReader(buffer: ByteBuffer, ratio: Double = 0.1) {
     func(buffer)
   }
 
-  def readBytes = totalRead
+  def readBytes: Long = totalRead
 }

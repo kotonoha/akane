@@ -24,10 +24,15 @@ import ws.kotonoha.akane.analyzers.knp.wire.{Bunsetsu, Kihonku, KnpTable}
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * @author eiennohito
- * @since 2015/09/18
- */
-final class TableWrapper(val message: KnpTable, lexemes: LexemeAccess, bunsetsus: BunsetsuAccess, kihonkus: KihonkuAccess) extends TableApi {
+  * @author eiennohito
+  * @since 2015/09/18
+  */
+final class TableWrapper(
+    val message: KnpTable,
+    lexemes: LexemeAccess,
+    bunsetsus: BunsetsuAccess,
+    kihonkus: KihonkuAccess)
+    extends TableApi {
   override def kihonkuStart = kihonkus.kihonkuStart
   override def kihonkuEnd = kihonkus.kihonkuEnd
   override def kihonkuCnt = kihonkus.kihonkuCnt
@@ -129,8 +134,14 @@ final class LexemeWrapper(lex: JumanLexeme) extends LexemeApi with OptionFeature
   override def toString = surface
 }
 
-final class KihonkuWrapper(val number: Int, kih: Kihonku, out: LexemeAccess,
-  val lexemeStart: Int, val lexemeCnt: Int) extends KihonkuApi with OptionFeatures {
+final class KihonkuWrapper(
+    val number: Int,
+    kih: Kihonku,
+    out: LexemeAccess,
+    val lexemeStart: Int,
+    val lexemeCnt: Int)
+    extends KihonkuApi
+    with OptionFeatures {
 
   val lexemeEnd = lexemeStart + lexemeCnt
   override protected def optionSequence = kih.features
@@ -145,11 +156,17 @@ final class KihonkuWrapper(val number: Int, kih: Kihonku, out: LexemeAccess,
   override def toString = lexemeIter.map(_.surface).mkString
 }
 
-final class BunsetsuWrapper (
-  val number: Int, bnst: Bunsetsu,
-  lexemes: LexemeAccess, val lexemeStart: Int, val lexemeCnt: Int,
-  kihonkus: KihonkuAccess, val kihonkuStart: Int, val kihonkuCnt: Int
-) extends BunsetsuApi with OptionFeatures {
+final class BunsetsuWrapper(
+    val number: Int,
+    bnst: Bunsetsu,
+    lexemes: LexemeAccess,
+    val lexemeStart: Int,
+    val lexemeCnt: Int,
+    kihonkus: KihonkuAccess,
+    val kihonkuStart: Int,
+    val kihonkuCnt: Int
+) extends BunsetsuApi
+    with OptionFeatures {
   val lexemeEnd = lexemeStart + lexemeCnt
   val kihonkuEnd = kihonkuStart + kihonkuCnt
 

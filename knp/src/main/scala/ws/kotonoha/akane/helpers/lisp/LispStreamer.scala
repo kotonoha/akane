@@ -35,7 +35,6 @@ class LispStreamer(data: InputStream) extends CalculatingIterator[KElement] {
   chars.position(chars.limit())
   buffer.limit(0)
 
-
   private def shouldRead(): Boolean = {
     !EOF && chars.remaining() < 2000
   }
@@ -44,7 +43,6 @@ class LispStreamer(data: InputStream) extends CalculatingIterator[KElement] {
     chars.compact()
 
     var toRead = chars.remaining() - buffer.position()
-
 
     while (toRead > 2000) {
       val readLen = data.read(buffer.array(), buffer.position(), toRead)
@@ -60,7 +58,6 @@ class LispStreamer(data: InputStream) extends CalculatingIterator[KElement] {
 
       buffer.limit(buffer.position() + readLen)
       buffer.position(0)
-
 
       coder.decode(buffer, chars, false)
       buffer.compact()

@@ -23,6 +23,8 @@ import java.io.InputStreamReader
 
 import ws.kotonoha.akane.helpers.lisp.{KAtom, KItems, LispParser}
 
+import scala.language.implicitConversions
+
 /**
  * @author eiennohito
  * @since 2013-09-04

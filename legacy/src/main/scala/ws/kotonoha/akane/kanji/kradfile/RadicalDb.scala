@@ -20,10 +20,9 @@ import java.net.URL
 import scalax.io.Codec
 
 /**
- * @author eiennohito
- * @since 08.07.13 
- */
-
+  * @author eiennohito
+  * @since 08.07.13
+  */
 object RadicalDb {
 
   def loadRadfile(url: URL) = {
@@ -40,10 +39,10 @@ object RadicalDb {
   }
 
   /**
-   * Kanji -> List of radicals mapping
-   *
-   * It is loaded from kradfile(s)
-   */
+    * Kanji -> List of radicals mapping
+    *
+    * It is loaded from kradfile(s)
+    */
   lazy val table = {
     val kradfile = RadicalDb.getClass.getClassLoader.getResource("kradfile/kradfile")
     val kradfile2 = RadicalDb.getClass.getClassLoader.getResource("kradfile/kradfile2")
@@ -51,20 +50,22 @@ object RadicalDb {
   }
 
   /**
-   * A reverse Radical -> Kanji mapping
-   *
-   * 2 foldlefts and no mutable state.
-   */
+    * A reverse Radical -> Kanji mapping
+    *
+    * 2 foldlefts and no mutable state.
+    */
   lazy val reverse = {
-    table.foldLeft(Map[String, Seq[String]]()) { case (m, (k, seq)) =>
-      seq.foldLeft(m) { case (m, rad) =>
-        val cur = m.get(rad)
-        val upd = cur match {
-          case Some(x) => Seq(k) ++ x
-          case _ => Seq(k)
+    table.foldLeft(Map[String, Seq[String]]()) {
+      case (m, (k, seq)) =>
+        seq.foldLeft(m) {
+          case (m, rad) =>
+            val cur = m.get(rad)
+            val upd = cur match {
+              case Some(x) => Seq(k) ++ x
+              case _       => Seq(k)
+            }
+            m.updated(rad, upd)
         }
-        m.updated(rad, upd)
-      }
     }
   }
 }

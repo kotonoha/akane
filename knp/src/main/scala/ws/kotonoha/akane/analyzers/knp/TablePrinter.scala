@@ -21,9 +21,9 @@ import ws.kotonoha.akane.analyzers.knp.wire.KnpTable
 import ws.kotonoha.akane.parser.JumanPosSet
 
 /**
- * @author eiennohito
- * @since 2015/09/18
- */
+  * @author eiennohito
+  * @since 2015/09/18
+  */
 class TablePrinter(posSet: JumanPosSet) {
 
   def appendPos(apd: Appendable, pos: JumanPos) = {
