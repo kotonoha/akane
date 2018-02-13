@@ -32,9 +32,9 @@ lazy val akaneSettings = Def.settings(
       "-target:jvm-1.8"
     )
     case "2.12" => Seq(
-      "-opt:l:classpath",
-      "-opt-warnings",
-      "-target:1.8"
+      "-opt:l:inline",
+      "-opt-inline-from:**",
+      "-opt-warnings:at-inline-failed"
     )
     case v => throw new Exception(s"Unsuported version, $v")
   }),
@@ -103,24 +103,40 @@ lazy val luceneDeps = Def.settings(
 lazy val akane = (project in file("."))
   .settings(akaneSettings)
   .aggregate(ioc, legacy, knp, util, macros, knpAkka, blobdb, akka, dic, kytea, misc, `jmdict-lucene`)
+  .settings(
+    publishArtifact := false
+  )
 
 lazy val ioc = akaneProject("ioc", file("ioc"))
 
 lazy val legacy = akaneProject("legacy", file("legacy"))
-  .settings(Seq(
+  .settings(
+    commonDeps,
     libraryDependencies ++= Seq(
       akkaDep,
       "com.nativelibs4java" % "bridj" % "0.7.0",
       "com.typesafe" % "config" % "1.3.2",
-      "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
+      "org.scala-lang.modules" %% "scala-xml" % "1.0.6"
       // "com.jsuereth" %% "scala-arm" % "2.0",
-
-      // 2.11-stuff only
-      "com.github.scala-incubator.io" %% "scala-io-core" % "0.4.3",
-      "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.3"
     ),
-    resolvers += "kyouni" at "http://lotus.kuee.kyoto-u.ac.jp/nexus/content/groups/public/"
-  ) ++ commonDeps)
+    libraryDependencies ++= (scalaBinaryVersion.value match { // 2.11-stuff only
+      case "2.11" => Seq(
+        "com.github.scala-incubator.io" %% "scala-io-core" % "0.4.3",
+        "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.3"
+      )
+      case _ => Nil
+    }),
+    Compile / sourceDirectory := (scalaBinaryVersion.value match {
+      case "2.11" => (Compile / sourceDirectory).value
+      case "2.12" => file("fake-source-directory/fake/fake")
+    }),
+    Test / sourceDirectory := (scalaBinaryVersion.value match {
+      case "2.11" => (Test / sourceDirectory).value
+      case "2.12" => file("fake-source-directory/fake/fake")
+    }),
+    resolvers += "kyouni" at "http://lotus.kuee.kyoto-u.ac.jp/nexus/content/groups/public/",
+    Test / fork := true
+  )
   .dependsOn(util, knpAkka, kytea)
 
 lazy val knp = akaneProject("knp", file("knp"))
