@@ -1,3 +1,5 @@
+import sbt.internal.LoadedBuild
+
 lazy val scalaPbVersion = "0.6.7"
 
 def pbScala(): Seq[Setting[_]] = {
@@ -16,7 +18,6 @@ lazy val akaneSettings = Def.settings(
   organization := "ws.kotonoha",
   moduleName := "akane",
   crossScalaVersions := Seq("2.11.12", "2.12.4"),
-  scalaVersion := "2.11.12",
   name := "Akane",
   version := "0.2-SNAPSHOT",
   javacOptions ++= Seq("-encoding", "utf8"),
@@ -100,11 +101,19 @@ lazy val luceneDeps = Def.settings(
   )
 )
 
+def isRoot(bld: LoadedBuild, proj: ResolvedProject): Boolean = {
+  val refUri = proj.base.toURI
+  val rootUri = bld.root
+  val areEqual = rootUri.getScheme == "file" && rootUri == refUri
+  areEqual
+}
+
 lazy val akane = (project in file("."))
   .settings(akaneSettings)
   .aggregate(ioc, legacy, knp, util, macros, knpAkka, blobdb, akka, dic, kytea, misc, `jmdict-lucene`)
   .settings(
-    publishArtifact := false
+    publishArtifact := false,
+    (scalaVersion in ThisBuild) := (if (isRoot(loadedBuild.value, thisProject.value)) "2.11.12" else scalaVersion.value)
   )
 
 lazy val ioc = akaneProject("ioc", file("ioc"))
