@@ -9,9 +9,9 @@ import ws.kotonoha.akane.io.Charsets
 import ws.kotonoha.akane.parser.KnpTabFormatParser
 
 /**
- * @author eiennohito
- * @since 2014-11-07
- */
+  * @author eiennohito
+  * @since 2014-11-07
+  */
 object TreeUtil {
   import ws.kotonoha.akane.resources.FSPaths._
 
@@ -43,7 +43,8 @@ trait KnpTrees { self: Suite =>
     TreeUtil.tabTreeFromResource(res)(self.getClass.getClassLoader)
   }
 
-  def resJuman(res: String): JumanSequence = JumanUtil.jumanTableFromResource(res)(self.getClass.getClassLoader)
+  def resJuman(res: String): JumanSequence =
+    JumanUtil.jumanTableFromResource(res)(self.getClass.getClassLoader)
 }
 
 object JumanUtil {
