@@ -5,8 +5,7 @@ lazy val scalaPbVersion = "0.6.7"
 def pbScala(): Seq[Setting[_]] = {
   Def.settings(
     PB.targets in Compile := Seq(
-      scalapb.gen(flatPackage = true, javaConversions = true, grpc = true) -> (sourceManaged in Compile).value,
-      PB.gens.java -> (sourceManaged in Compile).value
+      scalapb.gen(flatPackage = true, grpc = true) -> (sourceManaged in Compile).value
     ),
     libraryDependencies ++= Seq(
       "com.trueaccord.scalapb" %% "scalapb-runtime" % scalaPbVersion % "protobuf"
