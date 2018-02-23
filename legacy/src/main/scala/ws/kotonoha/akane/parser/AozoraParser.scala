@@ -21,7 +21,6 @@ import ws.kotonoha.akane.ast._
 import java.nio.CharBuffer
 import collection.mutable.ListBuffer
 import ws.kotonoha.akane.ast.Image
-import annotation.tailrec
 import collection.immutable.HashSet
 import ws.kotonoha.akane.unicode.UnicodeUtil
 
