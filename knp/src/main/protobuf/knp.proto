@@ -8,7 +8,7 @@ import "juman.proto";
 
 message KnpTable {
   optional string comment = 1;
-  repeated juman.JumanLexeme lexemes = 2;
+  repeated juman.JumanMorpheme lexemes = 2;
   repeated Kihonku kihonkuInfo = 3;
   repeated Bunsetsu bunsetsuInfo = 4;
 }
@@ -16,13 +16,13 @@ message KnpTable {
 message Bunsetsu {
   required sint32 dependency = 1;
   required string dependencyType = 2;
-  repeated juman.JumanOption features = 3;
+  repeated juman.JumanFeature features = 3;
   required uint32 kihonkuCnt = 4;
 }
 
 message Kihonku {
   required sint32 dependency = 1;
   required string dependencyType = 2;
-  repeated juman.JumanOption features = 3;
+  repeated juman.JumanFeature features = 3;
   required uint32 lexemeCnt = 4;
 }

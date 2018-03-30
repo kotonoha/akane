@@ -16,7 +16,7 @@
 
 package ws.kotonoha.akane.analyzers.knp
 
-import ws.kotonoha.akane.analyzers.juman.{JumanOption, JumanPos}
+import ws.kotonoha.akane.analyzers.juman.{JumanFeature, JumanOption, JumanPos}
 import ws.kotonoha.akane.analyzers.knp.wire.KnpTable
 import ws.kotonoha.akane.parser.JumanPosSet
 
@@ -37,7 +37,7 @@ class TablePrinter(posSet: JumanPosSet) {
     apd.append(conjuation.name).append(" ").append(conjuation.num.toString).append(" ")
   }
 
-  def appendFeatures(apd: Appendable, features: Seq[JumanOption]) = {
+  def appendFeatures(apd: Appendable, features: Seq[JumanFeature]) = {
     for (f <- features) {
       apd.append("<")
       apd.append(f.key)
@@ -79,7 +79,7 @@ class TablePrinter(posSet: JumanPosSet) {
           apd.append(l.baseform).append(" ")
           appendPos(apd, l.posInfo)
           apd.append("NIL").append(" ")
-          appendFeatures(apd, l.options)
+          appendFeatures(apd, l.features)
           apd.append("\n")
         }
         lStart = lEnd

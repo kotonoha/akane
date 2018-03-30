@@ -2,9 +2,9 @@ package ws.eiennohito.nlp.tree
 
 import org.apache.commons.io.IOUtils
 import org.scalatest.Suite
-import ws.kotonoha.akane.analyzers.juman.{JumanConfig, JumanSequence, JumanSubprocess}
-import ws.kotonoha.akane.analyzers.knp.{TableConverter, TableWrapper}
+import ws.kotonoha.akane.analyzers.juman.{JumanConfig, JumanSentence, JumanSubprocess}
 import ws.kotonoha.akane.analyzers.knp.raw.OldAngUglyKnpTable
+import ws.kotonoha.akane.analyzers.knp.{TableConverter, TableWrapper}
 import ws.kotonoha.akane.io.Charsets
 import ws.kotonoha.akane.parser.KnpTabFormatParser
 
@@ -43,7 +43,7 @@ trait KnpTrees { self: Suite =>
     TreeUtil.tabTreeFromResource(res)(self.getClass.getClassLoader)
   }
 
-  def resJuman(res: String): JumanSequence =
+  def resJuman(res: String): JumanSentence =
     JumanUtil.jumanTableFromResource(res)(self.getClass.getClassLoader)
 }
 
@@ -52,7 +52,7 @@ object JumanUtil {
 
   val reader = JumanSubprocess.reader(new JumanConfig("", "utf-8", Nil))
 
-  def jumanTableFromResource(path: String)(implicit cl: ClassLoader): JumanSequence = {
+  def jumanTableFromResource(path: String)(implicit cl: ClassLoader): JumanSentence = {
     val res = cl.getResource(path)
     val o = for (in <- res.openStream().res) yield {
       reader.readFrom(in)

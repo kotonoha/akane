@@ -8,19 +8,19 @@ option java_package = "ws.kotonoha.akane.analyzers.juman";
 
 import "scalapb/scalapb.proto";
 
-message JumanSequence {
-  repeated JumanLexeme lexemes = 1;
+message JumanSentence {
+  repeated JumanMorpheme morphemes = 1;
+  optional string comment = 2;
 }
 
-message JumanLexeme {
+message JumanMorpheme {
   required string surface = 1;
   required string reading = 2;
   required string baseform = 3;
   required JumanPos posInfo = 4;
-
-  repeated JumanOption options = 5;
-
-  repeated JumanLexeme variants = 20;
+  repeated JumanFeature features = 5;
+  optional JumanStringPos string_pos = 6;
+  repeated JumanMorpheme variants = 20;
 }
 
 message JumanPos {
@@ -32,8 +32,15 @@ message JumanPos {
   required uint32 conjugation = 4;
 }
 
+message JumanStringPos {
+  required string pos = 1;
+  required string subpos = 2;
+  required string conj_type = 3;
+  required string conj_form = 4;
+}
 
-message JumanOption {
+
+message JumanFeature {
   required string key = 1;
   optional string value = 2;
 }

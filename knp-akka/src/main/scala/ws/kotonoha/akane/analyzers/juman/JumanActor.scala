@@ -58,7 +58,7 @@ object JumanActor {
     def ref: AnyRef
   }
   case class AnalysisFailure(ref: AnyRef) extends AnalysisResult
-  case class AnalysisSuccess(ref: AnyRef, seq: JumanSequence) extends AnalysisResult
+  case class AnalysisSuccess(ref: AnyRef, seq: JumanSentence) extends AnalysisResult
   case object RestartSubprocess
 }
 

@@ -16,13 +16,9 @@
 
 package ws.kotonoha.akane.analyzers.knp
 
-import ws.kotonoha.akane.analyzers.juman.{JumanLexeme, JumanOption, JumanPos, JumanText}
+import ws.kotonoha.akane.analyzers.juman._
 import ws.kotonoha.akane.analyzers.knp.wire.{Bunsetsu, Kihonku, KnpTable}
-import ws.kotonoha.akane.analyzers.knp.raw.{
-  OldAngUglyKnpTable => OldTable,
-  OldAndUglyBunsetsu => OldBunsetsu,
-  OldAndUglyKihonku => OldKihonku
-}
+import ws.kotonoha.akane.analyzers.knp.raw.{OldAndUglyBunsetsu => OldBunsetsu, OldAndUglyKihonku => OldKihonku, OldAngUglyKnpTable => OldTable}
 import ws.kotonoha.akane.analyzers.knp.raw.OldAndUglyKnpLexeme
 
 /**
@@ -34,7 +30,7 @@ class TableConverter(
     filterLexeme: Set[String],
     filterBunsetsu: Set[String],
     filterKihonku: Set[String]) {
-  final def transformFeatures(features: Seq[String], filter: Set[String]): Seq[JumanOption] = {
+  final def transformFeatures(features: Seq[String], filter: Set[String]): Seq[JumanFeature] = {
     if (filter.isEmpty) {
       transformWoFilter(features)
     } else {
@@ -42,23 +38,23 @@ class TableConverter(
     }
   }
 
-  final def transformWithFilter(features: Seq[String], filter: Set[String]): Seq[JumanOption] = {
+  final def transformWithFilter(features: Seq[String], filter: Set[String]): Seq[JumanFeature] = {
     features.flatMap { f =>
       val semi = f.indexOf(':')
       val key = if (semi == -1) f else f.substring(0, semi)
       if (filter.contains(key))
         Seq(
-          if (semi == -1) JumanOption(key, None)
-          else JumanOption(key, Some(f.substring(semi + 1, f.length))))
+          if (semi == -1) JumanFeature(key, None)
+          else JumanFeature(key, Some(f.substring(semi + 1, f.length))))
       else Seq.empty
     }
   }
 
-  final def transformWoFilter(features: Seq[String]): Seq[JumanOption] = {
+  final def transformWoFilter(features: Seq[String]): Seq[JumanFeature] = {
     features.map { f =>
       val semi = f.indexOf(':')
-      if (semi == -1) JumanOption(f, None)
-      else JumanOption(f.substring(0, semi), Some(f.substring(semi + 1, f.length)))
+      if (semi == -1) JumanFeature(f, None)
+      else JumanFeature(f.substring(0, semi), Some(f.substring(semi + 1, f.length)))
     }
   }
 
@@ -80,8 +76,8 @@ class TableConverter(
     )
   }
 
-  final def fromLexeme(lexeme: OldAndUglyKnpLexeme): JumanLexeme = {
-    JumanLexeme(
+  final def fromLexeme(lexeme: OldAndUglyKnpLexeme): JumanMorpheme = {
+    JumanMorpheme(
       surface = lexeme.surface,
       reading = lexeme.reading,
       baseform = lexeme.dicForm,
@@ -91,7 +87,7 @@ class TableConverter(
         category = lexeme.pos.category,
         conjugation = lexeme.pos.conjugation
       ),
-      options =
+      features =
         (JumanText.parseOptionsInner(lexeme.info, 0, lexeme.info.length) ++ transformFeatures(
           lexeme.tags,
           filterLexeme)).distinct

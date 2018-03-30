@@ -18,7 +18,7 @@ package ws.kotonoha.akane.analyzers.knp
 
 import ws.eiennohito.nlp.util.ArrayLexemeAccess
 import ws.eiennohito.utils.Foreach
-import ws.kotonoha.akane.analyzers.juman.{JumanLexeme, JumanOption}
+import ws.kotonoha.akane.analyzers.juman.{JumanFeature, JumanLexeme, JumanMorpheme, JumanOption}
 import ws.kotonoha.akane.analyzers.knp.wire.{Bunsetsu, Kihonku, KnpTable}
 
 import scala.collection.mutable.ArrayBuffer
@@ -119,17 +119,17 @@ object TableWrapper {
 trait OptionFeatures extends FeatureAccess {
   override def valueOfFeature(name: String) = optionSequence.find(_.key == name).flatMap(_.value)
   override def featureExists(name: String) = optionSequence.exists(_.key == name)
-  protected def optionSequence: Seq[JumanOption]
+  protected def optionSequence: Seq[JumanFeature]
   override def featureKeys = optionSequence.map(_.key)
 }
 
-final class LexemeWrapper(lex: JumanLexeme) extends LexemeApi with OptionFeatures {
+final class LexemeWrapper(lex: JumanMorpheme) extends LexemeApi with OptionFeatures {
   override def surface = lex.surface
   override def reading = lex.reading
   override def dicForm = lex.baseform
   override def pos = lex.posInfo
   override def canonicForm() = valueOfFeature("代表表記").getOrElse(s"$dicForm/$reading")
-  override protected def optionSequence = lex.options
+  override protected def optionSequence = lex.features
 
   override def toString = surface
 }

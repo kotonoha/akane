@@ -35,7 +35,7 @@ object RadicalDb {
       val kanji = l.substring(0, pos).trim
       val rest = l.substring(pos + 1).split(" ").toSeq.map(_.trim).filter(x => x.length > 0)
       kanji -> rest
-    } toMap
+    }.toMap
   }
 
   /**

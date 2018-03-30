@@ -19,10 +19,14 @@ package ws.kotonoha.akane.parser
 import com.typesafe.scalalogging.StrictLogging
 import ws.kotonoha.akane.ast._
 import java.nio.CharBuffer
+
 import collection.mutable.ListBuffer
 import ws.kotonoha.akane.ast.Image
+
 import collection.immutable.HashSet
 import ws.kotonoha.akane.unicode.UnicodeUtil
+
+import scala.annotation.tailrec
 
 /**
   * @author eiennohito

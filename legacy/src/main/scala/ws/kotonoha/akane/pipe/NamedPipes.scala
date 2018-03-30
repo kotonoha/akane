@@ -86,7 +86,6 @@ object WindowsNamedPipes extends PipeGenerator {
     val fullname = directory + pipename
     val ptr = Pointer.pointerToCString(fullname)
     val data = Kernel32.CreateNamedPipeA(ptr, 3, 0, 255, 4096, 4096, 5000, Pointer.NULL)
-    fullname
     WindowsPipe(fullname, data)
   }
 }

@@ -20,8 +20,8 @@ import java.io.BufferedReader
 
 import org.apache.commons.lang3.StringUtils
 import ws.eiennohito.utils.Foreach
-import ws.kotonoha.akane.analyzers.juman.{JumanOption, JumanPos}
-import ws.kotonoha.akane.analyzers.jumanpp.wire.{Lattice, LatticeNode}
+import ws.kotonoha.akane.analyzers.juman.{JumanFeature, JumanPos, JumanStringPos}
+import ws.kotonoha.akane.analyzers.jumanpp.wire.{Lattice, LatticeNode, ScoreDetail}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -50,48 +50,54 @@ class JppLatticeParser {
     val pos2 = splitted(12)
     val pos3 = splitted(14)
     val pos4 = splitted(16)
+    val strPos1 = splitted(9)
+    val strPos2 = splitted(11)
+    val strPos3 = splitted(13)
+    val strPos4 = splitted(15)
     val features = splitted(17)
     val allFeatures = StringUtils.split(features, '|')
 
     var fscore = Float.NaN
-    var lmscore = Float.NaN
+    var langModelScore = Float.NaN
     var anscore = Float.NaN
     var rank: Seq[Int] = Nil
-    var rest = new ArrayBuffer[JumanOption]()
+    var rest = new ArrayBuffer[JumanFeature]()
 
     Foreach.fori(0, allFeatures.length) { i =>
       val f = allFeatures(i)
       val semi = StringUtils.indexOf(f, ':')
       if (semi == -1) {
-        rest += JumanOption(f, None)
+        rest += JumanFeature(f, None)
       } else {
         val key = f.substring(0, semi)
         val other = f.substring(semi + 1)
         key match {
           case "特徴量スコア"   => fscore = other.toFloat
-          case "言語モデルスコア" => lmscore = other.toFloat
+          case "言語モデルスコア" => langModelScore = other.toFloat
           case "形態素解析スコア" => anscore = other.toFloat
           case "ランク"      => rank = intList(other, ';')
-          case _          => rest += JumanOption(key, Some(other))
+          case _          => rest += JumanFeature(key, Some(other))
         }
       }
     }
 
+    val nranks = rank.size
+
     LatticeNode(
-      nodeId,
-      prev,
-      tokStart,
-      tokEnd,
-      surfForm,
-      canon,
-      reading,
-      midasi,
-      JumanPos(pos1.toInt, pos2.toInt, pos3.toInt, pos4.toInt),
-      fscore,
-      lmscore,
-      anscore,
-      rank,
-      rest
+      nodeId = nodeId,
+      prevNodes = prev,
+      startIndex = tokStart,
+      endIndex = tokEnd + 1,
+      surface = surfForm,
+      canonical = canon,
+      reading = reading,
+      dicform = midasi,
+      pos = JumanPos(pos1.toInt, pos2.toInt, pos3.toInt, pos4.toInt),
+      stringPos = Some(JumanStringPos(strPos1, strPos2, strPos3, strPos4)),
+      cumulativeScores = Seq.fill(nranks)(anscore),
+      scoreDetails = Seq.fill(nranks)(ScoreDetail(fscore, if (langModelScore.isNaN) Seq.empty else Seq(langModelScore))),
+      ranks = rank,
+      features = rest
     )
   }
 

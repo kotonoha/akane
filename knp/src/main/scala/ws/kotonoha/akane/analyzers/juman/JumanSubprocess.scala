@@ -29,8 +29,8 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.util.Success
 
-trait JumanAnalyzer extends SyncAnalyzer[String, JumanSequence]
-trait AsyncJumanAnalyzer extends AsyncAnalyzer[String, JumanSequence]
+trait JumanAnalyzer extends SyncAnalyzer[String, JumanSentence]
+trait AsyncJumanAnalyzer extends AsyncAnalyzer[String, JumanSentence]
 
 /**
   * Actually this is a blocking analyzer using juman in a subprocess mode
@@ -55,7 +55,7 @@ object JumanSubprocess extends StrictLogging {
     new Impl(config)
   }
 
-  def reader(cfg: JumanConfig): FromStream[JumanSequence] = JumanText.reader(cfg.encoding)
+  def reader(cfg: JumanConfig): FromStream[JumanSentence] = JumanText.reader(cfg.encoding)
 
   def writer(cfg: JumanConfig): ToStream[String] = new ToStream[String] {
     val eol = 0x0A //End of line
@@ -69,18 +69,18 @@ object JumanSubprocess extends StrictLogging {
   }
 
   private final class Impl(cfg: JumanConfig)
-      extends SpawnedProcessAnalyzer[String, JumanSequence](process(cfg))(writer(cfg), reader(cfg))
+      extends SpawnedProcessAnalyzer[String, JumanSentence](process(cfg))(writer(cfg), reader(cfg))
       with JumanAnalyzer
 }
 
 object JumanText {
 
-  def reader(enc: String) = new FromStream[JumanSequence] {
+  def reader(enc: String) = new FromStream[JumanSentence] {
     private val cs = Charset.forName(enc)
 
     override def readFrom(s: InputStream) =
       try {
-        val lexemes = new mutable.ArrayBuffer[JumanLexeme]
+        val lexemes = new mutable.ArrayBuffer[JumanMorpheme]
         val reader = new BufferedReader(new InputStreamReader(s, cs))
         var ok = true
         while (ok) {
@@ -95,14 +95,14 @@ object JumanText {
             } else lexemes += JumanText.parseLine(line, 0, line.length)
           }
         }
-        Success(JumanSequence(lexemes.result()))
+        Success(JumanSentence(lexemes.result()))
       } catch {
         case e: IOException => throw e
         case e: Exception   => scala.util.Failure(e)
       }
   }
 
-  def parseOptions(input: CharSequence, start: Int, end: Int): Seq[JumanOption] = {
+  def parseOptions(input: CharSequence, start: Int, end: Int): Seq[JumanFeature] = {
     val sub = input.subSequence(start, end)
 
     var stchr = StringUtils.indexOf(sub, '"', 0)
@@ -114,9 +114,9 @@ object JumanText {
     parseOptionsInner(sub, stchr, theend)
   }
 
-  def parseOptionsInner(sub: CharSequence, start: Int, theend: Int): Seq[JumanOption] = {
+  def parseOptionsInner(sub: CharSequence, start: Int, theend: Int): Seq[JumanFeature] = {
     var stchr = start
-    val bldr = new ListBuffer[JumanOption]
+    val bldr = new ListBuffer[JumanFeature]
     var stend = StringUtils.indexOf(sub, ' ', stchr)
     if (stend == -1) {
       stend = theend
@@ -125,9 +125,9 @@ object JumanText {
     while (stchr < theend) {
       val semi = StringUtils.indexOf(sub, ':', stchr)
       if (semi == -1 || semi >= stend) {
-        bldr += JumanOption(key = sub.subSequence(stchr, stend).toString)
+        bldr += JumanFeature(key = sub.subSequence(stchr, stend).toString)
       } else {
-        bldr += JumanOption(
+        bldr += JumanFeature(
           key = sub.subSequence(stchr, semi).toString,
           value = Some(sub.subSequence(semi + 1, stend).toString)
         )
@@ -144,7 +144,7 @@ object JumanText {
     bldr.result()
   }
 
-  def parseLine(seq: CharSequence, start: Int, end: Int): JumanLexeme = {
+  def parseLine(seq: CharSequence, start: Int, end: Int): JumanMorpheme = {
     val end0 = start
     val end1 = StringUtils.indexOf(seq, ' ', end0 + 1)
     val end2 = StringUtils.indexOf(seq, ' ', end1 + 1)
@@ -162,7 +162,7 @@ object JumanText {
       end11 = end
     }
 
-    JumanLexeme(
+    JumanMorpheme(
       surface = seq.subSequence(end0, end1).toString,
       reading = seq.subSequence(end1 + 1, end2).toString,
       baseform = seq.subSequence(end2 + 1, end3).toString,

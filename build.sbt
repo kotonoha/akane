@@ -1,14 +1,14 @@
 import sbt.internal.LoadedBuild
 
-lazy val scalaPbVersion = "0.6.7"
+lazy val scalaPbVersion = "0.7.0"
 
 def pbScala(): Seq[Setting[_]] = {
   Def.settings(
-    PB.targets in Compile := Seq(
+    Compile / PB.targets := Seq(
       scalapb.gen(flatPackage = true, grpc = true) -> (sourceManaged in Compile).value
     ),
     libraryDependencies ++= Seq(
-      "com.trueaccord.scalapb" %% "scalapb-runtime" % scalaPbVersion % "protobuf"
+      "com.thesamet.scalapb" %% "scalapb-runtime" % scalaPbVersion % "protobuf"
     )
   )
 }
@@ -109,7 +109,7 @@ def isRoot(bld: LoadedBuild, proj: ResolvedProject): Boolean = {
 
 lazy val akane = (project in file("."))
   .settings(akaneSettings)
-  .aggregate(ioc, legacy, knp, util, macros, knpAkka, blobdb, akka, dic, kytea, misc, `jmdict-lucene`)
+  .aggregate(ioc, legacy, knp, util, macros, knpAkka, blobdb, akka, dic, kytea, misc, `jmdict-lucene`, jumanppGrpc)
   .settings(
     publishArtifact := false,
     (scalaVersion in ThisBuild) := (if (isRoot(loadedBuild.value, thisProject.value)) "2.11.12" else scalaVersion.value)
@@ -169,6 +169,15 @@ lazy val macros = akaneProject("macros", file("macros"))
 lazy val knpAkka = akaneProject("knp-akka", file("knp-akka"))
   .settings(akkaDeps)
   .dependsOn(knp, akka, testkit % Test)
+
+lazy val jumanppGrpc = akaneProject("jumanpp-grpc", file("jumanpp-grpc"))
+    .settings(pbScala())
+    .settings(
+      libraryDependencies ++= Seq(
+        "com.thesamet.scalapb" %% "scalapb-runtime-grpc" % scalaPbVersion
+      )
+    )
+    .dependsOn(knp, testkit % Test)
 
 lazy val blobdb = akaneProject("blobdb", file("blobdb"))
   .dependsOn(util)

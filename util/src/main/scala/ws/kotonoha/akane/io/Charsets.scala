@@ -23,5 +23,5 @@ import java.nio.charset.{Charset, StandardCharsets}
   * @since 2016/07/12
   */
 object Charsets {
-  val utf8: Charset = StandardCharsets.UTF_8
+  def utf8: Charset = StandardCharsets.UTF_8
 }

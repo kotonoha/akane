@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package jumanpp.grpc;
+
+import "lattice_dump.proto";
+import "juman.proto";
+import "jumanpp.proto";
+
+option java_package = "ws.kotonoha.akane.analyzers.jumanpp.grpc";
+
+enum RequestType {
+    Normal = 0;
+    PartialAnnotation = 1;
+}
+
+message AnalysisRequest {
+    string key = 1;
+    string sentence = 2;
+    RequestType type = 3;
+    JumanppConfig config = 4;
+    int32 top_n = 5;
+}
+
+message JumanppConfig {
+    int32 local_beam = 1;
+    int32 global_beam_right = 2;
+    int32 global_beam_left = 3;
+    int32 global_beam_check = 4;
+    bool ignore_rnn = 5;
+}
+
+
+service JumanppJumandic {
+    rpc DefaultConfig(JumanppConfig) returns (JumanppConfig) {}
+    rpc Juman (AnalysisRequest) returns (juman.JumanSentence) {}
+    rpc JumanStream (stream AnalysisRequest) returns (stream juman.JumanSentence) {}
+    rpc TopN (AnalysisRequest) returns (juman.Lattice) {}
+    rpc TopNStream (stream AnalysisRequest) returns (stream juman.Lattice) {}
+    rpc LatticeDump (AnalysisRequest) returns (jumanpp.dump.LatticeDump) {}
+    rpc LatticeDumpStream (stream AnalysisRequest) returns (stream jumanpp.dump.LatticeDump) {}
+    rpc LatticeDumpWithFeatures(AnalysisRequest) returns (jumanpp.dump.LatticeDump) {}
+    rpc LatticeDumpWithFeaturesStream(stream AnalysisRequest) returns (stream jumanpp.dump.LatticeDump) {}
+}
