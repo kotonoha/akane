@@ -11,11 +11,10 @@ import scala.concurrent._
 import scala.util.Try
 
 case class JumanppGrpcConfig(
-  executable: Path,
-  config: Path,
-  numThreads: Int
+    executable: Path,
+    config: Path,
+    numThreads: Int
 )
-
 
 object JumanppGrpcProcess {
 
@@ -32,7 +31,7 @@ object JumanppGrpcProcess {
     try {
       while (continue) {
         stdin.read() match {
-          case -1 => return scala.util.Failure(new Exception("unexpected eof"))
+          case -1   => return scala.util.Failure(new Exception("unexpected eof"))
           case '\n' => return scala.util.Success(port)
           case x if x >= '0' && x <= '9' =>
             port *= 10
@@ -113,7 +112,8 @@ class JumanppGrpcProcess(process: Process, val port: Int) extends Closeable {
     override def run(): Unit = {
       val reader = new InputStreamReader(stderr, StandardCharsets.UTF_8)
       val buffReader = new BufferedReader(reader)
-      val logger = LoggerFactory.getLogger("ws.kotonoha.akane.analyzers.jumanpp.grpc.process.Stderr")
+      val logger =
+        LoggerFactory.getLogger("ws.kotonoha.akane.analyzers.jumanpp.grpc.process.Stderr")
 
       var line = ""
       while ({
@@ -131,7 +131,8 @@ class JumanppGrpcProcess(process: Process, val port: Int) extends Closeable {
     override def run(): Unit = {
       val reader = new InputStreamReader(stderr, StandardCharsets.UTF_8)
       val buffReader = new BufferedReader(reader)
-      val logger = LoggerFactory.getLogger("ws.kotonoha.akane.analyzers.jumanpp.grpc.process.Stdout")
+      val logger =
+        LoggerFactory.getLogger("ws.kotonoha.akane.analyzers.jumanpp.grpc.process.Stdout")
 
       var line = ""
       while ({

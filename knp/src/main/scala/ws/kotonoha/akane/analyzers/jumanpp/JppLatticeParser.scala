@@ -95,7 +95,8 @@ class JppLatticeParser {
       pos = JumanPos(pos1.toInt, pos2.toInt, pos3.toInt, pos4.toInt),
       stringPos = Some(JumanStringPos(strPos1, strPos2, strPos3, strPos4)),
       cumulativeScores = Seq.fill(nranks)(anscore),
-      scoreDetails = Seq.fill(nranks)(ScoreDetail(fscore, if (langModelScore.isNaN) Seq.empty else Seq(langModelScore))),
+      scoreDetails = Seq.fill(nranks)(
+        ScoreDetail(fscore, if (langModelScore.isNaN) Seq.empty else Seq(langModelScore))),
       ranks = rank,
       features = rest
     )

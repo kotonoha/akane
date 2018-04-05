@@ -18,7 +18,11 @@ package ws.kotonoha.akane.analyzers.knp
 
 import ws.kotonoha.akane.analyzers.juman._
 import ws.kotonoha.akane.analyzers.knp.wire.{Bunsetsu, Kihonku, KnpTable}
-import ws.kotonoha.akane.analyzers.knp.raw.{OldAndUglyBunsetsu => OldBunsetsu, OldAndUglyKihonku => OldKihonku, OldAngUglyKnpTable => OldTable}
+import ws.kotonoha.akane.analyzers.knp.raw.{
+  OldAndUglyBunsetsu => OldBunsetsu,
+  OldAndUglyKihonku => OldKihonku,
+  OldAngUglyKnpTable => OldTable
+}
 import ws.kotonoha.akane.analyzers.knp.raw.OldAndUglyKnpLexeme
 
 /**
