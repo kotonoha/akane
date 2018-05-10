@@ -19,7 +19,7 @@ class JumanAnalyzerSpec extends FreeSpec with Matchers with Inside {
           val obj = rdr.readFrom(is)
           inside(obj) {
             case Success(x) =>
-              val lexs = x.lexemes
+              val lexs = x.morphemes
               lexs should have length 4
               lexs.head should have (
                 'surface ("俺"),
@@ -36,7 +36,7 @@ class JumanAnalyzerSpec extends FreeSpec with Matchers with Inside {
           val obj = rdr.readFrom(is)
           inside(obj) {
             case Success(x) =>
-              val lexs = x.lexemes
+              val lexs = x.morphemes
               lexs should have length 5
               lexs.head.variants should have length 2
             case Failure(x) => throw x

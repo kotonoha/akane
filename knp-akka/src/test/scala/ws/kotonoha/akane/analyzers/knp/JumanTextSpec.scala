@@ -47,7 +47,7 @@ class JumanTextSpec extends FreeSpec with Matchers {
         lex.reading shouldBe "のって"
         lex.baseform shouldBe "乗る"
         lex.posInfo shouldBe JumanPos(2, 0, 10, 14)
-        lex.options should have length 3
+        lex.features should have length 3
       }
     }
   }
