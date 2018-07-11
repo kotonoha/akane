@@ -13,6 +13,7 @@ import scala.util.Try
 case class JumanppGrpcConfig(
     executable: Path,
     config: Path,
+  flags: Seq[String],
     numThreads: Int
 )
 
@@ -31,7 +32,9 @@ object JumanppGrpcProcess {
     try {
       while (continue) {
         stdin.read() match {
-          case -1   => return scala.util.Failure(new Exception("unexpected eof"))
+          case -1   =>
+            val stderr = proc.getErrorStream
+            return scala.util.Failure(new Exception("unexpected eof"))
           case '\n' => return scala.util.Success(port)
           case x if x >= '0' && x <= '9' =>
             port *= 10
@@ -84,8 +87,12 @@ object JumanppGrpcProcess {
     cmd.add(s"--config=${config.config}")
     cmd.add(s"--threads=${config.numThreads}")
     cmd.add("--port=0")
+    for (f <- config.flags) {
+      cmd.add(f)
+    }
 
     val pb = new ProcessBuilder(cmd)
+    pb.redirectError(ProcessBuilder.Redirect.INHERIT)
     pb.start()
   }
 
