@@ -25,8 +25,8 @@ import org.scalatest.{Matchers, FreeSpec}
 
 class InfoExtractorTest extends FreeSpec with Matchers {
   "mecab info extractor" - {
-    val mp = new MecabParser()
     "extracts an info from a noun" ignore {
+      val mp = new MecabParser()
       val n = mp.parse("猫")
       n should have length (1)
       val i = InfoExtractor.parseInfo(n.head)

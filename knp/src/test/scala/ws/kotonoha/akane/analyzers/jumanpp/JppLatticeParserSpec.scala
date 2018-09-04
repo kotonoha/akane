@@ -36,7 +36,7 @@ class JppLatticeParserSpec extends FreeSpec with Matchers {
     "parses example1" in {
       val raw = input("jpp/example1.jpp")
       val lattice = parser.parse(raw)
-      val node = lattice.nodes.find(_.canonic == "入る/はいる").get
+      val node = lattice.nodes.find(_.canonical == "入る/はいる").get
       node should have (
         'nodeId (90),
         'surface ("はいる")
