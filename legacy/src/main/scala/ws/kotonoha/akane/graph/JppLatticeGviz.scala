@@ -62,8 +62,8 @@ class JppLatticeGviz(writer: Appendable) {
         val lid = s"n_$prev"
         val rid = s"n_$id"
         val common = left match {
-          case None    => n.rank.toSet
-          case Some(l) => l.rank.toSet.intersect(n.rank.toSet)
+          case None    => n.ranks.toSet
+          case Some(l) => l.ranks.toSet.intersect(n.ranks.toSet)
         }
 
         val sorted = common.toSeq.sorted
@@ -96,7 +96,7 @@ class JppLatticeGviz(writer: Appendable) {
       }
 
       val repr =
-        s"""label=<<table><tr><td border="0">${n.surface}</td><td border="0">${n.canonic}</td></tr><tr><td border="0">${pos.name}</td><td border="0">$pform</td></tr></table>>"""
+        s"""label=<<table><tr><td border="0">${n.surface}</td><td border="0">${n.canonical}</td></tr><tr><td border="0">${pos.name}</td><td border="0">$pform</td></tr></table>>"""
       println(s"$ids [$repr]")
     }
   }
