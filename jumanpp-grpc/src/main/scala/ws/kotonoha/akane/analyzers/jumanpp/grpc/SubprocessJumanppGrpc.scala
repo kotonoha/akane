@@ -6,6 +6,7 @@ import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
+import com.typesafe.scalalogging.StrictLogging
 import org.apache.commons.io.IOUtils
 import org.slf4j.LoggerFactory
 
@@ -22,7 +23,7 @@ case class JumanppGrpcConfig(
 
 class JumanppException(msg: String) extends Exception(msg)
 
-object JumanppGrpcProcess {
+object JumanppGrpcProcess extends StrictLogging {
 
   /**
     * Read a port number from Juman++ gRPC process input stream.
@@ -98,6 +99,10 @@ object JumanppGrpcProcess {
     for (f <- config.flags) {
       cmd.add(f)
     }
+
+    import scala.collection.JavaConverters._
+
+    logger.debug(s"starting jumanpp-grpc: ${cmd.asScala.mkString(" ")}")
 
     val pb = new ProcessBuilder(cmd)
     pb.redirectError(ProcessBuilder.Redirect.INHERIT)
