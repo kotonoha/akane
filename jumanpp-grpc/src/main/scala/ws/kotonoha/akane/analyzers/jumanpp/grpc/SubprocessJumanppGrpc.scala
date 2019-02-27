@@ -3,17 +3,19 @@ package ws.kotonoha.akane.analyzers.jumanpp.grpc
 import java.io.{BufferedReader, Closeable, InputStreamReader}
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
 import org.slf4j.LoggerFactory
 
 import scala.concurrent._
+import scala.concurrent.duration.FiniteDuration
 import scala.util.Try
 
 case class JumanppGrpcConfig(
     executable: Path,
     config: Path,
-  flags: Seq[String],
+    flags: Seq[String],
     numThreads: Int
 )
 
@@ -22,6 +24,7 @@ object JumanppGrpcProcess {
   /**
     * Read a port number from Juman++ gRPC process input stream.
     * This function is unsafe because it can block forever if there is no input on stdin.
+    *
     * @param proc
     * @return
     */
@@ -32,7 +35,7 @@ object JumanppGrpcProcess {
     try {
       while (continue) {
         stdin.read() match {
-          case -1   =>
+          case -1 =>
             val stderr = proc.getErrorStream
             return scala.util.Failure(new Exception("unexpected eof"))
           case '\n' => return scala.util.Success(port)
@@ -51,11 +54,13 @@ object JumanppGrpcProcess {
   /**
     * Read the port in another thread on the execution context,
     * handle the indefinite blocking with timeouts.
+    *
     * @param proc
     * @param ec
     * @return
     */
-  def safeReadPort(proc: Process)(implicit ec: ExecutionContext): Try[Int] = {
+  def safeReadPort(proc: Process, timeout: FiniteDuration = FiniteDuration(10, TimeUnit.SECONDS))(
+      implicit ec: ExecutionContext): Try[Int] = {
     val p = Promise[Int]
 
     ec.execute(new Runnable {
@@ -66,8 +71,7 @@ object JumanppGrpcProcess {
 
     try {
       val future = p.future
-      import scala.concurrent.duration._
-      Await.ready(future, 1.second)
+      Await.ready(future, timeout)
       future.value.get
     } catch {
       case e: TimeoutException =>
