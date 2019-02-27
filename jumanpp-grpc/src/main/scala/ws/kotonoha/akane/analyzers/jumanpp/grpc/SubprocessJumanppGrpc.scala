@@ -6,6 +6,7 @@ import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
+import org.apache.commons.io.IOUtils
 import org.slf4j.LoggerFactory
 
 import scala.concurrent._
@@ -18,6 +19,8 @@ case class JumanppGrpcConfig(
     flags: Seq[String],
     numThreads: Int
 )
+
+class JumanppException(msg: String) extends Exception(msg)
 
 object JumanppGrpcProcess {
 
@@ -37,18 +40,19 @@ object JumanppGrpcProcess {
         stdin.read() match {
           case -1 =>
             val stderr = proc.getErrorStream
-            return scala.util.Failure(new Exception("unexpected eof"))
+            val content = IOUtils.toString(stderr, StandardCharsets.UTF_8)
+            return scala.util.Failure(new JumanppException("unexpected eof\n" + content))
           case '\n' => return scala.util.Success(port)
           case x if x >= '0' && x <= '9' =>
             port *= 10
             port += (x - '0')
-          case x => return scala.util.Failure(new Exception(s"unexpected char=$x, curport=$port"))
+          case x => return scala.util.Failure(new JumanppException(s"unexpected char=$x, curport=$port"))
         }
       }
     } catch {
       case e: Exception => return scala.util.Failure(e)
     }
-    throw new Exception("unreachable")
+    throw new JumanppException("unreachable")
   }
 
   /**
